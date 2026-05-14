@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://divomni.org/aep/schemas/source.schema.json",
+  "title": "AEP Source",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "title",
+    "source_type",
+    "provenance_strength",
+    "location",
+    "limits",
+    "created_at"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^src:[A-Za-z0-9._:-]+$"
+    },
+    "type": {
+      "const": "Source"
+    },
+    "title": {
+      "type": "string"
+    },
+    "source_type": {
+      "enum": [
+        "user_artifact",
+        "official_spec",
+        "primary_source",
+        "secondary_source",
+        "runtime_output",
+        "inference_note",
+        "other"
+      ]
+    },
+    "provenance_strength": {
+      "enum": [
+        "strong",
+        "medium",
+        "weak",
+        "unknown"
+      ]
+    },
+    "location": {
+      "type": "object"
+    },
+    "limits": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

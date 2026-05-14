@@ -1,0 +1,72 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aep-reference"
+version = "0.4.0a1"
+description = "AEP — Agent Evidence Packet — portable, schema-validated, content-addressed file format for AI agent memory. Reference implementation."
+readme = "README.md"
+license = { file = "LICENSE" }
+authors = [
+    { name = "Shadow", email = "shadowmonkey@x.com" },
+]
+maintainers = [
+    { name = "Shadow", email = "shadowmonkey@x.com" },
+]
+requires-python = ">=3.10"
+keywords = [
+    "aep",
+    "agent-evidence-packet",
+    "agent-memory",
+    "provenance",
+    "claim-validation",
+    "json-ld",
+    "ro-crate",
+    "ai-safety",
+    "content-addressed",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "Topic :: Text Processing :: Markup",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+]
+dependencies = []
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/OnePunchForAll/AEP"
+Specification = "https://github.com/OnePunchForAll/AEP/blob/main/spec/AEP_v0_4_SPEC.md"
+Issues = "https://github.com/OnePunchForAll/AEP/issues"
+"X / Twitter" = "https://x.com/ShadowMonkeyMan"
+
+[project.scripts]
+aep-validate = "aep.validate:main"
+aep-validate-v0_4 = "aep.validate_v0_4:main"
+aep-convert-divomni-lesson = "aep.convert_divomni_lesson:main"
+aep-transition = "aep.transition_parser:main"
+
+[tool.setuptools]
+package-dir = { "" = "src" }
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v --tb=short"

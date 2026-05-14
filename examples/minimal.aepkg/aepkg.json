@@ -1,0 +1,26 @@
+{
+  "aep_version": "0.3",
+  "packet_id": "aepkg:minimal-example",
+  "title": "Minimal AEP Example",
+  "created_at": "2026-05-14T00:00:00Z",
+  "created_by": "divomni-reference-generator",
+  "profile": "aep:0.3/minimal-jsonl",
+  "canonical_files": [
+    "data/sources.jsonl",
+    "data/spans.jsonl",
+    "data/claims.jsonl",
+    "data/relations.jsonl",
+    "ops/events.jsonl",
+    "reviews/reviews.jsonl",
+    "validations/runs.jsonl"
+  ],
+  "extensions": {
+    "jsonld_context": "future",
+    "rdf_projection": "future",
+    "signed_receipts": "future"
+  },
+  "integrity": {
+    "algorithm": "sha256",
+    "state_hash": "computed-by-validator"
+  }
+}

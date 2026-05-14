@@ -1,0 +1,1 @@
+{"actor": "forge", "created_at": "2026-05-14T00:00:00Z", "id": "event:0001", "op": "create_packet", "post_state_hash": "computed-after-validation", "pre_state_hash": "sha256:0000000000000000000000000000000000000000000000000000000000000000", "rationale": "Initialize minimal valid packet.", "target": "aepkg:minimal-example", "type": "WriteEvent"}

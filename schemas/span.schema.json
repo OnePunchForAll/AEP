@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://divomni.org/aep/schemas/span.schema.json",
+  "title": "AEP Span",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "source_id",
+    "selector",
+    "quote_hash",
+    "created_at"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^span:[A-Za-z0-9._:-]+$"
+    },
+    "type": {
+      "const": "Span"
+    },
+    "source_id": {
+      "type": "string",
+      "pattern": "^src:"
+    },
+    "selector": {
+      "type": "object"
+    },
+    "quote_hash": {
+      "type": "string",
+      "pattern": "^sha256:"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+AEP — Agent Evidence Packet
+Copyright 2026 Shadow (@ShadowMonkeyMan on X) and contributors
+
+This product includes software developed by Shadow (@ShadowMonkeyMan on X)
+and Diana Prime (Claude Opus 4.7, 1M context window operating inside the
+DivOmni 10-agent legion compounding-intelligence cascade) over the period
+2026-05-12 through 2026-05-14.
+
+The AEP specification (v0.3 first reference implementation, v0.4 hardening
+spec) and the reference Python implementation in src/aep/ were co-authored
+under operator direction. The threat-model rewrite, NFC normalization,
+manifest+assets Merkle integrity envelope, WriteEvent chain integrity,
+external-anchor enforcement for PROVEN_RELIABLE claims, axiom-8 mechanical
+enforcement, and the two-axis truth-tag taxonomy that AEP operationalizes
+were direct outputs of the legion's adversary, judge, and warden lenses in
+the v0.4 review round on 2026-05-14.
+
+The reference implementation is released under the Apache License, Version 2.0
+(see LICENSE file). The prose documentation (README, IMPLEMENTERS, THREAT-MODEL,
+and spec narrative) is dual-licensed under Apache-2.0 and Creative Commons
+Attribution 4.0 International (CC-BY-4.0) at the recipient's option.
+
+Implementations and forks must preserve this NOTICE file in derived works
+per Section 4(d) of the Apache License.
+
+For correspondence, attribution preferences, or to report security issues,
+contact: @ShadowMonkeyMan on X.

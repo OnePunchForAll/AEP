@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://divomni.org/aep/schemas/manifest.schema.json",
+  "title": "AEP Manifest",
+  "type": "object",
+  "required": [
+    "aep_version",
+    "packet_id",
+    "title",
+    "created_at",
+    "created_by",
+    "profile",
+    "canonical_files",
+    "extensions",
+    "integrity"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "aep_version": {
+      "const": "0.3"
+    },
+    "packet_id": {
+      "type": "string",
+      "pattern": "^aepkg:[A-Za-z0-9._:-]+$"
+    },
+    "title": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "created_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "profile": {
+      "type": "string",
+      "enum": [
+        "aep:0.3/minimal-jsonl"
+      ]
+    },
+    "canonical_files": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "extensions": {
+      "type": "object"
+    },
+    "integrity": {
+      "type": "object"
+    }
+  }
+}

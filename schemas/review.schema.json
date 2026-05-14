@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://divomni.org/aep/schemas/review.schema.json",
+  "title": "AEP Review",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "reviewer_agent",
+    "review_tier",
+    "decision",
+    "basis",
+    "findings",
+    "created_at"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^review:"
+    },
+    "type": {
+      "const": "Review"
+    },
+    "reviewer_agent": {
+      "type": "string"
+    },
+    "review_tier": {
+      "type": "string",
+      "pattern": "^R[1-4]$"
+    },
+    "decision": {
+      "enum": [
+        "pass",
+        "warn",
+        "block",
+        "defer"
+      ]
+    },
+    "basis": {
+      "type": "array"
+    },
+    "findings": {
+      "type": "array"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

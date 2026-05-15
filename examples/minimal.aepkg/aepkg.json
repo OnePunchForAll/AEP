@@ -1,10 +1,5 @@
 {
-  "aep_version": "0.3",
-  "packet_id": "aepkg:minimal-example",
-  "title": "Minimal AEP Example",
-  "created_at": "2026-05-14T00:00:00Z",
-  "created_by": "divomni-reference-generator",
-  "profile": "aep:0.3/minimal-jsonl",
+  "aep_version": "0.5",
   "canonical_files": [
     "data/sources.jsonl",
     "data/spans.jsonl",
@@ -14,13 +9,17 @@
     "reviews/reviews.jsonl",
     "validations/runs.jsonl"
   ],
-  "extensions": {
-    "jsonld_context": "future",
-    "rdf_projection": "future",
-    "signed_receipts": "future"
-  },
+  "created_at": "2026-05-14T12:00:00Z",
+  "created_by": "AEP example author",
+  "extensions": {},
   "integrity": {
-    "algorithm": "sha256",
-    "state_hash": "computed-by-validator"
-  }
+    "algorithm": "AEP-v0.5",
+    "assets_merkle_root": "sha256:21b3d47efb6adea7054b139b625c70ab575e8a461306754ed81c4980c04bb327",
+    "manifest_hash": "sha256:d2474b1016ce661efa987796f0dd93d97c0cef7990c27503be796e1df58969aa",
+    "state_hash": "sha256:fbb5a7a5e814c7b526fc9309d328197b9590516efe0007b37236f65ad9832e20"
+  },
+  "packet_epoch": 1,
+  "packet_id": "aepkg:minimal-example",
+  "profile": "aep:0.5/stable",
+  "title": "Minimal AEP v0.5.5 example packet"
 }

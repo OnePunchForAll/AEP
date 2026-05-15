@@ -1,0 +1,26 @@
+{
+  "builder": "aep.build_index v0.6.0",
+  "built_at": "2026-05-15T04:44:16Z",
+  "claim_count": 2,
+  "enum_bitfield_layout": {
+    "axis_b_action_bits": [
+      6,
+      9
+    ],
+    "reliability_bits": [
+      0,
+      4
+    ],
+    "scope_bits": [
+      4,
+      6
+    ],
+    "status_bits": [
+      9,
+      11
+    ]
+  },
+  "index_version": "v0.6.0",
+  "record_size_bytes": 48,
+  "sort_order": "claim_id_sha256_ascending"
+}

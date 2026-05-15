@@ -1,0 +1,88 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "@protected": true,
+    "aep": "https://aep.dev/ns/0.6/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "prov": "http://www.w3.org/ns/prov#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+
+    "id": "@id",
+    "type": "@type",
+
+    "packet_id": "aep:packet_id",
+    "aep_version": "aep:aep_version",
+    "profile": "aep:profile",
+    "title": "aep:title",
+    "created_at": {"@id": "aep:created_at", "@type": "xsd:dateTime"},
+    "created_by": "aep:created_by",
+    "packet_epoch": {"@id": "aep:packet_epoch", "@type": "xsd:integer"},
+    "canonical_files": {"@id": "aep:canonical_files", "@container": "@list"},
+    "extensions": {"@id": "aep:extensions", "@container": "@index"},
+
+    "integrity": "aep:integrity",
+    "algorithm": "aep:integrity/algorithm",
+    "state_hash": "aep:integrity/state_hash",
+    "manifest_hash": "aep:integrity/manifest_hash",
+    "assets_merkle_root": "aep:integrity/assets_merkle_root",
+    "context_hash": "aep:integrity/context_hash",
+    "index_hash": "aep:integrity/index_hash",
+
+    "Claim": "aep:Claim",
+    "Source": "aep:Source",
+    "Span": "aep:Span",
+    "Relation": "aep:Relation",
+    "Event": "aep:Event",
+    "Review": "aep:Review",
+    "ValidationRun": "aep:ValidationRun",
+
+    "reliability": "aep:reliability",
+    "scope": "aep:scope",
+    "axis_b_action": "aep:axis_b_action",
+    "status": "aep:status",
+    "claim_text": "aep:claim_text",
+    "basis": {"@id": "aep:basis", "@container": "@list"},
+    "supersedes": "aep:supersedes",
+    "go_justification_claim_ids": {"@id": "aep:go_justification_claim_ids", "@container": "@list"},
+    "decision_time_revalidation_required": {"@id": "aep:decision_time_revalidation_required", "@type": "xsd:boolean"},
+    "semantic_stability": "aep:semantic_stability",
+
+    "source_id": "aep:source_id",
+    "source_type": "aep:source_type",
+    "location": "aep:location",
+    "retrieved_at": {"@id": "aep:retrieved_at", "@type": "xsd:dateTime"},
+    "retrieval_method": "aep:retrieval_method",
+    "byte_sha256": "aep:byte_sha256",
+
+    "subject": "aep:subject",
+    "predicate": "aep:predicate",
+    "object": "aep:object",
+    "relation_type": "aep:relation_type",
+
+    "event_type": "aep:event_type",
+    "event_time": {"@id": "aep:event_time", "@type": "xsd:dateTime"},
+    "actor": "aep:actor",
+    "target": "aep:target",
+
+    "PROVEN_RELIABLE": "aep:reliability/PROVEN_RELIABLE",
+    "STRONGLY_PLAUSIBLE": "aep:reliability/STRONGLY_PLAUSIBLE",
+    "PLAUSIBLE": "aep:reliability/PLAUSIBLE",
+    "EXPERIMENTAL": "aep:reliability/EXPERIMENTAL",
+    "ASSUMPTION": "aep:reliability/ASSUMPTION",
+    "SPECULATIVE_FRONTIER": "aep:reliability/SPECULATIVE_FRONTIER",
+    "CONFLICTED": "aep:reliability/CONFLICTED",
+    "GOVERNANCE_RULE": "aep:reliability/GOVERNANCE_RULE",
+    "DANGEROUS_NOT_WORTH_DOING": "aep:reliability/DANGEROUS_NOT_WORTH_DOING",
+    "UNKNOWN": "aep:reliability/UNKNOWN",
+
+    "GO": "aep:axis_b_action/GO",
+    "EXPERIMENT": "aep:axis_b_action/EXPERIMENT",
+    "EXPLORE": "aep:axis_b_action/EXPLORE",
+    "HALT": "aep:axis_b_action/HALT",
+    "FORBIDDEN": "aep:axis_b_action/FORBIDDEN",
+
+    "LOCAL_OBSERVATION": "aep:scope/LOCAL_OBSERVATION",
+    "CONTEXT_BOUND_PATTERN": "aep:scope/CONTEXT_BOUND_PATTERN",
+    "GENERAL_CLAIM": "aep:scope/GENERAL_CLAIM"
+  }
+}

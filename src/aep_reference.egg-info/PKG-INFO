@@ -1,0 +1,491 @@
+Metadata-Version: 2.4
+Name: aep-reference
+Version: 0.7.1
+Summary: AEP — Agent Evidence Packet — portable, schema-validated, content-addressed file format for AI agent memory. Reference implementation with Ed25519 signing, view derivation, JCS canonical-surface corpus, and cross-runtime Node.js verifier (13/13 byte-parity).
+Author: AEP Contributors
+Maintainer: AEP Contributors
+License:                                  Apache License
+                                   Version 2.0, January 2004
+                                http://www.apache.org/licenses/
+        
+           TERMS AND CONDITIONS FOR USE, REPRODUCTION, AND DISTRIBUTION
+        
+           1. Definitions.
+        
+              "License" shall mean the terms and conditions for use, reproduction,
+              and distribution as defined by Sections 1 through 9 of this document.
+        
+              "Licensor" shall mean the copyright owner or entity authorized by
+              the copyright owner that is granting the License.
+        
+              "Legal Entity" shall mean the union of the acting entity and all
+              other entities that control, are controlled by, or are under common
+              control with that entity. For the purposes of this definition,
+              "control" means (i) the power, direct or indirect, to cause the
+              direction or management of such entity, whether by contract or
+              otherwise, or (ii) ownership of fifty percent (50%) or more of the
+              outstanding shares, or (iii) beneficial ownership of such entity.
+        
+              "You" (or "Your") shall mean an individual or Legal Entity
+              exercising permissions granted by this License.
+        
+              "Source" form shall mean the preferred form for making modifications,
+              including but not limited to software source code, documentation
+              source, and configuration files.
+        
+              "Object" form shall mean any form resulting from mechanical
+              transformation or translation of a Source form, including but
+              not limited to compiled object code, generated documentation,
+              and conversions to other media types.
+        
+              "Work" shall mean the work of authorship, whether in Source or
+              Object form, made available under the License, as indicated by a
+              copyright notice that is included in or attached to the work
+              (an example is provided in the Appendix below).
+        
+              "Derivative Works" shall mean any work, whether in Source or Object
+              form, that is based on (or derived from) the Work and for which the
+              editorial revisions, annotations, elaborations, or other modifications
+              represent, as a whole, an original work of authorship. For the purposes
+              of this License, Derivative Works shall not include works that remain
+              separable from, or merely link (or bind by name) to the interfaces of,
+              the Work and Derivative Works thereof.
+        
+              "Contribution" shall mean any work of authorship, including
+              the original version of the Work and any modifications or additions
+              to that Work or Derivative Works thereof, that is intentionally
+              submitted to Licensor for inclusion in the Work by the copyright owner
+              or by an individual or Legal Entity authorized to submit on behalf of
+              the copyright owner. For the purposes of this definition, "submitted"
+              means any form of electronic, verbal, or written communication sent
+              to the Licensor or its representatives, including but not limited to
+              communication on electronic mailing lists, source code control systems,
+              and issue tracking systems that are managed by, or on behalf of, the
+              Licensor for the purpose of discussing and improving the Work, but
+              excluding communication that is conspicuously marked or otherwise
+              designated in writing by the copyright owner as "Not a Contribution."
+        
+              "Contributor" shall mean Licensor and any individual or Legal Entity
+              on behalf of whom a Contribution has been received by Licensor and
+              subsequently incorporated within the Work.
+        
+           2. Grant of Copyright License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              copyright license to reproduce, prepare Derivative Works of,
+              publicly display, publicly perform, sublicense, and distribute the
+              Work and such Derivative Works in Source or Object form.
+        
+           3. Grant of Patent License. Subject to the terms and conditions of
+              this License, each Contributor hereby grants to You a perpetual,
+              worldwide, non-exclusive, no-charge, royalty-free, irrevocable
+              (except as stated in this section) patent license to make, have made,
+              use, offer to sell, sell, import, and otherwise transfer the Work,
+              where such license applies only to those patent claims licensable
+              by such Contributor that are necessarily infringed by their
+              Contribution(s) alone or by combination of their Contribution(s)
+              with the Work to which such Contribution(s) was submitted. If You
+              institute patent litigation against any entity (including a
+              cross-claim or counterclaim in a lawsuit) alleging that the Work
+              or a Contribution incorporated within the Work constitutes direct
+              or contributory patent infringement, then any patent licenses
+              granted to You under this License for that Work shall terminate
+              as of the date such litigation is filed.
+        
+           4. Redistribution. You may reproduce and distribute copies of the
+              Work or Derivative Works thereof in any medium, with or without
+              modifications, and in Source or Object form, provided that You
+              meet the following conditions:
+        
+              (a) You must give any other recipients of the Work or
+                  Derivative Works a copy of this License; and
+        
+              (b) You must cause any modified files to carry prominent notices
+                  stating that You changed the files; and
+        
+              (c) You must retain, in the Source form of any Derivative Works
+                  that You distribute, all copyright, patent, trademark, and
+                  attribution notices from the Source form of the Work,
+                  excluding those notices that do not pertain to any part of
+                  the Derivative Works; and
+        
+              (d) If the Work includes a "NOTICE" text file as part of its
+                  distribution, then any Derivative Works that You distribute must
+                  include a readable copy of the attribution notices contained
+                  within such NOTICE file, excluding those notices that do not
+                  pertain to any part of the Derivative Works, in at least one
+                  of the following places: within a NOTICE text file distributed
+                  as part of the Derivative Works; within the Source form or
+                  documentation, if provided along with the Derivative Works; or,
+                  within a display generated by the Derivative Works, if and
+                  wherever such third-party notices normally appear. The contents
+                  of the NOTICE file are for informational purposes only and
+                  do not modify the License. You may add Your own attribution
+                  notices within Derivative Works that You distribute, alongside
+                  or as an addendum to the NOTICE text from the Work, provided
+                  that such additional attribution notices cannot be construed
+                  as modifying the License.
+        
+              You may add Your own copyright statement to Your modifications and
+              may provide additional or different license terms and conditions
+              for use, reproduction, or distribution of Your modifications, or
+              for any such Derivative Works as a whole, provided Your use,
+              reproduction, and distribution of the Work otherwise complies with
+              the conditions stated in this License.
+        
+           5. Submission of Contributions. Unless You explicitly state otherwise,
+              any Contribution intentionally submitted for inclusion in the Work
+              by You to the Licensor shall be under the terms and conditions of
+              this License, without any additional terms or conditions.
+              Notwithstanding the above, nothing herein shall supersede or modify
+              the terms of any separate license agreement you may have executed
+              with Licensor regarding such Contributions.
+        
+           6. Trademarks. This License does not grant permission to use the trade
+              names, trademarks, service marks, or product names of the Licensor,
+              except as required for describing the origin of the Work and
+              reproducing the content of the NOTICE file.
+        
+           7. Disclaimer of Warranty. Unless required by applicable law or
+              agreed to in writing, Licensor provides the Work (and each
+              Contributor provides its Contributions) on an "AS IS" BASIS,
+              WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+              implied, including, without limitation, any warranties or conditions
+              of TITLE, NON-INFRINGEMENT, MERCHANTABILITY, or FITNESS FOR A
+              PARTICULAR PURPOSE. You are solely responsible for determining the
+              appropriateness of using or redistributing the Work and assume any
+              risks associated with Your exercise of permissions under this License.
+        
+           8. Limitation of Liability. In no event and under no legal theory,
+              whether in tort (including negligence), contract, or otherwise,
+              unless required by applicable law (such as deliberate and grossly
+              negligent acts) or agreed to in writing, shall any Contributor be
+              liable to You for damages, including any direct, indirect, special,
+              incidental, or consequential damages of any character arising as a
+              result of this License or out of the use or inability to use the
+              Work (including but not limited to damages for loss of goodwill,
+              work stoppage, computer failure or malfunction, or any and all
+              other commercial damages or losses), even if such Contributor
+              has been advised of the possibility of such damages.
+        
+           9. Accepting Warranty or Additional Liability. While redistributing
+              the Work or Derivative Works thereof, You may accept and charge a
+              fee for, or provide warranty, support, indemnity, or other liability
+              obligations and/or rights consistent with this License. However, in
+              accepting such obligations, You may act only on Your own behalf
+              and on Your sole responsibility, not on behalf of any other
+              Contributor, and only if You agree to indemnify, defend, and hold
+              each Contributor harmless for any liability incurred by, or claims
+              asserted against, such Contributor by reason of your accepting any
+              such warranty or additional liability.
+        
+           END OF TERMS AND CONDITIONS
+        
+           APPENDIX: How to apply the Apache License to your work.
+        
+              To apply the Apache License to your work, attach the following
+              boilerplate notice, with the fields enclosed by brackets "[]"
+              replaced with your own identifying information. (Don't include
+              the brackets!)  The text should be enclosed in the appropriate
+              comment syntax for the file format. We also recommend that a
+              file or class name and description of purpose be included on the
+              same "printed page" as the copyright notice for easier
+              identification within third-party archives.
+        
+           Copyright 2026 AEP Contributors
+        
+           Licensed under the Apache License, Version 2.0 (the "License");
+           you may not use this file except in compliance with the License.
+           You may obtain a copy of the License at
+        
+               http://www.apache.org/licenses/LICENSE-2.0
+        
+           Unless required by applicable law or agreed to in writing, software
+           distributed under the License is distributed on an "AS IS" BASIS,
+           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+           See the License for the specific language governing permissions and
+           limitations under the License.
+        
+Project-URL: Homepage, https://github.com/OnePunchForAll/AEP
+Project-URL: Repository, https://github.com/OnePunchForAll/AEP
+Project-URL: Spec, https://github.com/OnePunchForAll/AEP/blob/main/spec/AEP_v0_7_1_SPEC.md
+Project-URL: Issues, https://github.com/OnePunchForAll/AEP/issues
+Keywords: ai-agents,evidence-packet,content-addressed,tamper-detection,merkle-tree,schema-validation,json-ld,ed25519,provenance
+Classifier: Development Status :: 4 - Beta
+Classifier: Intended Audience :: Developers
+Classifier: License :: OSI Approved :: Apache Software License
+Classifier: Operating System :: OS Independent
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
+Classifier: Programming Language :: Python :: 3.13
+Classifier: Programming Language :: Python :: 3.14
+Classifier: Topic :: Software Development :: Libraries
+Classifier: Topic :: Security :: Cryptography
+Classifier: Topic :: Text Processing :: Markup
+Requires-Python: >=3.10
+Description-Content-Type: text/markdown
+License-File: LICENSE
+License-File: NOTICE
+Requires-Dist: cryptography>=42.0
+Provides-Extra: test
+Requires-Dist: pytest>=8.0; extra == "test"
+Dynamic: license-file
+
+# AEP — Agent Evidence Packet
+
+**A portable, schema-validated, content-addressed file format for AI agent memory.**
+
+Every claim carries its reliability label, its evidence, and its tamper-detectable provenance — so the next agent doesn't have to take the last one's word for it.
+
+[![License: Apache-2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg)](LICENSE)
+[![Spec: v0.7.1](https://img.shields.io/badge/Spec-v0.7.1-brightgreen.svg)](spec/AEP_v0_7_1_SPEC.md)
+[![Cross-runtime byte-parity: 13/13](https://img.shields.io/badge/Cross--runtime%20byte--parity-13%2F13-brightgreen.svg)](verifiers/node/verify.cjs)
+[![Lane B fixtures: 11/11 closed](https://img.shields.io/badge/Lane%20B%20attack%20classes-11%20closed-brightgreen.svg)](spec/AEP_v0_7_1_SPEC.md)
+
+---
+
+## What is AEP?
+
+**AEP (Agent Evidence Packet)** is a directory-form file format that replaces unstructured prose with typed claims, structured provenance, and cryptographic tamper-detection — without losing the original authoring surface.
+
+Each packet is a directory of canonical JSONL records (`sources`, `spans`, `claims`, `relations`, `events`, `reviews`, `validations`) plus a deterministic `sha256` state-hash that any conforming validator independently reproduces. Every claim is independently auditable: it carries an explicit reliability label, scope, evidence basis, and reviewer receipts.
+
+The original `.html` / `.md` stays canonical for authoring and reading. The `.aepkg/` directory is the queryable structural index + integrity-binding envelope.
+
+```
+project.aepkg/
+├── aepkg.json                    # root manifest (state_hash + manifest_hash + assets_merkle_root + context_hash + index_hash + views_merkle_root)
+├── data/
+│   ├── sources.jsonl             # who said what
+│   ├── spans.jsonl               # where exactly (selector + sha256 quote_hash)
+│   ├── claims.jsonl              # what was claimed + reliability + basis
+│   └── relations.jsonl           # how claims relate
+├── ops/events.jsonl              # append-only write log (chain-integrity)
+├── reviews/reviews.jsonl         # independent reviewer receipts
+├── validations/runs.jsonl        # validation history
+├── views/                        # derived byte-identical projections
+│   ├── claim-ledger.html         # table view of all claims
+│   ├── integrity-tree.svg        # Merkle visualization
+│   └── provenance-graph.mmd      # Mermaid dependency graph
+├── cache/index.bin               # binary index for O(log n) claim-by-id lookup
+├── contexts/aep.context.jsonld   # frozen offline JSON-LD context
+└── signatures (optional)         # Ed25519 over canonical SIGNED_DIGEST
+```
+
+---
+
+## Capability matrix — AEP v0.7.1 vs HTML vs Markdown
+
+Measured on a 13-packet conformance corpus (11 attack fixtures + 2 example packets) plus 449 real-world evidence-content packets.
+
+| # | Dimension | HTML | Markdown | AEP v0.7.1 | Verdict |
+|---|---|---|---|---|---|
+| 1 | Tamper-detection (Merkle integrity) | none | none | **6 invariants** (state_hash + manifest_hash + assets_merkle_root + context_hash + index_hash + views_merkle_root) | **AEP** |
+| 2 | Fail-closed validation | none | none | **35+ reason codes** | **AEP** |
+| 3 | Append-only audit trail | none | none | verification_receipt_v1 with hash-chained receipts | **AEP** |
+| 4 | **Cross-language verifier byte parity** | WHATWG spec; cross-browser DOM differs in practice | CommonMark/GFM/Pandoc all produce DIFFERENT bytes | **Python + Node 13/13 packets BYTE-IDENTICAL state_hash + manifest_hash** | **AEP** |
+| 5 | Semantic interop (JSON-LD / RDF) | partial (microdata optional) | none | Frozen offline `@context` + 60+ IRI mappings | **AEP** |
+| 6 | Per-claim provenance | mutable hyperlinks | mutable hyperlinks | Typed basis with shared-fingerprint collapse detection | **AEP** |
+| 7 | Adversarial robustness | XSS/injection ubiquitous | injection-in-blocks | **11 attack classes closed** with permanent regression fixtures | **AEP** |
+| 8 | Diff-friendliness (line-oriented) | merge-conflict-prone | excellent | excellent JSONL | tie |
+| 9 | Browser-native rendering | yes (native) | yes (via JS) | **derives** byte-identical HTML + SVG + Mermaid views integrity-bound by `views_merkle_root` | **AEP** (via composition) |
+| 10 | Compactness (wire size) | bloated | minimal | compact JSONL profile w/ dictionary-encoded enums | **AEP** for evidence; HTML/MD for prose |
+| 11 | Embedded query index | none | none | `cache/index.bin` 48-byte records, O(log n) lookup | **AEP** |
+| 12 | Hand-authoring ergonomics | annoying | excellent | high friction (structured JSON) | **Markdown** |
+| 13 | Offline replay determinism | depends on remote `@context` / CDN | depends on renderer | Frozen offline context; zero network calls during validate | **AEP** |
+| 14 | Multi-layer profile composability | one rendering profile | one syntax | 8 profiles across v0.5–v0.7 | **AEP** |
+| 15 | Two-axis truth tagging (reliability × action) | none | none | Required on every claim | **AEP** |
+| 16 | Compounding-via-doctrine | none | none | Lane A regression corpus + Lane B attack fixtures + lesson chain | **AEP** |
+
+### Score
+
+| Category | Count | % of 16 |
+|---|---|---|
+| AEP Pareto-better | **14** | **87.5%** |
+| AEP wins via composition | 1 | 6.25% |
+| Tie | 1 | 6.25% |
+| Honest loss (hand-authoring) | 1 | 6.25% |
+
+**AEP v0.7.1 wins or ties on 15 of 16 dimensions (93.75%) for the evidence-packet use-case.**
+
+The single honest loss (hand-authoring) is mitigated by automated converters but acknowledged. Pareto-better is **use-case-bound**, not universal — HTML wins on hypertext browsing; Markdown wins on hand-authoring prose. AEP wins where evidence-packet integrity matters: provenance, validation, tamper-detection, cross-runtime portability.
+
+---
+
+## Measured metrics
+
+Baseline: `examples/minimal-signed.aepkg/` (signed, fully-populated v0.7.1 packet), measured on Python 3.14 + Node v24.
+
+| Metric | HTML (estimate) | Markdown (estimate) | AEP v0.7.1 (measured) |
+|---|---|---|---|
+| Packet total bytes | 1.5–3 KB (full HTML wrap) | 600–800 B (prose only) | **18,232 B** (full envelope + signatures + derived views) |
+| Canonical body (data/*.jsonl only) | n/a | 600–800 B | **2,237 B** |
+| Validation latency (18+ closures) | n/a (no validator) | n/a (no validator) | **~83 ms** |
+| Packet-hash recompute | n/a | n/a | **~3 ms** (chunked streaming SHA-256) |
+| Integrity invariants verified | 0 | 0 | **6** |
+| Closed attack classes | 0 | 0 | **11** |
+| Reason codes (fail-closed) | 0 | 0 | **35+** |
+| Cross-language verifier impls | n/a | n/a | **2** (Python + Node, byte-parity proven 13/13) |
+
+### Storage trade-off (honest)
+
+| | HTML | AEP packet | Ratio |
+|---|---|---|---|
+| Average size for typical evidence-content document | ~16 KB | ~110 KB | **6.5× bigger** |
+
+AEP packets are ~6.5× larger on disk because they carry full provenance + integrity envelope + derived views. For 449 evidence-content documents tested at scale, total disk delta was **~49 MB**. For evidence content that needs tamper-detection + cross-runtime verification, this trade-off is defensible. For prose-heavy content (READMEs, articles), HTML/MD remain the right substrate.
+
+---
+
+## Agent capability findings
+
+Empirical results from running AI agents against AEP packets vs HTML for 5 representative evidence-content documents.
+
+| Task | HTML | AEP v0.7.1 | Verdict |
+|---|---|---|---|
+| **Provenance graph recovery** (list basis source_ids for a claim) | 0% — structurally inaccessible | **100%** (5/5 packets recovered structured basis) | **AEP only** |
+| **Cross-runtime integrity verification** (Python + independent verifier agree) | 0% — no integrity layer | **100%** (5/5 packets; Python and Node verifier agree on every hash) | **AEP only** |
+| **Deterministic view derivation** (regenerate HTML/SVG/Mermaid from canonical) | 0% — HTML is its own view | **100%** (15 byte-identical views derived from 5 packets) | **AEP only** |
+| **Tamper-roundtrip detection** (modify body content, leave envelope intact) | 0% — undetectable | **100%** — 5 defense-in-depth gates fire (state_hash + manifest_hash + views_merkle + index + BagIt) | **AEP only** |
+| Simple text-grep (regex over file contents) | ~0.5 ms | ~14 ms (28× slower for naive grep) | **HTML wins** for one-off text lookups |
+| Selective field extraction (claims of reliability=PROVEN/RELIABLE) | regex over prose | JSONL filter (structured) | **AEP** wins on precision; **HTML** wins on raw latency |
+
+**Mass-conversion success rate**: 449/449 = **100%** evidence-content HTML files converted to AEP packets in 344.7 seconds (~1.3 files/sec), 0 failures.
+
+**Net agent capability gain**: AEP enables **4 capabilities HTML+MD literally cannot do** (provenance graph + cross-runtime verification + deterministic view derivation + tamper-roundtrip detection) at a 6.5× storage cost. Read latency for simple text-grep is slower but converges as agents shift to structured queries.
+
+---
+
+## Cross-runtime byte-parity
+
+The most-controversial dimension of any new format is cross-language portability. AEP v0.7.1 ships two independent reference implementations:
+
+- **Python** — `src/aep/validate_v0_6.py` (the primary reference; faithful to spec)
+- **Node.js** — `verifiers/node/verify.cjs` (independent port; recomputes canonical hashes from spec, not from Python source)
+
+Empirical result on 13-packet conformance corpus:
+
+```
+CROSS-RUNTIME BYTE-PARITY: 13/13 packets (100%)
+
+Python state_hash      ≡ Node state_hash      ✓
+Python manifest_hash   ≡ Node manifest_hash   ✓
+```
+
+Both implementations produce byte-identical `state_hash` and `manifest_hash` on every packet, including all 11 adversarial fixtures. When one fails (intentionally invalid packet), both fail with the same error code set. This is the strongest form of cross-runtime determinism: **agree on validity, agree on errors**.
+
+The Node verifier also emits an honesty WARN when packet content contains JS Number-precision edge cases (integers ≥ 2⁵³, U+2028/U+2029, scientific notation) — content that may diverge between languages is flagged before silent corruption.
+
+---
+
+## Quickstart
+
+### Install (Python)
+
+```bash
+pip install -e .
+```
+
+### Validate a packet
+
+```bash
+python -m aep.validate_v0_6 examples/minimal-signed.aepkg \
+  --profile aep:0.7/signed \
+  --conformance-level 2 \
+  --strict
+```
+
+Output:
+```
+schema_result: pass
+[info] AEP5_CHANNEL_INFO @ aepkg.json:aep_version: …
+```
+
+### Cross-runtime verify
+
+```bash
+node verifiers/node/verify.cjs examples/minimal-signed.aepkg
+```
+
+Output:
+```
+OK  examples/minimal-signed.aepkg: all recomputed hashes match manifest
+```
+
+### Generate a signed packet
+
+```bash
+python -m aep.signing keygen priv.pem pub.pem
+python -m aep.signing sign my-packet.aepkg priv.pem --signer-did did:key:my-id
+python -m aep.signing verify my-packet.aepkg
+```
+
+### Emit verification receipt
+
+```bash
+python -m aep.validate_v0_6 my-packet.aepkg \
+  --profile aep:0.7/stable \
+  --emit-receipt receipts.jsonl
+```
+
+Receipts are append-only hash-chained for HCRL-style audit trail.
+
+### Derive views
+
+```bash
+python -m aep.views my-packet.aepkg
+# Writes views/claim-ledger.html + views/integrity-tree.svg + views/provenance-graph.mmd
+```
+
+---
+
+## Architecture
+
+AEP v0.7.1 is a multi-layer architecture:
+
+- **Canonical** — `data/*.jsonl` records (the load-bearing content)
+- **Profiles** — versioned schema constraints (`aep:0.5/stable`, `aep:0.6/stable`, `aep:0.7/stable`, `aep:0.7/signed`, `aep:0.7/views-derived`)
+- **Layers** — additive features (compact JSONL, embedded index, frozen JSON-LD context, Ed25519 signing, byte-identical view derivation)
+- **Extensions** — implementer-specific custom fields under namespace prefixes (e.g., `aep:`, `jsonld:`, or any caller-chosen prefix)
+
+The validator accepts the most recent profile that doesn't reject the packet (strict-additive backwards-compat). v0.5.5 packets validate unchanged under v0.7.1; new packets gain access to signing, views, embedded index, and 11 closed attack classes.
+
+---
+
+## SIGNED_DIGEST design (`aep:0.7/signed`)
+
+Ed25519 signatures attest a canonical sequence that **NEVER includes the signature value itself**:
+
+```
+SIGNED_DIGEST = integrity.state_hash + LF + integrity.manifest_hash + LF
+SIGNATURE     = Ed25519_sign(SIGNED_DIGEST)
+```
+
+`manifest_hash` basis EXCLUDES: `manifest_hash` + `views_merkle_root` + `signatures` (3-field exclusion). This breaks all self-reference cycles. Verifier recomputes the digest from raw body bytes — signature attests content, not just stored scalars.
+
+---
+
+## Status & maturity
+
+- **Spec stability**: v0.7.1 is the first release with cross-runtime byte-parity proven. Spec changes after v0.7.1 will be strictly additive.
+- **Reference impl coverage**: 35+ fail-closed reason codes; 11 attack classes closed with permanent regression fixtures; 41-vector numeric canonicalization corpus; 52-vector canonical-surface corpus.
+- **Cross-language**: 2 independent implementations (Python + Node) byte-parity-verified on 13-packet conformance corpus.
+- **Production readiness**: validators are stable; signing is opt-in (`aep:0.7/signed` profile); view derivation is byte-deterministic.
+
+---
+
+## License
+
+- **Code**: Apache-2.0 (see [LICENSE](LICENSE))
+- **Docs**: CC-BY-4.0
+- **Spec**: CC-BY-4.0 ([spec/AEP_v0_7_1_SPEC.md](spec/AEP_v0_7_1_SPEC.md))
+
+---
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for spec-PR procedures, reference-impl test harness, and the cross-runtime conformance gate.
+
+PRs that fail Lane B regression fixtures or break cross-runtime byte parity will not be merged.

@@ -1,0 +1,5 @@
+Bag-Software-Agent: aep.bagit_derive v0.6.0
+External-Identifier: aepkg:minimal-example
+Bagging-Date: 2026-05-14
+Source-Organization: AEP example author
+Internal-Sender-Description: Minimal AEP v0.5.5 example packet

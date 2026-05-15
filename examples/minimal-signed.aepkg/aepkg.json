@@ -1,0 +1,40 @@
+{
+  "aep_version": "0.5",
+  "canonical_files": [
+    "data/sources.jsonl",
+    "data/spans.jsonl",
+    "data/claims.jsonl",
+    "data/relations.jsonl",
+    "ops/events.jsonl",
+    "reviews/reviews.jsonl",
+    "validations/runs.jsonl"
+  ],
+  "created_at": "2026-05-14T12:00:00Z",
+  "created_by": "AEP example author",
+  "extensions": {
+    "jsonld:context_hash": "sha256:7890b78f31fcc39f449034f9589cc4bb3f4afca36a6b6f19671644c92f3d4799"
+  },
+  "integrity": {
+    "algorithm": "AEP-v0.5",
+    "assets_merkle_root": "sha256:21b3d47efb6adea7054b139b625c70ab575e8a461306754ed81c4980c04bb327",
+    "index_hash": "sha256:693492aee27e18ce680683f90ee9e69ab6cabcb720f9e05b43413f978d05b3b6",
+    "manifest_hash": "sha256:4fc67b3e50ae0613b54aefd535bb52c7c042cc1061de01d4a261e620f2f276d2",
+    "state_hash": "sha256:fbb5a7a5e814c7b526fc9309d328197b9590516efe0007b37236f65ad9832e20",
+    "views_merkle_root": "sha256:2ab79c3da824c0f0eb675cad38f7144648abe756dccda4594e0fdaa8ce99493f"
+  },
+  "packet_epoch": 1,
+  "packet_id": "aepkg:minimal-example",
+  "profile": "aep:0.7/signed",
+  "signatures": [
+    {
+      "pubkey": "FqTXVRUBEeX1QZmHhoVkLg6dYr2Juwb857WUdJmzLj4=",
+      "pubkey_format": "raw32_base64",
+      "sig_alg": "ed25519",
+      "signature": "26b5Gjn7JHMXVG4Tw96Vny8SWY8lBH7xJFBxU7p9H3lUBsPhwChPFqRO/WdjgEAs8Q50kzVnJodxsRyFk+mjCg==",
+      "signed_at": "2026-05-15T04:44:16Z",
+      "signed_digest_sha256": "sha256:aad9c2d6ab794889903d83cd9d300782f77a1cc7ae012f488264c5df5cfdfe7f",
+      "signer_did": "did:key:test-v0_7-example"
+    }
+  ],
+  "title": "Minimal AEP v0.5.5 example packet"
+}

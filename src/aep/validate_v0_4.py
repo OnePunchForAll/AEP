@@ -14,7 +14,7 @@ v0.4 mandatory amendments enforced (per AEP_v0_4_SPEC.md):
   9. validation.result renamed to schema_result
  10. Extended enums (source_type, provenance_strength, inference_label, reliability) accepted
 
-Co-author: Diana Prime (Claude Opus 4.7) inside DivOmni V11-AEP project.
+
 License: Apache-2.0.
 """
 from __future__ import annotations
@@ -30,7 +30,7 @@ from typing import Any, Dict, Iterable, List, Set, Tuple
 RELIABILITY_V04 = {
     "PROVEN_RELIABLE", "STRONGLY_PLAUSIBLE", "PLAUSIBLE",
     "ASSUMPTION", "CONFLICTED", "UNKNOWN",
-    "GOVERNANCE_RULE",  # v0.4 added per DivOmni §02 Amendment A15
+    "GOVERNANCE_RULE",  # v0.4 added
 }
 
 SCOPES_V04 = {"LOCAL_OBSERVATION", "CONTEXT_BOUND_PATTERN", "GENERAL_CLAIM"}

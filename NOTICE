@@ -1,27 +1,43 @@
 AEP — Agent Evidence Packet
-Copyright 2026 Shadow (@ShadowMonkeyMan on X) and contributors
+Copyright 2026 AEP Contributors
 
-This product includes software developed by Shadow (@ShadowMonkeyMan on X)
-and Diana Prime (Claude Opus 4.7, 1M context window operating inside the
-DivOmni 10-agent legion compounding-intelligence cascade) over the period
-2026-05-12 through 2026-05-14.
+This product includes software developed as a reference implementation of the
+AEP (Agent Evidence Packet) specification.
 
-The AEP specification (v0.3 first reference implementation, v0.4 hardening
-spec) and the reference Python implementation in src/aep/ were co-authored
-under operator direction. The threat-model rewrite, NFC normalization,
-manifest+assets Merkle integrity envelope, WriteEvent chain integrity,
-external-anchor enforcement for PROVEN_RELIABLE claims, axiom-8 mechanical
-enforcement, and the two-axis truth-tag taxonomy that AEP operationalizes
-were direct outputs of the legion's adversary, judge, and warden lenses in
-the v0.4 review round on 2026-05-14.
+Licensed under the Apache License, Version 2.0 (the "License"); you may not
+use this file except in compliance with the License. You may obtain a copy of
+the License at:
 
-The reference implementation is released under the Apache License, Version 2.0
-(see LICENSE file). The prose documentation (README, IMPLEMENTERS, THREAT-MODEL,
-and spec narrative) is dual-licensed under Apache-2.0 and Creative Commons
-Attribution 4.0 International (CC-BY-4.0) at the recipient's option.
+    http://www.apache.org/licenses/LICENSE-2.0
 
-Implementations and forks must preserve this NOTICE file in derived works
-per Section 4(d) of the Apache License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+License for the specific language governing permissions and limitations under
+the License.
 
-For correspondence, attribution preferences, or to report security issues,
-contact: @ShadowMonkeyMan on X.
+== Specification license ==
+
+The AEP specification documents in `spec/` and `docs/` are licensed under the
+Creative Commons Attribution 4.0 International License (CC-BY-4.0). To view a
+copy of this license, visit https://creativecommons.org/licenses/by/4.0/.
+
+== Third-party dependencies ==
+
+This project depends on:
+  - cryptography (Apache-2.0 / BSD): Ed25519 keypair generation, signing, and
+    verification for the aep:0.7/signed profile.
+
+The Node.js verifier in verifiers/node/ uses only the Node.js standard library
+(crypto, fs, path) with no third-party dependencies.
+
+== References ==
+
+The AEP design draws upon and is compatible with the following open standards:
+  - RFC 8259 (JSON)
+  - RFC 8785 (JSON Canonicalization Scheme)
+  - RFC 7515 (JSON Web Signature) — adapted for SIGNED_DIGEST
+  - W3C JSON-LD 1.1
+  - W3C Verifiable Credentials Data Integrity 1.0
+  - BagIt File Packaging Format (RFC 8493) — DERIVED projection
+  - RO-Crate 1.1 — DERIVED projection

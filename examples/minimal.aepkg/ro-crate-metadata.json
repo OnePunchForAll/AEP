@@ -1,0 +1,97 @@
+{
+  "@context": "https://w3id.org/ro/crate/1.1/context",
+  "@graph": [
+    {
+      "@id": "ro-crate-metadata.json",
+      "@type": "CreativeWork",
+      "about": {
+        "@id": "./"
+      },
+      "conformsTo": {
+        "@id": "https://w3id.org/ro/crate/1.1"
+      },
+      "description": "RO-Crate metadata, DERIVED from aepkg.json (SINGLE-AUTHORITY per AEP v0.6 §V60-6)"
+    },
+    {
+      "@id": "./",
+      "@type": [
+        "Dataset",
+        "aep:Packet"
+      ],
+      "aep:packet_epoch": 1,
+      "conformsTo": [
+        {
+          "@id": "https://aep.dev/profile/aep:0.5/stable"
+        },
+        {
+          "@id": "https://w3id.org/ro/crate/1.1"
+        }
+      ],
+      "creator": {
+        "@type": "Person",
+        "name": "AEP example author"
+      },
+      "datePublished": "2026-05-14T12:00:00Z",
+      "hasPart": [
+        {
+          "@id": "data/claims.jsonl"
+        },
+        {
+          "@id": "data/relations.jsonl"
+        },
+        {
+          "@id": "data/sources.jsonl"
+        },
+        {
+          "@id": "data/spans.jsonl"
+        },
+        {
+          "@id": "ops/events.jsonl"
+        },
+        {
+          "@id": "reviews/reviews.jsonl"
+        },
+        {
+          "@id": "validations/runs.jsonl"
+        }
+      ],
+      "identifier": "aepkg:minimal-example",
+      "name": "Minimal AEP v0.5.5 example packet"
+    },
+    {
+      "@id": "data/claims.jsonl",
+      "@type": "File",
+      "name": "claims.jsonl"
+    },
+    {
+      "@id": "data/relations.jsonl",
+      "@type": "File",
+      "name": "relations.jsonl"
+    },
+    {
+      "@id": "data/sources.jsonl",
+      "@type": "File",
+      "name": "sources.jsonl"
+    },
+    {
+      "@id": "data/spans.jsonl",
+      "@type": "File",
+      "name": "spans.jsonl"
+    },
+    {
+      "@id": "ops/events.jsonl",
+      "@type": "File",
+      "name": "events.jsonl"
+    },
+    {
+      "@id": "reviews/reviews.jsonl",
+      "@type": "File",
+      "name": "reviews.jsonl"
+    },
+    {
+      "@id": "validations/runs.jsonl",
+      "@type": "File",
+      "name": "runs.jsonl"
+    }
+  ]
+}

@@ -1,0 +1,9 @@
+{
+  "name": "aep-node-verifier",
+  "version": "0.7.0-rc1",
+  "description": "AEP v0.7-rc1 minimal Node.js reference verifier (cross-runtime byte-parity proof for SP-R8-02)",
+  "type": "commonjs",
+  "main": "verify.cjs",
+  "bin": { "aep-verify": "verify.cjs" },
+  "license": "Apache-2.0"
+}

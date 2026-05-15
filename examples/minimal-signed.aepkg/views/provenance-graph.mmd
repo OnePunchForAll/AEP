@@ -1,0 +1,10 @@
+graph LR
+  claim_cross_runtime_conformance_gap["claim:cross-runtime-conformance-gap<br/>Cross-runtime numeric canonicalization b"]
+  style claim_cross_runtime_conformance_gap fill:#95a5a6,color:#fff
+  claim_rfc_8785_canonical_form["claim:rfc-8785-canonical-form<br/>AEP v0.5 strict canonical JSON profile i"]
+  style claim_rfc_8785_canonical_form fill:#27ae60,color:#fff
+  src_rfc_8785[("RFC 8785 — JSON Canonicalization Scheme ")]
+  span_rfc_8785_canonical{"span:rfc-8785-canonical"}
+  claim_cross_runtime_conformance_gap -->|basis| src_rfc_8785
+  claim_rfc_8785_canonical_form -->|basis| src_rfc_8785
+  claim_rfc_8785_canonical_form -.->|depends_on| claim_cross_runtime_conformance_gap

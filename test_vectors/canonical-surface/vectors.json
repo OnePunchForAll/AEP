@@ -1,0 +1,498 @@
+{
+  "description": "JCS edge-vector test corpus (SP-R8-04). Covers canonical surface beyond AEP-NUMERIC-v1. Vectors test: duplicate-key rejection, large-integer-as-string encoding, NaN/Infinity rejection, UTF-16 property sorting, NFC/NFD normalization discipline, empty-string-vs-null distinction, whitespace policy, Unicode-lookalike enum-code rejection, escape-sequence canonicalization, nested-empty disambiguation, trailing-newline policy, BOM/RTL/bidi-override rejection, and synthetic stress tests (1MiB strings, 10K keys).",
+  "schema": "aep.canonical_surface_vectors.v1",
+  "spec_version": "0.7-rc1",
+  "vector_count": 52,
+  "vectors": [
+    {
+      "category": "duplicate_keys",
+      "description": "Duplicate object keys MUST be rejected (RFC 8259 + RFC 8785).",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_DUPLICATE_KEY",
+      "id": "V001",
+      "input_raw": "{\"a\":1,\"a\":2}"
+    },
+    {
+      "category": "large_integer",
+      "description": "Integer exceeding IEEE-754 safe range (2^53) MUST be encoded as decimal string in canonical form.",
+      "expected_canonical_output": "{\"big\":\"9007199254740993\"}",
+      "expected_outcome": "ACCEPT_AS_STRING",
+      "id": "V002",
+      "input_decoded": {
+        "big": 9007199254740993
+      }
+    },
+    {
+      "category": "large_negative_integer",
+      "description": "Negative integer below -2^53 MUST be encoded as decimal string.",
+      "expected_canonical_output": "{\"neg\":\"-9007199254740993\"}",
+      "expected_outcome": "ACCEPT_AS_STRING",
+      "id": "V003",
+      "input_decoded": {
+        "neg": -9007199254740993
+      }
+    },
+    {
+      "category": "nan_rejection",
+      "description": "NaN MUST be rejected (RFC 8785 disallows; AEP-NUMERIC-v1 already enforces).",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_NUMERIC_NAN",
+      "id": "V004",
+      "input_raw": "{\"x\":NaN}"
+    },
+    {
+      "category": "infinity_rejection",
+      "description": "Infinity MUST be rejected.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_NUMERIC_INFINITY",
+      "id": "V005",
+      "input_raw": "{\"x\":Infinity}"
+    },
+    {
+      "category": "negative_infinity_rejection",
+      "description": "-Infinity MUST be rejected.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_NUMERIC_INFINITY",
+      "id": "V006",
+      "input_raw": "{\"x\":-Infinity}"
+    },
+    {
+      "category": "utf16_property_sort",
+      "description": "Object keys MUST be sorted by UTF-16 code units (RFC 8785), NOT UTF-8 bytes.",
+      "expected_canonical_output": "{\"e\":3,\"f\":2,\"é\":1}",
+      "expected_outcome": "ACCEPT_SORTED",
+      "id": "V007",
+      "input_decoded": {
+        "e": 3,
+        "f": 2,
+        "é": 1
+      }
+    },
+    {
+      "category": "nfc_vs_nfd",
+      "description": "NFC and NFD forms of same visual string have different sort positions; AEP-CANON-v1 MUST preserve parsed bytes (no post-parse normalization).",
+      "expected_canonical_output_form": "BOTH_KEYS_PRESERVED",
+      "expected_outcome": "ACCEPT_WITHOUT_NORMALIZE",
+      "id": "V008",
+      "input_decoded": {
+        "café": 2,
+        "café": 1
+      }
+    },
+    {
+      "category": "empty_string_vs_null",
+      "description": "Empty string MUST NOT equal null in canonical form.",
+      "expected_outcome": "DISTINGUISHABLE",
+      "id": "V009",
+      "input_a": {
+        "x": ""
+      },
+      "input_b": {
+        "x": null
+      }
+    },
+    {
+      "category": "absent_vs_null",
+      "description": "Absent field MUST NOT equal explicit null in canonical form.",
+      "expected_outcome": "DISTINGUISHABLE",
+      "id": "V010",
+      "input_a": {},
+      "input_b": {
+        "x": null
+      }
+    },
+    {
+      "category": "whitespace_policy",
+      "description": "Canonical form MUST contain no whitespace between tokens (RFC 8785 + separators).",
+      "expected_canonical_output": "{\"a\":1,\"b\":[2,3]}",
+      "expected_outcome": "ACCEPT_NO_WHITESPACE",
+      "id": "V011",
+      "input_decoded": {
+        "a": 1,
+        "b": [
+          2,
+          3
+        ]
+      }
+    },
+    {
+      "category": "cyrillic_lookalike",
+      "description": "Cyrillic Er (U+0420) where Latin P (U+0050) expected in compact enum code MUST be REJECTED (already AEP60_COMPACT_ENUM_NON_ASCII).",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP60_COMPACT_ENUM_NON_ASCII",
+      "id": "V012",
+      "input_hex": "7b227265 6c696162 696c6974 79223a22 d0a0227d"
+    },
+    {
+      "category": "greek_lookalike",
+      "description": "Greek Capital Pi (U+03A0) where Latin P expected MUST be REJECTED.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP60_COMPACT_ENUM_NON_ASCII",
+      "id": "V013",
+      "input_hex": "7b227265 6c696162 696c6974 79223a22 ce a0 227d"
+    },
+    {
+      "category": "math_bold_lookalike",
+      "description": "Mathematical Bold Capital P (U+1D40F) MUST be REJECTED in enum code position.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP60_COMPACT_ENUM_NON_ASCII",
+      "id": "V014",
+      "input_hex": "7b227265 6c696162 696c6974 79223a22 f09d908f 227d"
+    },
+    {
+      "category": "fullwidth_lookalike",
+      "description": "Fullwidth Latin Capital P (U+FF30) MUST be REJECTED in enum code position.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP60_COMPACT_ENUM_NON_ASCII",
+      "id": "V015",
+      "input_hex": "7b227265 6c696162 696c6974 79223a22 efbcb0 227d"
+    },
+    {
+      "category": "escape_canonicalization_quote",
+      "description": "Quoted strings in canonical form MUST use \\\" escape, NOT \\u0022.",
+      "expected_canonical_output": "{\"x\":\"a\\\"b\"}",
+      "expected_outcome": "ACCEPT_CANONICAL_ESCAPE",
+      "id": "V016",
+      "input_decoded": {
+        "x": "a\"b"
+      }
+    },
+    {
+      "category": "escape_canonicalization_backslash",
+      "description": "Backslash MUST be escaped as \\\\, NOT \\u005c.",
+      "expected_canonical_output": "{\"x\":\"a\\\\b\"}",
+      "expected_outcome": "ACCEPT_CANONICAL_ESCAPE",
+      "id": "V017",
+      "input_decoded": {
+        "x": "a\\b"
+      }
+    },
+    {
+      "category": "escape_canonicalization_control",
+      "description": "Control characters U+0001..U+001F (except specials \\b \\f \\n \\r \\t) MUST use \\u00XX form.",
+      "expected_canonical_output": "{\"x\":\"\\u0001\"}",
+      "expected_outcome": "ACCEPT_CANONICAL_ESCAPE",
+      "id": "V018",
+      "input_decoded_hex": {
+        "x_hex": "01"
+      }
+    },
+    {
+      "category": "escape_canonicalization_newline",
+      "description": "Newline U+000A MUST be \\n, NOT \\u000a.",
+      "expected_canonical_output": "{\"x\":\"\\n\"}",
+      "expected_outcome": "ACCEPT_CANONICAL_ESCAPE",
+      "id": "V019",
+      "input_decoded": {
+        "x": "\n"
+      }
+    },
+    {
+      "category": "escape_canonicalization_tab",
+      "description": "Tab U+0009 MUST be \\t.",
+      "expected_canonical_output": "{\"x\":\"\\t\"}",
+      "expected_outcome": "ACCEPT_CANONICAL_ESCAPE",
+      "id": "V020",
+      "input_decoded": {
+        "x": "\t"
+      }
+    },
+    {
+      "category": "high_unicode_preserved",
+      "description": "BMP characters above U+007F MUST be preserved literally (ensure_ascii=False).",
+      "expected_canonical_output": "{\"x\":\"中文\"}",
+      "expected_outcome": "ACCEPT_LITERAL",
+      "id": "V021",
+      "input_decoded": {
+        "x": "中文"
+      }
+    },
+    {
+      "category": "surrogate_pair_preserved",
+      "description": "Astral plane characters (U+10000+) MUST be preserved as literal UTF-8 bytes.",
+      "expected_canonical_output": "{\"x\":\"🔥\"}",
+      "expected_outcome": "ACCEPT_LITERAL",
+      "id": "V022",
+      "input_decoded": {
+        "x": "🔥"
+      }
+    },
+    {
+      "category": "nested_empty_array",
+      "description": "Empty array MUST be [] without internal whitespace.",
+      "expected_canonical_output": "{\"x\":[]}",
+      "expected_outcome": "ACCEPT",
+      "id": "V023",
+      "input_decoded": {
+        "x": []
+      }
+    },
+    {
+      "category": "nested_empty_object",
+      "description": "Empty object MUST be {} without internal whitespace.",
+      "expected_canonical_output": "{\"x\":{}}",
+      "expected_outcome": "ACCEPT",
+      "id": "V024",
+      "input_decoded": {
+        "x": {}
+      }
+    },
+    {
+      "category": "deeply_nested",
+      "description": "Deeply nested objects MUST canonicalize without depth-related drift.",
+      "expected_canonical_output": "{\"a\":{\"b\":{\"c\":{\"d\":1}}}}",
+      "expected_outcome": "ACCEPT",
+      "id": "V025",
+      "input_decoded": {
+        "a": {
+          "b": {
+            "c": {
+              "d": 1
+            }
+          }
+        }
+      }
+    },
+    {
+      "category": "trailing_newline",
+      "description": "Canonical JSONL file MUST end with exactly one LF; no CRLF; no extra trailing whitespace.",
+      "expected_file_bytes": "{\"a\":1}\n{\"a\":2}\n",
+      "expected_outcome": "ACCEPT_TRAILING_LF",
+      "id": "V026",
+      "input_lines": [
+        "{\"a\":1}",
+        "{\"a\":2}"
+      ]
+    },
+    {
+      "category": "no_crlf",
+      "description": "CRLF line endings MUST be rejected or normalized; canonical is LF-only.",
+      "expected_outcome": "REJECT_OR_NORMALIZE",
+      "expected_reason": "AEP70_LINE_ENDING_NOT_LF",
+      "id": "V027",
+      "input_raw_hex": "7b2261223a317d 0d0a 7b2261223a327d 0d0a"
+    },
+    {
+      "category": "leading_zero_integer",
+      "description": "Integers MUST NOT have leading zeros (except 0 itself).",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_NUMERIC_LEADING_ZERO",
+      "id": "V028",
+      "input_raw": "{\"x\":007}"
+    },
+    {
+      "category": "positive_sign_integer",
+      "description": "Integers MUST NOT have leading + sign.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_NUMERIC_POSITIVE_SIGN",
+      "id": "V029",
+      "input_raw": "{\"x\":+5}"
+    },
+    {
+      "category": "negative_zero",
+      "description": "Negative zero MUST canonicalize to 0 (per AEP-NUMERIC-v1).",
+      "expected_canonical_output": "{\"x\":0}",
+      "expected_outcome": "ACCEPT_NORMALIZED_TO_ZERO",
+      "id": "V030",
+      "input_decoded": {
+        "x": -0.0
+      }
+    },
+    {
+      "category": "trailing_decimal_point",
+      "description": "Numbers MUST NOT end with decimal point alone (e.g., '5.').",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_NUMERIC_TRAILING_DECIMAL",
+      "id": "V031",
+      "input_raw": "{\"x\":5.}"
+    },
+    {
+      "category": "leading_decimal_point",
+      "description": "Numbers MUST NOT start with decimal point alone (e.g., '.5').",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_NUMERIC_LEADING_DECIMAL",
+      "id": "V032",
+      "input_raw": "{\"x\":.5}"
+    },
+    {
+      "category": "scientific_lowercase_e",
+      "description": "Scientific notation MUST use lowercase 'e' canonical form.",
+      "expected_canonical_output_pattern": "lowercase_e",
+      "expected_outcome": "ACCEPT_LOWERCASE_E",
+      "id": "V033",
+      "input_decoded": {
+        "x": 15000000000.0
+      }
+    },
+    {
+      "category": "duplicate_keys_nested",
+      "description": "Duplicate keys at any nesting depth MUST be rejected.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_DUPLICATE_KEY",
+      "id": "V034",
+      "input_raw": "{\"x\":{\"a\":1,\"a\":2}}"
+    },
+    {
+      "category": "zero_width_space",
+      "description": "Zero-width-space U+200B in enum code position MUST be REJECTED.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP60_COMPACT_ENUM_NON_ASCII",
+      "id": "V035",
+      "input_hex": "7b227265 6c696162 696c6974 79223a22 50 e2808b 227d"
+    },
+    {
+      "category": "rtl_override",
+      "description": "Right-to-left override U+202E in any position MUST be REJECTED.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_BIDI_OVERRIDE_FORBIDDEN",
+      "id": "V036",
+      "input_hex": "7b2278223a22 61 e280ae 62 227d"
+    },
+    {
+      "category": "byte_order_mark",
+      "description": "UTF-8 BOM at start of canonical JSONL file MUST be REJECTED.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_BOM_FORBIDDEN",
+      "id": "V037",
+      "input_hex": "efbbbf 7b2261223a317d"
+    },
+    {
+      "category": "key_with_unicode_lookalike",
+      "description": "Object key containing Cyrillic Er where Latin P expected MUST be REJECTED for enum-position keys.",
+      "expected_outcome": "REJECT_OR_FLAG",
+      "expected_reason": "AEP70_KEY_UNICODE_LOOKALIKE",
+      "id": "V038",
+      "input_hex": "7b22 d180 656c69 6162696c697479 223a 22 50524f56454e5f52454c4941424c45 22 7d"
+    },
+    {
+      "category": "unicode_combiner_in_enum",
+      "description": "Combining diacritic U+0301 attached to enum code letter MUST be REJECTED.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP60_COMPACT_ENUM_NON_ASCII",
+      "id": "V039",
+      "input_hex": "7b227265 6c696162 696c6974 79223a22 50 cc81 227d"
+    },
+    {
+      "category": "tab_in_string",
+      "description": "Literal tab character in string MUST be escaped as \\t, NOT preserved raw.",
+      "expected_canonical_output": "{\"x\":\"a\\tb\"}",
+      "expected_outcome": "ACCEPT_ESCAPED",
+      "id": "V040",
+      "input_decoded": {
+        "x": "a\tb"
+      }
+    },
+    {
+      "category": "vertical_tab_in_string",
+      "description": "Vertical tab U+000B in string MUST be escaped as \\u000b.",
+      "expected_canonical_output": "{\"x\":\"a\\u000bb\"}",
+      "expected_outcome": "ACCEPT_ESCAPED",
+      "id": "V041",
+      "input_decoded_hex": {
+        "x_hex": "61 0b 62"
+      }
+    },
+    {
+      "category": "form_feed_in_string",
+      "description": "Form feed U+000C MUST be escaped as \\f.",
+      "expected_canonical_output": "{\"x\":\"a\\fb\"}",
+      "expected_outcome": "ACCEPT_ESCAPED",
+      "id": "V042",
+      "input_decoded_hex": {
+        "x_hex": "61 0c 62"
+      }
+    },
+    {
+      "category": "null_value_preserved",
+      "description": "null value MUST be preserved as canonical null token.",
+      "expected_canonical_output": "{\"x\":null}",
+      "expected_outcome": "ACCEPT",
+      "id": "V043",
+      "input_decoded": {
+        "x": null
+      }
+    },
+    {
+      "category": "boolean_true",
+      "description": "true boolean MUST be canonical token.",
+      "expected_canonical_output": "{\"x\":true}",
+      "expected_outcome": "ACCEPT",
+      "id": "V044",
+      "input_decoded": {
+        "x": true
+      }
+    },
+    {
+      "category": "boolean_false",
+      "description": "false boolean MUST be canonical token.",
+      "expected_canonical_output": "{\"x\":false}",
+      "expected_outcome": "ACCEPT",
+      "id": "V045",
+      "input_decoded": {
+        "x": false
+      }
+    },
+    {
+      "category": "array_with_mixed_types",
+      "description": "Heterogeneous arrays MUST canonicalize element-by-element with separators.",
+      "expected_canonical_output": "{\"x\":[1,\"a\",null,true,{}]}",
+      "expected_outcome": "ACCEPT",
+      "id": "V046",
+      "input_decoded": {
+        "x": [
+          1,
+          "a",
+          null,
+          true,
+          {}
+        ]
+      }
+    },
+    {
+      "category": "single_quote_string",
+      "description": "Single-quoted string literal MUST be REJECTED (JSON requires double quotes).",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_INVALID_JSON_SYNTAX",
+      "id": "V047",
+      "input_raw": "{'a':1}"
+    },
+    {
+      "category": "trailing_comma_object",
+      "description": "Trailing comma in object MUST be REJECTED.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_INVALID_JSON_SYNTAX",
+      "id": "V048",
+      "input_raw": "{\"a\":1,}"
+    },
+    {
+      "category": "trailing_comma_array",
+      "description": "Trailing comma in array MUST be REJECTED.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_INVALID_JSON_SYNTAX",
+      "id": "V049",
+      "input_raw": "[1,2,]"
+    },
+    {
+      "category": "comment_forbidden",
+      "description": "JSON5/JS-style comments MUST be REJECTED.",
+      "expected_outcome": "REJECT",
+      "expected_reason": "AEP70_INVALID_JSON_SYNTAX",
+      "id": "V050",
+      "input_raw": "{\"a\":1 /* comment */}"
+    },
+    {
+      "category": "extremely_long_string",
+      "description": "Long-string (1 MiB) MUST canonicalize without precision loss or memory blow-up.",
+      "expected_outcome": "ACCEPT_NO_TRUNCATION",
+      "id": "V051",
+      "input_decoded_size_hint": 1048576
+    },
+    {
+      "category": "many_keys",
+      "description": "Object with 10K keys MUST sort deterministically by UTF-16 in O(n log n).",
+      "expected_outcome": "ACCEPT_SORTED_DETERMINISTIC",
+      "id": "V052",
+      "input_key_count": 10000
+    }
+  ]
+}

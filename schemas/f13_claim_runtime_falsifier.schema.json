@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:f13-claim-runtime-falsifier:0.1",
+  "title": "AEP v1.1 F13 Claim Runtime Falsifier",
+  "description": "v1.1 F13 frontier-break primitive (SPECULATIVE FRONTIER). Four-agent convergence (adversary+judge+forge+curator). Every claim carries an executable falsifier handle that a fresh validator can run in bounded time. Closes the dormitive-virtue NP-2 class structurally at write-time, not via human archaeology. Composes_with: v0.8 F5 self_falsifying (packet-level; F13 is CLAIM-level), v0.8 F2 reproducibility_certificate, sec02 truth-tags, sec50 EH Law-3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_claim_id",
+    "executor",
+    "cmd",
+    "expected_exit",
+    "ttl_ms",
+    "binding_principal"
+  ],
+  "properties": {
+    "type": {
+      "const": "ClaimRuntimeFalsifier",
+      "description": "Discriminator. Always 'ClaimRuntimeFalsifier'."
+    },
+    "schema_version": {
+      "const": "aep-claim-runtime-falsifier-0.1",
+      "description": "Schema version pin."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^crf:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable CRF id. Recommended: crf:<claim-id-slug>:<short>."
+    },
+    "bound_to_claim_id": {
+      "type": "string",
+      "description": "Claim ID this falsifier binds. The claim being falsified.",
+      "maxLength": 512
+    },
+    "executor": {
+      "type": "string",
+      "enum": [
+        "python_static_dotted",
+        "node_static_dotted",
+        "subprocess_sandboxed",
+        "sql_query",
+        "grep_pattern",
+        "json_path_assertion"
+      ],
+      "description": "Execution model. python_static_dotted + node_static_dotted are the safe defaults (no shell, no fs writes outside packet_root). subprocess_sandboxed is OPT-IN per FALSIFIER-V80-2 (v0.8 F5 inheritance)."
+    },
+    "cmd": {
+      "type": "string",
+      "description": "Command in the executor's idiom. For python_static_dotted: 'module.func' resolving to func(claim, packet_root) -> int. For grep_pattern: a regex applied to a designated path. For json_path_assertion: a JSONPath expression with expected-value side.",
+      "minLength": 1,
+      "maxLength": 2048
+    },
+    "expected_exit": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 255,
+      "description": "Exit code semantics PER F5 inheritance: 0 = falsifier PASSES (claim survives); non-zero = falsifier FIRES (claim is FALSIFIED). Default 0."
+    },
+    "ttl_ms": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 100,
+      "description": "Wall-time bound in ms. Operator constraint: <=100ms per F13 spec. Validator SIGKILLs on overrun and emits AEP11_F13_TIMEOUT."
+    },
+    "binding_principal": {
+      "type": "string",
+      "description": "did:key or substrate id of the authority that bound this falsifier. Composes with sec50 Law-3 (anti-self-attestation: binding_principal !== claim author principal).",
+      "maxLength": 256
+    },
+    "on_fire_action": {
+      "type": "string",
+      "enum": ["REJECT", "DEMOTE_RELIABILITY", "WARN", "QUARANTINE"],
+      "default": "DEMOTE_RELIABILITY",
+      "description": "Action when falsifier fires. REJECT = packet validation FAIL. DEMOTE_RELIABILITY = truth-tag downgraded one tier (R->S->P->E->A->U). WARN = informational only. QUARANTINE = claim isolated in validation results but packet still PASSES."
+    },
+    "last_run_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "ISO-8601 UTC when falsifier last executed; null if never run."
+    },
+    "last_run_exit_code": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "maximum": 255,
+      "description": "Last observed exit code; null if never run."
+    },
+    "f9_quorum_required": {
+      "type": "boolean",
+      "default": false,
+      "description": "If true, falsifier must produce same exit across N>=2 substrates per v1.0.x F9. Closes dormitive-virtue + executor-drift class simultaneously."
+    },
+    "tautology_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "trivially_true_blocker": {
+          "type": "boolean",
+          "default": true,
+          "description": "If true, validator rejects falsifiers whose cmd matches a tautology pattern (e.g., 'exit 0', 'return True')."
+        },
+        "tautology_patterns_checked": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "List of tautology patterns the validator scanned against."
+        }
+      },
+      "description": "Anti-dormitive-self-binding: a falsifier that always returns expected_exit is tautological and provides no falsification value."
+    }
+  },
+  "examples": [
+    {
+      "type": "ClaimRuntimeFalsifier",
+      "schema_version": "aep-claim-runtime-falsifier-0.1",
+      "id": "crf:c001:api-surface-check",
+      "bound_to_claim_id": "c_001",
+      "executor": "grep_pattern",
+      "cmd": "scan_packet_body:window\\.claude\\.complete",
+      "expected_exit": 0,
+      "ttl_ms": 100,
+      "binding_principal": "did:key:z6Mk...adversary",
+      "on_fire_action": "REJECT",
+      "last_run_at": null,
+      "last_run_exit_code": null,
+      "f9_quorum_required": false,
+      "tautology_check": {
+        "trivially_true_blocker": true,
+        "tautology_patterns_checked": ["^exit 0$", "^return True$"]
+      }
+    }
+  ]
+}

@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:f19-corpus-coverage-witness:0.1",
+  "title": "AEP v1.1 F19 Corpus Coverage Witness",
+  "description": "v1.1 F19 STAGED anti-convergence primitive (SPECULATIVE FRONTIER × FRONTIER_OTHER; single-source from adversary attack on legion synthesis). Every agent invocation declares expected_corpus_scope[]; validator computes touched-set from hook log + emits coverage_gap[]. Closes the recall-COMPLETENESS direction (vs F12 which covers recall-FROM-touched-packets). Composes_with: F12 recall_layer_v1, sec50 EH Law-3 multi-lens, sec73.6 NO-OPERATOR-REACTION-CALIBRATION (gaps surface unshaped).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "agent_role",
+    "invocation_id",
+    "expected_corpus_scope",
+    "touched_packet_ids",
+    "coverage_gap",
+    "computed_at"
+  ],
+  "properties": {
+    "type": {
+      "const": "CorpusCoverageWitness",
+      "description": "Discriminator. Always 'CorpusCoverageWitness'."
+    },
+    "schema_version": {
+      "const": "aep-corpus-coverage-witness-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^ccw:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable witness id. Recommended: ccw:<agent>:<invocation-slug>."
+    },
+    "agent_role": {
+      "type": "string",
+      "enum": [
+        "strategist","pathfinder","scout","forge","judge","adversary","warden","scribe","curator","visual-judge","diana"
+      ],
+      "description": "Canonical agent role being audited."
+    },
+    "invocation_id": {
+      "type": "string",
+      "description": "Session/dispatch identifier for the invocation under audit.",
+      "maxLength": 256
+    },
+    "expected_corpus_scope": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Glob-style or packet_id-pattern list the agent declared it SHOULD have considered. e.g. ['doctrine/02-truth-tags.html', 'doctrine/lessons/sibling-13*'].",
+      "minItems": 1
+    },
+    "touched_packet_ids": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Packet IDs the agent actually read during the invocation. Sourced from the PreToolUse Read hook log."
+    },
+    "coverage_gap": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["packet_id_pattern", "justification_required", "justification_text"],
+        "properties": {
+          "packet_id_pattern": {"type": "string", "maxLength": 512},
+          "justification_required": {"type": "boolean"},
+          "justification_text": {
+            "type": "string",
+            "description": "Agent's justification for the gap. Empty if not yet justified.",
+            "maxLength": 2048
+          }
+        }
+      },
+      "description": "Items declared in expected_corpus_scope but absent from touched_packet_ids. Agent MUST justify each gap (or the witness emits AEP11_F19_GAP_UNJUSTIFIED)."
+    },
+    "computed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "hook_log_path": {
+      "type": ["string", "null"],
+      "description": "Path to the PreToolUse Read hook log used to compute touched_packet_ids. Audit-replayable.",
+      "maxLength": 512
+    },
+    "coverage_ratio": {
+      "type": ["number", "null"],
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Validator-computed: |touched intersect expected| / |expected|. 1.0 = full coverage. <1.0 = gaps exist."
+    },
+    "single_source_attribution": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["adversary_attack_id", "convergence_count"],
+      "properties": {
+        "adversary_attack_id": {
+          "type": "string",
+          "description": "Reference to the adversary attack that surfaced this primitive. Default: adversary-2026-05-18-v11-convergence-map-attack."
+        },
+        "convergence_count": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 1,
+          "description": "F19 is single-source by design (only adversary surfaced; no other agent converged). 1 = honest single-source attribution per sec73.6."
+        }
+      },
+      "description": "F19 ships with explicit single-source attribution per sec73.6 NO-OPERATOR-REACTION-CALIBRATION (do not pretend convergence we don't have)."
+    }
+  },
+  "examples": [
+    {
+      "type": "CorpusCoverageWitness",
+      "schema_version": "aep-corpus-coverage-witness-0.1",
+      "id": "ccw:pathfinder:v103-cascade-2026-05-18",
+      "agent_role": "pathfinder",
+      "invocation_id": "v103-cascade-pathfinder-2026-05-18",
+      "expected_corpus_scope": [
+        "projects/v11-aep/publish-ready/aep/spec/AEP_v0_*_SPEC.md",
+        "projects/v11-aep/publish-ready/aep/spec/AEP_v1_0_3_SPEC.md"
+      ],
+      "touched_packet_ids": [
+        "projects/v11-aep/publish-ready/aep/spec/AEP_v0_8_SPEC.md",
+        "projects/v11-aep/publish-ready/aep/spec/AEP_v1_0_3_SPEC.md"
+      ],
+      "coverage_gap": [
+        {
+          "packet_id_pattern": "projects/v11-aep/publish-ready/aep/spec/AEP_v0_5*_SPEC.md",
+          "justification_required": true,
+          "justification_text": "v0.5* specs were superseded by v0.8 STABLE; pathfinder dispatch did not need to re-read them."
+        }
+      ],
+      "computed_at": "2026-05-18T11:00:00Z",
+      "hook_log_path": ".claude/_logs/read-hook.jsonl",
+      "coverage_ratio": 0.75,
+      "single_source_attribution": {
+        "adversary_attack_id": "adversary-2026-05-18-v11-convergence-map-attack",
+        "convergence_count": 1
+      }
+    }
+  ]
+}

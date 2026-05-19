@@ -1,0 +1,244 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:bug-ontology:0.1",
+  "title": "AEP v1.2 Bug Ontology Record",
+  "description": "v1.2 immune-system primitive (operator source.md L15-18). Every bug becomes a typed memory object. Not just 'fixed bug' but: bug class / root cause / escape path / detection gap / affected primitive / reproduction input / smallest failing example / prevention rule / regression test / future warning cue. Operator framing: 'A normal software repo has tests. AEP should have scar tissue.' Lineage EXTENDS structured bug taxonomies (CWE/CVE) + post-mortem culture (Google SRE) + structured fault analysis. Composes_with: v1.2 F20 BugVaccineKernel (each bug ontology record births a vaccine) + v1.1 F13 ClaimRuntimeFalsifier + v1.1 F16 AttackClass registry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bug_class",
+    "root_cause",
+    "escape_path",
+    "detection_gap",
+    "affected_primitive",
+    "reproduction_input",
+    "smallest_failing_example",
+    "prevention_rule",
+    "regression_test",
+    "future_warning_cue",
+    "discovered_at",
+    "discoverer_principal_id",
+    "lineage_basis",
+    "ontology_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "BugOntologyRecord",
+      "description": "Discriminator. Always 'BugOntologyRecord'. New claim type added to data/claims.jsonl per operator L15."
+    },
+    "schema_version": {
+      "const": "aep-bug-ontology-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^bug:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bug_class": {
+      "type": "string",
+      "enum": [
+        "false_completion",
+        "missing_witness",
+        "source_laundering",
+        "rubric_definitional_gap",
+        "principal_collision",
+        "hash_mismatch",
+        "sandbox_escape",
+        "stale_claim",
+        "lineage_falsification",
+        "convergence_contamination",
+        "validator_theater",
+        "civilian_oversimplification",
+        "vaccine_calcification",
+        "frequency_analysis_leak",
+        "passport_undeclared_unverified",
+        "trust_dial_underprotection",
+        "other"
+      ],
+      "description": "Operator L15 verbatim. Bug class taxonomy. Extensible via v1.2.1+ amendment per schema-additive-only discipline."
+    },
+    "root_cause": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operator L15 verbatim field 2. The underlying cause that made the bug possible."
+    },
+    "escape_path": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operator L15 verbatim field 3. How the bug escaped from authoring to production / promotion."
+    },
+    "detection_gap": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operator L15 verbatim field 4. Which validator / gate / review SHOULD have caught this but did not, and why."
+    },
+    "affected_primitive": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "F1", "F2", "F3", "F4", "F5", "F6", "F7", "F8",
+          "F9", "F10",
+          "F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19",
+          "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8",
+          "F20", "F21", "F22", "F23", "F24", "F25", "F26",
+          "InvariantContract", "BugOntology", "PolicyRego", "AEPLite", "SandboxGate",
+          "canonical_7_files",
+          "manifest_extension",
+          "hcrl_chain"
+        ]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "Operator L15 verbatim field 5. Which AEP primitive(s) this bug affects."
+    },
+    "reproduction_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["input_text_or_path", "input_sha256"],
+      "properties": {
+        "input_text_or_path": {
+          "type": "string",
+          "description": "Operator L15 verbatim field 6. The exact input that triggers the bug."
+        },
+        "input_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "smallest_failing_example": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["example_text_or_path", "example_sha256"],
+      "properties": {
+        "example_text_or_path": {
+          "type": "string",
+          "description": "Operator L15 verbatim field 7. Hand-reduced smallest failing example. Often a single-claim packet that triggers the bug."
+        },
+        "example_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "prevention_rule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "executable_form"],
+      "properties": {
+        "rule_id": {
+          "type": "string",
+          "pattern": "^pr:[a-z0-9][a-z0-9._:-]*$"
+        },
+        "executable_form": {
+          "type": "string",
+          "description": "Operator L15 verbatim field 8. The rule that prevents recurrence. Expressed in policy-as-code form (Rego) or jsonpath or schema constraint."
+        }
+      }
+    },
+    "regression_test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["test_path", "test_outcome_pre_fix", "test_outcome_post_fix"],
+      "properties": {
+        "test_path": {
+          "type": "string",
+          "description": "Operator L15 verbatim field 9. Path to the regression test."
+        },
+        "test_outcome_pre_fix": {
+          "type": "string",
+          "enum": ["FAIL"],
+          "description": "Before the fix, the test MUST fail (otherwise the test does not actually test the bug)."
+        },
+        "test_outcome_post_fix": {
+          "type": "string",
+          "enum": ["PASS"],
+          "description": "After the fix, the test MUST pass."
+        }
+      }
+    },
+    "future_warning_cue": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operator L15 verbatim field 10. The cue that surfaces on a future packet resembling this bug class. Plain-language civilian text."
+    },
+    "discovered_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "discoverer_principal_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "F18 lineage. Bug Ontology EXTENDS: CWE (Common Weakness Enumeration) + CVE (Common Vulnerabilities and Exposures) + Google SRE post-mortem culture + structured fault tree analysis."
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    },
+    "ontology_signature_ed25519": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "BugOntologyRecord",
+      "schema_version": "aep-bug-ontology-0.1",
+      "id": "bug:bc-v103-1-rubric-definitional-gap",
+      "bug_class": "rubric_definitional_gap",
+      "root_cause": "VG04 rubric language did not distinguish load-bearing vs decorative list items in failure_prevented[]; readers applied different mental models scoring decorative items as either 0 (irrelevant) or 5 (present).",
+      "escape_path": "Rubric authored alongside SPEC v1.0.3; not stress-tested with multiple independent readers before VG04 went live. the agent mean 4.00 vs warden mean 3.00 surfaced the gap.",
+      "detection_gap": "v1.1 F14 RaterQuorumAttestation enforces principal independence but does NOT enforce rubric-language completeness on list-valued recall fields. F14 caught the inter-rater divergence (its job) but the rubric design upstream had the bug.",
+      "affected_primitive": ["F14", "A4"],
+      "reproduction_input": {
+        "input_text_or_path": "VG04 blind-recall on adversary AEP using cue 'premortem weakest-assumption' produced delta 1.00 across 3 attempts.",
+        "input_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+      },
+      "smallest_failing_example": {
+        "example_text_or_path": "Hand-reduced: a single rubric scoring a 3-item failure_prevented[] list where 2 items are load-bearing and 1 is decorative; two independent readers disagree on whether the decorative item counts.",
+        "example_sha256": "2222222222222222222222222222222222222222222222222222222222222222"
+      },
+      "prevention_rule": {
+        "rule_id": "pr:rubric-list-valued-fields-class-each-item",
+        "executable_form": "policy.deny[reason] { input.rubric.evaluated_field_type == 'array'; not input.rubric.rubric_field_class_per_item; reason := 'array-valued rubric must class each item as load_bearing | decorative | evidence_anchor' }"
+      },
+      "regression_test": {
+        "test_path": "projects/v11-aep/publish-ready/aep/tests/test_rubric_list_valued_fields_classed.py",
+        "test_outcome_pre_fix": "FAIL",
+        "test_outcome_post_fix": "PASS"
+      },
+      "future_warning_cue": "This packet's rubric does not separate critical findings from supporting details — reviewers may score it inconsistently.",
+      "discovered_at": "2026-05-18T05:30:00Z",
+      "discoverer_principal_id": "principal:judge:diana-prime",
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "CWE Common Weakness Enumeration",
+          "CVE Common Vulnerabilities and Exposures",
+          "Google SRE post-mortem culture",
+          "Structured fault tree analysis"
+        ],
+        "verifying_grep": "rg 'cwe|cve|sre post-mortem|fault tree' --type md research/sources/",
+        "n_hits": 0
+      },
+      "ontology_signature_ed25519": "ed25519_pending_phase_1_keypair"
+    }
+  ]
+}

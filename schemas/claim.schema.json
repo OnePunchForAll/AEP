@@ -1,0 +1,74 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aepkit.org/aep/schemas/claim.schema.json",
+  "title": "AEP Claim",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "text",
+    "reliability",
+    "scope",
+    "basis",
+    "reasoning",
+    "owner_agent",
+    "review_tier",
+    "status",
+    "created_at"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^claim:[A-Za-z0-9._:-]+$"
+    },
+    "type": {
+      "const": "Claim"
+    },
+    "text": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reliability": {
+      "enum": [
+        "PROVEN_RELIABLE",
+        "STRONGLY_PLAUSIBLE",
+        "PLAUSIBLE",
+        "ASSUMPTION",
+        "CONFLICTED",
+        "UNKNOWN"
+      ]
+    },
+    "scope": {
+      "enum": [
+        "LOCAL_OBSERVATION",
+        "CONTEXT_BOUND_PATTERN",
+        "GENERAL_CLAIM"
+      ]
+    },
+    "basis": {
+      "type": "array"
+    },
+    "reasoning": {
+      "type": "string"
+    },
+    "owner_agent": {
+      "type": "string"
+    },
+    "review_tier": {
+      "type": "string",
+      "pattern": "^R[1-4]$"
+    },
+    "status": {
+      "enum": [
+        "active",
+        "superseded",
+        "rejected",
+        "needs_review"
+      ]
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

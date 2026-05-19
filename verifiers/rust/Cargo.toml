@@ -1,0 +1,20 @@
+[package]
+name = "preflight"
+version = "0.8.1"
+edition = "2021"
+
+[[bin]]
+name = "preflight"
+path = "src/main.rs"
+
+[dependencies]
+serde_json = "1.0"
+# Wave-027 closure of pin_0007 PARTIAL parity — operator complete-authority 2026-05-17
+# authorized supply-chain expansion (8 transitive crates disclosed Wave-022 cargo-tree).
+# All maintainers: rust-lang / BurntSushi / unicode-rs (well-known, audit-grade).
+regex = "1"
+unicode-normalization = "0.1"
+
+[profile.release]
+opt-level = 3
+strip = true

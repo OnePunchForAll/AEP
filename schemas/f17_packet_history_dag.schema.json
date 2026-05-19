@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:f17-packet-history-dag:0.1",
+  "title": "AEP v1.1 F17 Packet History DAG Event",
+  "description": "v1.1 F17 frontier-break primitive (SPECULATIVE FRONTIER). Three-agent convergence (warden+scribe+curator). aepkg.json.extensions.packet_history[] is an append-only typed list of (audit | amendment | promotion | rollback) events forming a DAG (not just a chain). Supports sec41 DAG re-anchor natively. Composes_with: sec41 HCRL, sec73.5 warden-receipts-or-halt, v0.8 F2 reproducibility_certificate, v1.0.3.1 F14 RaterQuorumAttestation (audits carry rater quora).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "event_kind",
+    "event_at",
+    "auditor_principal_id",
+    "parent_event_ids",
+    "verdict",
+    "event_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "PacketHistoryEvent",
+      "description": "Discriminator. Always 'PacketHistoryEvent'."
+    },
+    "schema_version": {
+      "const": "aep-packet-history-dag-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^phe:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable event id. Recommended: phe:<packet-slug>:<event-kind>:<seq>."
+    },
+    "event_kind": {
+      "type": "string",
+      "enum": [
+        "audit",
+        "amendment",
+        "promotion",
+        "rollback",
+        "supersede",
+        "contradict",
+        "freeze_lock",
+        "redaction"
+      ],
+      "description": "Typed event kind. supersede + contradict come from scribe-IDEA-2; promotion + audit + amendment + rollback are core warden+curator; freeze_lock + redaction inherited from v0.8."
+    },
+    "event_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "auditor_principal_id": {
+      "type": "string",
+      "description": "Principal that emitted this event (role + did:key).",
+      "maxLength": 256
+    },
+    "parent_event_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^phe:[a-z0-9][a-z0-9._:-]*$"},
+      "description": "Parent event IDs. Empty array = root event. Multiple parents = DAG merge (forms the DAG topology). Single parent = linear chain segment."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["PASS", "FAIL", "CONDITIONAL", "PARTIAL", "ABORT", "PROMOTED", "DEMOTED", "ROLLED_BACK", "FROZEN", "REDACTED"],
+      "description": "Event verdict. Composes with v1.0.3.1 F14 verdict taxonomy."
+    },
+    "event_signature_ed25519": {
+      "type": "string",
+      "description": "Ed25519 signature over (id || '\\n' || event_kind || '\\n' || event_at || '\\n' || auditor_principal_id || '\\n' || JCS-canonical-encode(parent_event_ids) || '\\n' || verdict). Base64url-encoded.",
+      "maxLength": 256
+    },
+    "bound_to_packet_id": {
+      "type": "string",
+      "description": "The packet this event modifies. Cross-packet events (e.g., supersede) reference the SOURCE packet here.",
+      "maxLength": 256
+    },
+    "bound_to_packet_sha256_pre": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Packet sha256 BEFORE this event. Anchors the event to a concrete packet state."
+    },
+    "bound_to_packet_sha256_post": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Packet sha256 AFTER this event. null if event is informational (audit) and does not change packet."
+    },
+    "evidence_artifact_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Optional. sha256 of the evidence artifact (e.g., audit report, amendment diff, promotion gate output)."
+    },
+    "rater_quorum_id": {
+      "type": ["string", "null"],
+      "pattern": "^rqa:[a-z0-9][a-z0-9._:-]*:v[0-9]+$",
+      "description": "Optional. F14 RaterQuorumAttestation id if this event was rater-attested. Required for promotion events under v1.0.3.1 strict profile."
+    },
+    "narrative_summary": {
+      "type": "string",
+      "maxLength": 2048,
+      "description": "Short human-readable summary of the event."
+    },
+    "composes_with_doctrine_slots": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^sec[0-9]+$"},
+      "description": "Doctrine slot IDs this event composes with (e.g., sec41 for DAG re-anchor)."
+    }
+  },
+  "examples": [
+    {
+      "type": "PacketHistoryEvent",
+      "schema_version": "aep-packet-history-dag-0.1",
+      "id": "phe:v103-spec:audit:001",
+      "event_kind": "audit",
+      "event_at": "2026-05-18T05:50:00Z",
+      "auditor_principal_id": "judge:did:key:zexample",
+      "parent_event_ids": [],
+      "verdict": "PASS",
+      "event_signature_ed25519": "AAA",
+      "bound_to_packet_id": "projects/v11-aep/publish-ready/aep/spec/AEP_v1_0_3_SPEC.md",
+      "bound_to_packet_sha256_pre": "sha256:0635570ae4e256726188c78792177858126ece99e52daffa96390d9486883746",
+      "bound_to_packet_sha256_post": "sha256:0635570ae4e256726188c78792177858126ece99e52daffa96390d9486883746",
+      "evidence_artifact_sha256": null,
+      "rater_quorum_id": null,
+      "narrative_summary": "Judge audit of v1.0.3 unified forge output (HCRL row 6).",
+      "composes_with_doctrine_slots": ["sec41", "sec73"]
+    }
+  ]
+}

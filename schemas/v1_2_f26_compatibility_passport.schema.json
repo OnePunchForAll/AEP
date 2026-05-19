@@ -1,0 +1,276 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:f26-compatibility-passport:0.1",
+  "title": "AEP v1.2 F26 Compatibility Passport Record",
+  "description": "v1.2 immune-system primitive. Every packet declares what external trust ecosystems it can map to (operator source.md L209-211 + L31). 14 mapping targets verbatim from L211: PROV / C2PA / SLSA / in-toto / RO-Crate / OpenLineage / OpenTelemetry / SBOM / PDF / Markdown / HTML / Git_commit / email_thread / LMS_artifact. Lineage EXTENDS PROV-O + C2PA + in-toto + SLSA + RO-Crate + OpenLineage + OpenTelemetry + SBOM (SPDX/CycloneDX). HV7 closure: TWO arrays HARD-CONSTRAINED — verified_round_trip_compatible[] (export+import test PASSED with sha256 fixture path) vs declared_compatible[] (claimed but not yet tested). Default declared_compatible is INFORMATIONAL ONLY; only verified_round_trip_compatible counts toward trust attestation. Composes_with: v1.1 F18 SourceProvenanceGraph (lineage_basis surface).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_packet_id",
+    "verified_round_trip_compatible",
+    "declared_compatible",
+    "verified_count",
+    "declared_only_count",
+    "trust_attestation_basis",
+    "lineage_basis",
+    "issued_at",
+    "issue_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "CompatibilityPassportRecord",
+      "description": "Discriminator. Always 'CompatibilityPassportRecord'."
+    },
+    "schema_version": {
+      "const": "aep-compatibility-passport-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^cmp:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_packet_id": {
+      "type": "string",
+      "description": "Packet ID this passport describes.",
+      "maxLength": 256
+    },
+    "verified_round_trip_compatible": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target_ecosystem",
+          "export_fixture_path",
+          "import_fixture_path",
+          "round_trip_test_path",
+          "round_trip_test_outcome",
+          "round_trip_sha256",
+          "external_validator_invoked"
+        ],
+        "properties": {
+          "target_ecosystem": {
+            "type": "string",
+            "enum": [
+              "PROV",
+              "C2PA",
+              "SLSA",
+              "in_toto",
+              "RO_Crate",
+              "OpenLineage",
+              "OpenTelemetry",
+              "SBOM_SPDX",
+              "SBOM_CycloneDX",
+              "PDF",
+              "Markdown",
+              "HTML",
+              "Git_commit",
+              "email_thread",
+              "LMS_artifact"
+            ],
+            "description": "Operator L211 verbatim 14-target enum. SBOM split into SBOM_SPDX + SBOM_CycloneDX per modern split."
+          },
+          "export_fixture_path": {
+            "type": "string",
+            "description": "Path to the test fixture exporting an AEP packet to the target ecosystem format."
+          },
+          "import_fixture_path": {
+            "type": "string",
+            "description": "Path to the test fixture re-importing the exported file back into AEP."
+          },
+          "round_trip_test_path": {
+            "type": "string",
+            "description": "Path to the CI test that runs the round-trip. HV7 closure: validator REJECTS verified entries lacking a fixture."
+          },
+          "round_trip_test_outcome": {
+            "type": "string",
+            "enum": ["PASS", "FAIL", "PENDING"]
+          },
+          "round_trip_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$",
+            "description": "sha256 of the round-tripped AEP packet (post-import). Used for byte-parity check against pre-export sha256."
+          },
+          "external_validator_invoked": {
+            "type": "boolean",
+            "description": "HV7 closure: whether the target ecosystem's canonical external validator was actually invoked. Adversary A7 attack: in-repo validator only is NOT verified compatibility."
+          },
+          "external_validator_name": {
+            "type": "string",
+            "description": "Name of the external validator (e.g., 'prov-toolbox', 'c2pa-rs', 'in-toto Python lib', 'rdflib SHACL', 'spdx-tools'). Required when external_validator_invoked == true."
+          },
+          "external_validator_version": {
+            "type": "string"
+          }
+        }
+      },
+      "uniqueItems": true,
+      "description": "HV7 closure HARD-CONSTRAINED. ONLY entries in this array count toward trust attestation. Empty array on a new packet is permitted; honest framing per sec73.6."
+    },
+    "declared_compatible": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "target_ecosystem",
+          "declaration_truth_tag",
+          "honest_framing_text"
+        ],
+        "properties": {
+          "target_ecosystem": {
+            "type": "string",
+            "enum": [
+              "PROV",
+              "C2PA",
+              "SLSA",
+              "in_toto",
+              "RO_Crate",
+              "OpenLineage",
+              "OpenTelemetry",
+              "SBOM_SPDX",
+              "SBOM_CycloneDX",
+              "PDF",
+              "Markdown",
+              "HTML",
+              "Git_commit",
+              "email_thread",
+              "LMS_artifact"
+            ]
+          },
+          "declaration_truth_tag": {
+            "type": "string",
+            "enum": ["EXPERIMENTAL", "SPECULATIVE FRONTIER"],
+            "description": "HV7 closure HARD-CONSTRAINED. Declared compatibility cannot be tagged PROVEN/RELIABLE or STRONGLY PLAUSIBLE; verification is required for those tiers."
+          },
+          "honest_framing_text": {
+            "type": "string",
+            "minLength": 16,
+            "description": "Plain-language disclosure of the declared-only status. Required per sec73.6. Example: 'This packet declares compatibility with RO-Crate but has not been round-tripped against the canonical RO-Crate validator. Treat as a goal, not a guarantee.'"
+          }
+        }
+      },
+      "uniqueItems": true,
+      "description": "HV7 closure HARD-CONSTRAINED. INFORMATIONAL ONLY. Does NOT count toward trust attestation. Plan Phase 7 acceptance: 4 baseline (PROV+C2PA+SLSA+in_toto) move to verified[]; remaining 10 STAGED in declared_compatible[] with honest framing per sec73.6."
+    },
+    "verified_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 15,
+      "description": "Count of verified_round_trip_compatible[] entries. Recomputed on every passport emit. v1.2 ships with 0..4 verified; rest STAGED."
+    },
+    "declared_only_count": {
+      "type": "integer",
+      "minimum": 0,
+      "maximum": 15
+    },
+    "trust_attestation_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["only_verified_counts", "external_validator_required_for_verified"],
+      "properties": {
+        "only_verified_counts": {
+          "type": "boolean",
+          "const": true,
+          "description": "HV7 closure HARD-CONSTRAINED. Trust attestation considers ONLY verified_round_trip_compatible[] entries. Schema enforces this as const true."
+        },
+        "external_validator_required_for_verified": {
+          "type": "boolean",
+          "const": true,
+          "description": "HV7 closure HARD-CONSTRAINED. Entries in verified_round_trip_compatible[] MUST have external_validator_invoked == true."
+        }
+      }
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "F18 lineage. F26 EXTENDS: W3C PROV-O + C2PA Content Credentials + in-toto + SLSA + RO-Crate + OpenLineage + OpenTelemetry + SBOM (SPDX/CycloneDX)."
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    },
+    "issued_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "issue_signature_ed25519": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "CompatibilityPassportRecord",
+      "schema_version": "aep-compatibility-passport-0.1",
+      "id": "cmp:lease-summary-example-passport",
+      "bound_to_packet_id": "aepkg:lease-summary-example",
+      "verified_round_trip_compatible": [
+        {
+          "target_ecosystem": "PROV",
+          "export_fixture_path": "projects/v11-aep/publish-ready/aep/tests/passport/prov_export_fixture.aepkg/",
+          "import_fixture_path": "projects/v11-aep/publish-ready/aep/tests/passport/prov_import_fixture.aepkg/",
+          "round_trip_test_path": "projects/v11-aep/publish-ready/aep/tests/test_passport_prov_round_trip.py",
+          "round_trip_test_outcome": "PENDING",
+          "round_trip_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+          "external_validator_invoked": false,
+          "external_validator_name": "prov-toolbox",
+          "external_validator_version": "0.7.5"
+        }
+      ],
+      "declared_compatible": [
+        {
+          "target_ecosystem": "C2PA",
+          "declaration_truth_tag": "EXPERIMENTAL",
+          "honest_framing_text": "This packet declares compatibility with C2PA Content Credentials but has not yet been round-tripped against the canonical c2pa-rs validator. Treat as a goal, not a guarantee. v1.2.1 STAGED."
+        },
+        {
+          "target_ecosystem": "SLSA",
+          "declaration_truth_tag": "EXPERIMENTAL",
+          "honest_framing_text": "This packet declares compatibility with SLSA provenance but has not yet been round-tripped against the canonical SLSA verifier. v1.2.1 STAGED."
+        },
+        {
+          "target_ecosystem": "in_toto",
+          "declaration_truth_tag": "EXPERIMENTAL",
+          "honest_framing_text": "This packet declares compatibility with in-toto ITE6 but has not yet been round-tripped against the canonical in-toto Python lib. v1.2.1 STAGED."
+        }
+      ],
+      "verified_count": 0,
+      "declared_only_count": 3,
+      "trust_attestation_basis": {
+        "only_verified_counts": true,
+        "external_validator_required_for_verified": true
+      },
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "W3C PROV-O",
+          "C2PA Content Credentials",
+          "in-toto",
+          "SLSA",
+          "RO-Crate",
+          "OpenLineage",
+          "OpenTelemetry",
+          "SBOM SPDX",
+          "SBOM CycloneDX"
+        ],
+        "verifying_grep": "rg 'prov-o|c2pa|in-toto|slsa|ro-crate|openlineage|opentelemetry|spdx|cyclonedx' --type md research/sources/",
+        "n_hits": 0
+      },
+      "issued_at": "2026-05-18T08:30:00Z",
+      "issue_signature_ed25519": "ed25519_pending_phase_7_keypair"
+    }
+  ]
+}

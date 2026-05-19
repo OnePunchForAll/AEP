@@ -563,7 +563,7 @@ def _looks_like_in_packet_path(value: str) -> bool:
         return False
     # Treat as in-packet only if it matches a canonical-file or assets/ shape.
     if "/" not in v:
-        return False  # Bare names like "convert_implementer_lesson.py" are NOT in-packet paths.
+        return False  # Bare names like "convert_aepkit_lesson.py" are NOT in-packet paths.
     if v.startswith("assets/"):
         return True
     return _looks_like_canonical_file(v)
@@ -1307,9 +1307,9 @@ RELIABILITY_AXIS_B_VALID: Dict[str, Set[str]] = {
 def check_deep_migration_receipt(manifest: Dict[str, Any]) -> List[Finding]:
     """v0.5.4 Closure #4 — Round-5 Attack #5 (Deep-Migration Provenance Forgery).
 
-    When extensions claim deep-migration provenance (implementer:deep_migrated_from),
+    When extensions claim deep-migration provenance (aep:deep_migrated_from),
     the packet MUST also carry a structurally well-formed receipt:
-      extensions.implementer:deep_migration_receipt = {
+      extensions.aep:deep_migration_receipt = {
         "pre_state_hash": "sha256:...",   # state_hash before migration
         "post_state_hash": "sha256:...",  # state_hash after migration
         "tool": "convert_v0_5_shallow_to_deep.py",
@@ -1328,19 +1328,19 @@ def check_deep_migration_receipt(manifest: Dict[str, Any]) -> List[Finding]:
     extensions = manifest.get("extensions")
     if not isinstance(extensions, dict):
         return findings
-    claimed_from = extensions.get("implementer:deep_migrated_from")
+    claimed_from = extensions.get("aep:deep_migrated_from")
     if not isinstance(claimed_from, str) or claimed_from == "":
         # No deep-migration claim — nothing to verify.
         return findings
-    receipt = extensions.get("implementer:deep_migration_receipt")
+    receipt = extensions.get("aep:deep_migration_receipt")
     if receipt is None:
         findings.append(
             _mkfinding(
                 AEP54_DEEP_MIGRATION_RECEIPT_MISSING,
                 SEVERITY_WARNING,
                 (
-                    "extensions.implementer:deep_migrated_from is set but "
-                    "implementer:deep_migration_receipt is missing. v0.5.4 requires a "
+                    "extensions.aep:deep_migrated_from is set but "
+                    "aep:deep_migration_receipt is missing. v0.5.4 requires a "
                     "structurally well-formed receipt; full cryptographic verification "
                     "is deferred to v0.7 (signed identity)."
                 ),
@@ -1353,8 +1353,8 @@ def check_deep_migration_receipt(manifest: Dict[str, Any]) -> List[Finding]:
             _mkfinding(
                 AEP54_DEEP_MIGRATION_RECEIPT_MALFORMED,
                 SEVERITY_ERROR,
-                "implementer:deep_migration_receipt must be an object",
-                "aepkg.json:extensions:implementer:deep_migration_receipt",
+                "aep:deep_migration_receipt must be an object",
+                "aepkg.json:extensions:aep:deep_migration_receipt",
             )
         )
         return findings
@@ -1365,8 +1365,8 @@ def check_deep_migration_receipt(manifest: Dict[str, Any]) -> List[Finding]:
             _mkfinding(
                 AEP54_DEEP_MIGRATION_RECEIPT_MALFORMED,
                 SEVERITY_ERROR,
-                f"implementer:deep_migration_receipt missing required fields: {sorted(missing)}",
-                "aepkg.json:extensions:implementer:deep_migration_receipt",
+                f"aep:deep_migration_receipt missing required fields: {sorted(missing)}",
+                "aepkg.json:extensions:aep:deep_migration_receipt",
             )
         )
         return findings
@@ -1378,8 +1378,8 @@ def check_deep_migration_receipt(manifest: Dict[str, Any]) -> List[Finding]:
                 _mkfinding(
                     AEP54_DEEP_MIGRATION_RECEIPT_MALFORMED,
                     SEVERITY_ERROR,
-                    f"implementer:deep_migration_receipt.{hkey} must be 'sha256:' + 64 hex digits",
-                    "aepkg.json:extensions:implementer:deep_migration_receipt",
+                    f"aep:deep_migration_receipt.{hkey} must be 'sha256:' + 64 hex digits",
+                    "aepkg.json:extensions:aep:deep_migration_receipt",
                 )
             )
     return findings
@@ -1573,7 +1573,7 @@ def validate_v0_5_1(packet_root: Path, config: ValidationConfig) -> ValidationRe
     # === v0.5.3 closures (Round-5 top-3) ===
     try:
         # Re-use the claims/relations/events/reviews/sources loaded above.
-        # (Local binding AEP Contributor from the artifact_closure try-block — re-load defensively.)
+        # (Local binding shadow from the artifact_closure try-block — re-load defensively.)
         claims_v53, relations_v53, events_v53, reviews_v53, sources_v53 = _load_records_by_logical_type(
             packet_root, manifest
         )

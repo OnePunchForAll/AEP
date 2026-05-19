@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:a1-phase-boundary-fork-record:0.1",
+  "title": "AEP v1.1 A1 Phase Boundary Fork Record",
+  "description": "v1.1 A1 amendment (STRONGLY PLAUSIBLE × CONTEXT-BOUND PATTERN). Two-agent convergence (pathfinder + strategist). Stored at every phase boundary: {chose: A, runner_up: B, decision_signal, confidence_margin}. Forms the counterfactual-branch capsule. Composes_with: sec41 HCRL row attribution, sec73.6 NO-OPERATOR-REACTION-CALIBRATION (runner_up not retconned post-hoc), v1.0.3.1 F14 RaterQuorumAttestation (decisions attested).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "phase_boundary_at",
+    "phase_id",
+    "chose",
+    "runner_up",
+    "decision_signal",
+    "confidence_margin"
+  ],
+  "properties": {
+    "type": {
+      "const": "PhaseBoundaryForkRecord"
+    },
+    "schema_version": {
+      "const": "aep-phase-boundary-fork-record-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^pbfr:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "phase_boundary_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "phase_id": {
+      "type": "string",
+      "description": "Phase identifier (e.g., 'v103-phase-2-vg04', 'v11-phase-1-schemas').",
+      "maxLength": 256
+    },
+    "chose": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["option_id", "option_label"],
+      "properties": {
+        "option_id": {"type": "string", "maxLength": 256},
+        "option_label": {"type": "string", "maxLength": 512},
+        "rationale": {"type": "string", "maxLength": 2048}
+      }
+    },
+    "runner_up": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["option_id", "option_label"],
+      "properties": {
+        "option_id": {"type": "string", "maxLength": 256},
+        "option_label": {"type": "string", "maxLength": 512},
+        "rationale": {"type": "string", "maxLength": 2048},
+        "why_rejected": {"type": "string", "maxLength": 2048}
+      }
+    },
+    "additional_options_considered": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "option_id": {"type": "string", "maxLength": 256},
+          "option_label": {"type": "string", "maxLength": 512},
+          "why_eliminated": {"type": "string", "maxLength": 1024}
+        }
+      },
+      "description": "Other options enumerated but eliminated before the chose/runner_up split."
+    },
+    "decision_signal": {
+      "type": "string",
+      "description": "The empirical signal that drove the decision. E.g., 'adversary HV-5 closure', 'codex burn synthesis convergence', 'operator directive verbatim'.",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "confidence_margin": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Confidence margin chose-over-runner_up (0.0 = coin-flip, 1.0 = unanimous). Used by curator for promotion-gate signal."
+    },
+    "decided_by_principal": {
+      "type": "string",
+      "description": "Principal that made the call (role + did:key).",
+      "maxLength": 256
+    },
+    "rater_quorum_id": {
+      "type": ["string", "null"],
+      "pattern": "^rqa:[a-z0-9][a-z0-9._:-]*:v[0-9]+$",
+      "description": "Optional F14 RaterQuorumAttestation id if this decision was rater-attested."
+    }
+  },
+  "examples": [
+    {
+      "type": "PhaseBoundaryForkRecord",
+      "schema_version": "aep-phase-boundary-fork-record-0.1",
+      "id": "pbfr:v103-phase-7:choose-unified-forge",
+      "phase_boundary_at": "2026-05-18T05:00:00Z",
+      "phase_id": "v103-phase-7-product-build",
+      "chose": {
+        "option_id": "unified-single-forge",
+        "option_label": "ONE forge invocation for SPEC + 5 scripts",
+        "rationale": "sec73.4 SINGLE-FORGE-FOR-PRODUCT-BUILDS binding"
+      },
+      "runner_up": {
+        "option_id": "4-serial-forge",
+        "option_label": "4 forge invocations parallelizing schemas + tests",
+        "rationale": "faster per-phase wall-clock",
+        "why_rejected": "HV3 closure: 4-forge fragmentation breaks coherence"
+      },
+      "additional_options_considered": [],
+      "decision_signal": "sec73.4 + adversary HV-3 closure non-rescindable",
+      "confidence_margin": 0.95,
+      "decided_by_principal": "agent_inline",
+      "rater_quorum_id": null
+    }
+  ]
+}

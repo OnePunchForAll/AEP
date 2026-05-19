@@ -1,0 +1,7 @@
+Wave 18 Phase delta DAG re-anchor synthetic 3-packet pilot. AEP v1.5 LTS.
+
+Goal: build 3 synthetic .aepkg packets where packet C cites BOTH packet A AND packet B (DAG re-anchor shape; multi-parent claim graph). Combine via aep_cluster_combine.py. Decompose. Verify byte-roundtrip 3 of 3 PASS. Then 3 edge cases: (a) overlapping claim ids across A and B both cited by C, (b) cycle c1 to c2 to c3 to c1, (c) self-reference c3 to c3 own packet. Recommend code structure for synthesizing 3-packet DAG.
+
+Adversary failure modes anticipated for D2 general-case: (a) decompose drops one parent of multi-parent claim, (b) cycle causes infinite loop, (c) self-ref causes path collision in views directory.
+
+Reply terse: minimal code skeleton for build_synthetic_dag_packets() function emitting 3 .aepkg directories with meta.json + data/claims.jsonl + integrity.json. Also note any anti-pattern.

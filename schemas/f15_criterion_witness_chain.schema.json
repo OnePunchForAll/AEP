@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:f15-criterion-witness-chain:0.1",
+  "title": "AEP v1.1 F15 Criterion Witness Chain Entry",
+  "description": "v1.1 F15 frontier-break primitive (SPECULATIVE FRONTIER). Three-agent convergence (judge+pathfinder+adversary). Every PLAN.html criterion gets a falsifiable predicate + evidence_kind_required; completion claims emit a CompletionAttestation (see f15_completion_attestation.schema.json) listing per-criterion witness signatures. Closes the forge-says-done-judge-finds-skipped class. Composes_with: sec02 truth-tags, sec41 HCRL, sec73.5 warden-receipts-or-halt, v0.8 F5 self_falsifying, v1.0.3.1 F14 RaterQuorumAttestation.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "criterion_id",
+    "criterion_text",
+    "falsifiable_predicate_sha256",
+    "evidence_kind_required",
+    "plan_path",
+    "owner_role"
+  ],
+  "properties": {
+    "type": {
+      "const": "CriterionWitnessEntry",
+      "description": "Discriminator. Always 'CriterionWitnessEntry'."
+    },
+    "schema_version": {
+      "const": "aep-criterion-witness-chain-0.1",
+      "description": "Schema version pin."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^cwe:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable CWE id. Recommended: cwe:<plan-slug>:<criterion-id>."
+    },
+    "criterion_id": {
+      "type": "string",
+      "pattern": "^crit:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable criterion ID. Recommended: crit:<plan-slug>:<N>.",
+      "maxLength": 256
+    },
+    "criterion_text": {
+      "type": "string",
+      "description": "Verbatim criterion text from the PLAN.html. Preserved for sec73.2 operator-verbatim-sacred when criteria are operator-supplied.",
+      "minLength": 1,
+      "maxLength": 4096
+    },
+    "falsifiable_predicate_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "sha256 of the canonical-JSON encoding of a machine-checkable predicate. Predicate format is implementation-defined (Python dotted-path callable, JSONPath assertion, etc.) but MUST resolve to a deterministic pass/fail check at validation time."
+    },
+    "evidence_kind_required": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "enum": [
+          "file_sha256_match",
+          "test_exit_0",
+          "command_output_match",
+          "claim_promotion_event",
+          "rater_quorum_attestation",
+          "external_signature",
+          "screenshot_pHash",
+          "hcrl_receipt_row",
+          "regex_pattern_match",
+          "structural_assertion"
+        ]
+      },
+      "description": "Allowed evidence kinds the witness MUST present in its CompletionAttestation. Pathfinder + judge converge on enumerated kinds; adversary mandates the structural enforcement."
+    },
+    "plan_path": {
+      "type": "string",
+      "description": "Repo-relative path to the PLAN.html (or PLAN.md) that owns this criterion.",
+      "maxLength": 512
+    },
+    "owner_role": {
+      "type": "string",
+      "enum": [
+        "strategist","pathfinder","scout","forge","judge","adversary","warden","scribe","curator","visual-judge","diana","operator"
+      ],
+      "description": "Canonical owner role responsible for emitting the matching CompletionAttestation."
+    },
+    "supersedes_criterion_id": {
+      "type": ["string", "null"],
+      "pattern": "^crit:[a-z0-9][a-z0-9._:-]*$",
+      "description": "If this criterion supersedes a prior one (e.g., during plan revision), link the prior. Forms the criterion DAG natively."
+    },
+    "blocking_severity": {
+      "type": "string",
+      "enum": ["BLOCK", "WARN", "INFO"],
+      "default": "BLOCK",
+      "description": "If BLOCK, completion claim CANNOT promote without a passing witness signature for this criterion. WARN = packet validates with warning. INFO = informational only."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC when this criterion was canonicalized."
+    }
+  },
+  "examples": [
+    {
+      "type": "CriterionWitnessEntry",
+      "schema_version": "aep-criterion-witness-chain-0.1",
+      "id": "cwe:v1-1-build:c-001",
+      "criterion_id": "crit:v1-1-build:001",
+      "criterion_text": "All 15 schemas validate clean under jsonschema lib with additionalProperties:false on top-level.",
+      "falsifiable_predicate_sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "evidence_kind_required": ["test_exit_0", "command_output_match"],
+      "plan_path": "doctrine/_proposals/diana-2026-05-18-v11-legion-convergence-synthesis.md",
+      "owner_role": "forge",
+      "supersedes_criterion_id": null,
+      "blocking_severity": "BLOCK",
+      "created_at": "2026-05-18T10:00:00Z"
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:invariant-contract:0.1",
+  "title": "AEP v1.2 Invariant Contract Claim",
+  "description": "v1.2 contract layer primitive (operator source.md L11-14). Every packet declares, in plain and machine-checkable form: 'What must always be true about this packet?' Operator-named 6 examples verbatim: every promoted claim must have a source / every source must have a provenance type / every completion claim must link to success criteria / every score must have a rubric / every rubric must have reviewer evidence / every external file must have a content hash. Turns AEP from 'evidence after the fact' into 'invalid states cannot exist.' Lineage EXTENDS TLA+ state-invariant idiom + Hoare-logic preconditions + Eiffel design-by-contract per scout external prior-art search. Composes_with: v1.1 F18 SourceProvenanceGraph (invariant violations become lineage defects).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "invariant_name",
+    "machine_checkable_predicate",
+    "plain_language_form",
+    "scope",
+    "violation_class",
+    "violation_outcome",
+    "operator_directive_basis_line_range",
+    "lineage_basis",
+    "declared_at",
+    "declare_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "Invariant",
+      "description": "Discriminator. New claim type 'Invariant' added to data/claims.jsonl per operator L13. Composes with v1.1 + v0.8 claim type discriminators."
+    },
+    "schema_version": {
+      "const": "aep-invariant-contract-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^inv:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "invariant_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Human-readable invariant name. Examples (operator L13 verbatim): 'every_promoted_claim_must_have_a_source' / 'every_source_must_have_a_provenance_type' / 'every_completion_claim_must_link_to_success_criteria' / 'every_score_must_have_a_rubric' / 'every_rubric_must_have_reviewer_evidence' / 'every_external_file_must_have_a_content_hash'."
+    },
+    "machine_checkable_predicate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["form", "expression"],
+      "properties": {
+        "form": {
+          "type": "string",
+          "enum": ["jsonpath", "rego_policy", "python_callable", "regex", "shacl_shape", "tla_action"],
+          "description": "Operator L13 requires invariants to be 'plain and machine-checkable.' This field selects the executable form."
+        },
+        "expression": {
+          "type": "string",
+          "description": "The machine-checkable expression. Examples: jsonpath '$.claims[?(@.truth_tag == \"PROVEN/RELIABLE\" && @.basis_source_ids.length == 0)]' (negation; should match zero rows). Rego: 'deny[reason] { input.claim.truth_tag == \"PROVEN/RELIABLE\"; not input.claim.basis_source_ids }'."
+        },
+        "expected_match_count_on_compliant_packet": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Sanity check. For negation-pattern jsonpath, expected = 0. For positive-pattern, expected >= 1."
+        }
+      }
+    },
+    "plain_language_form": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "description": "Operator L13 requires invariants to be 'plain.' Civilian-readable. Banned-term linter applies."
+    },
+    "scope": {
+      "type": "string",
+      "enum": ["packet_global", "claim_local", "source_local", "review_local", "validation_local", "ledger_row", "manifest_extension"],
+      "description": "Where in the canonical 7-file shape this invariant applies."
+    },
+    "violation_class": {
+      "type": "string",
+      "enum": [
+        "missing_required_field",
+        "type_mismatch",
+        "reference_unresolved",
+        "duplicate_id",
+        "ordering_violation",
+        "hash_mismatch",
+        "principal_collision",
+        "rubric_undefined",
+        "provenance_missing",
+        "witness_missing",
+        "expiry_missing"
+      ]
+    },
+    "violation_outcome": {
+      "type": "string",
+      "enum": ["REJECT", "WARN", "DOWNGRADE_TRUTH_TAG", "QUARANTINE"],
+      "description": "What happens when this invariant is violated. REJECT = packet does not validate. WARN = validates with AEP12_INV_<name> warning. DOWNGRADE_TRUTH_TAG = packet's claim truth tags auto-downgrade to EXPERIMENTAL. QUARANTINE = packet promoted to STAGED-PENDING."
+    },
+    "operator_directive_basis_line_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_line", "end_line", "source_path"],
+      "properties": {
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "source_path": {
+          "type": "string",
+          "const": "research/sources/operator-2026-05-18-aep-v12-immune-system/assets/source.md",
+          "description": "Operator-directive inheritance per sec73.3. The 6 operator-named invariants live at L13."
+        }
+      }
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "F18 lineage. Invariant Contract EXTENDS: TLA+ state-invariant idiom + Hoare-logic preconditions + Eiffel design-by-contract."
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    },
+    "declared_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "declare_signature_ed25519": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "Invariant",
+      "schema_version": "aep-invariant-contract-0.1",
+      "id": "inv:every-promoted-claim-must-have-a-source",
+      "invariant_name": "every_promoted_claim_must_have_a_source",
+      "machine_checkable_predicate": {
+        "form": "rego_policy",
+        "expression": "deny[reason] { input.claim.truth_tag == \"PROVEN/RELIABLE\"; not input.claim.basis_source_ids; reason := \"PROVEN/RELIABLE claim must cite at least one source\" }",
+        "expected_match_count_on_compliant_packet": 0
+      },
+      "plain_language_form": "Every PROVEN/RELIABLE claim must cite at least one source.",
+      "scope": "claim_local",
+      "violation_class": "provenance_missing",
+      "violation_outcome": "REJECT",
+      "operator_directive_basis_line_range": {
+        "start_line": 13,
+        "end_line": 13,
+        "source_path": "research/sources/operator-2026-05-18-aep-v12-immune-system/assets/source.md"
+      },
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "TLA+ state-invariant idiom",
+          "Hoare-logic preconditions",
+          "Eiffel design-by-contract"
+        ],
+        "verifying_grep": "rg 'tla|hoare logic|design by contract|eiffel' --type md research/sources/",
+        "n_hits": 0
+      },
+      "declared_at": "2026-05-18T08:00:00Z",
+      "declare_signature_ed25519": "ed25519_pending_phase_1_keypair"
+    }
+  ]
+}

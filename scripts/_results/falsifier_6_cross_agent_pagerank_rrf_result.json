@@ -1,0 +1,289 @@
+{
+  "depth": 20,
+  "falsifier": "F6-cross-agent-cites-recall-PAGERANK-RRF-4-RANKER",
+  "methodology": "rrf-fuse(bm25,contextual,tfidf,pagerank)-k60-depth20",
+  "n_cross_agent_citations": 191,
+  "n_match_3_ranker": 8,
+  "n_match_4_ranker_with_pagerank": 8,
+  "n_verified": 126,
+  "pagerank_delta_full": 0.0,
+  "pagerank_delta_verified": 0.0,
+  "pagerank_nodes_loaded": 754,
+  "per_query": [
+    {
+      "citation": "ledger::forge::lamport-208::cross-agent-citation-test-forge",
+      "cited_agent": "forge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 10,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::judge::lamport-203::meta-validate-lag-perfection-claims",
+      "cited_agent": "judge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 5,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::pathfinder::lamport-57::section-56-promotion-ladder",
+      "cited_agent": "pathfinder",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 3,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::judge::lamport-205::cross-agent-citation-test-judge-rerun-circularity",
+      "cited_agent": "judge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 1,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::curator::lamport-57::cross-agent-citation-test-curator",
+      "cited_agent": "curator",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 1,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::forge::lamport-210::closure-surge-forge-close-h1-h2",
+      "cited_agent": "forge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 14,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::judge::lamport-207::closure-surge-judge-task-aligned",
+      "cited_agent": "judge",
+      "citing_agent": "adversary",
+      "match_3_ranker": true,
+      "match_4_ranker_with_pagerank": true,
+      "pool_size": 5,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::pathfinder::lamport-59::closure-surge-pathfinder-g2-ladder",
+      "cited_agent": "pathfinder",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 6,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::final-round-scout-retrieva",
+      "cited_agent": "scout",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 1,
+      "validation": "fabricated"
+    },
+    {
+      "citation": "ledger::forge::lamport-211::final-round-forge-task-aligned-harness-2026-05-15",
+      "cited_agent": "forge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 17,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::pathfinder::lamport-58::max-power-wave-pathfinder-2026-05-15",
+      "cited_agent": "pathfinder",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 3,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::forge::lamport-213::investigation-loop-1-forge-co",
+      "cited_agent": "forge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 17,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::judge::lamport-null-f2679de28a50::investigation-loo",
+      "cited_agent": "judge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 7,
+      "validation": "fabricated"
+    },
+    {
+      "citation": "ledger::scribe::lamport-null-7d9e3f2a1c8b4e5f6a7b8c9d::investigation-loo",
+      "cited_agent": "scribe",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 13,
+      "validation": "fabricated"
+    },
+    {
+      "citation": "ledger::forge::lamport-214::investigation-loop-2-forge-rrf-fusion-build-2026-05-",
+      "cited_agent": "forge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 14,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::judge::lamport-208::final-round-judge-f6-battery-2026-05-15",
+      "cited_agent": "judge",
+      "citing_agent": "adversary",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 7,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::pathfinder::lamport-57::section-56-promotion-ladder",
+      "cited_agent": "pathfinder",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 9,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::judge::lamport-null-e7a02fd1c3b5::verify-tc-d-re-run-independent",
+      "cited_agent": "judge",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 18,
+      "validation": "fabricated"
+    },
+    {
+      "citation": "ledger::warden::lamport-null-9b7897f3485e::operator-double-3-warden-doctrine-val",
+      "cited_agent": "warden",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 19,
+      "validation": "fabricated"
+    },
+    {
+      "citation": "ledger::pathfinder::lamport-57::section-56-promotion-ladder-cross-agent-citation",
+      "cited_agent": "pathfinder",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 4,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::scribe::lamport-null-7a8bd00b95a9::sibling-77-composes-with-audit",
+      "cited_agent": "scribe",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 8,
+      "validation": "fabricated"
+    },
+    {
+      "citation": "ledger::judge::lamport-204::sibling-77-meta-validate-truth-tag-honesty",
+      "cited_agent": "judge",
+      "citing_agent": "curator",
+      "match_3_ranker": true,
+      "match_4_ranker_with_pagerank": true,
+      "pool_size": 3,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::judge::lamport-206::max-power-wave-judge-audit-ac1-ac2-f6-post-closure",
+      "cited_agent": "judge",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 6,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::pathfinder::lamport-59::closure-surge-pathfinder-g2-detailed-ladder",
+      "cited_agent": "pathfinder",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 6,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::forge::lamport-211::f6-task-aligned-harness",
+      "cited_agent": "forge",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 16,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::judge::lamport-208::f6-4-variant-battery",
+      "cited_agent": "judge",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 13,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::retrieval-arch-14-preceden",
+      "cited_agent": "scout",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 2,
+      "validation": "fabricated"
+    },
+    {
+      "citation": "ledger::forge::lamport-211::f6-task-aligned-harness-tf-idf-cosine-filter",
+      "cited_agent": "forge",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 16,
+      "validation": "verified"
+    },
+    {
+      "citation": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::external-prior-art-retriev",
+      "cited_agent": "scout",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 2,
+      "validation": "fabricated"
+    },
+    {
+      "citation": "ledger::scout::lamport-48::external-prior-art-slug-agnostic-match-bm25-short-doc",
+      "cited_agent": "scout",
+      "citing_agent": "curator",
+      "match_3_ranker": false,
+      "match_4_ranker_with_pagerank": false,
+      "pool_size": 2,
+      "validation": "verified"
+    }
+  ],
+  "recall_3_ranker_full": 0.0419,
+  "recall_3_ranker_verified": 0.0635,
+  "recall_4_ranker_full": 0.0419,
+  "recall_4_ranker_verified": 0.0635,
+  "top_k": 5
+}

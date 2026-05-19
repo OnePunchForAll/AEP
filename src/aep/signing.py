@@ -1,12 +1,12 @@
 """signing.py — Apache-2.0 — AEP v0.7-rc1 Ed25519 signing lane.
 
 Implements `aep:0.7/signed` profile per SP-R8-02 + warden H1+H2 + curator
-LAW-V1-C from review cycle. Signing is OPTIONAL — packets without
+LAW-V1-C from knowledge-run-1. Signing is OPTIONAL — packets without
 signature still validate under non-signed profiles. Identity gap surfaced
 in v0.6.1 via AEP61_IDENTITY_UNAUTHENTICATED INFO finding is closed when a
 v0.7-signed packet is verified.
 
-Signature design (closes internal review input TRIPLE-converged "No Self-Signature
+Signature design (closes operator-bundle TRIPLE-converged "No Self-Signature
 in Signed Bytes" law):
 
   1. BODY (data/* + canonical_files) is hashed → state_hash (already in v0.6).
@@ -22,7 +22,7 @@ in Signed Bytes" law):
      manifest_hash computation. signatures[] is EXCLUDED from manifest_hash
      basis (same exclusion as manifest_hash itself).
 
-This avoids the self-reference circularity warned about in internal review input
+This avoids the self-reference circularity warned about in operator-bundle
 Analysis 3 ("CID verification gap") and Analysis 5 ("No Self-Including
 Signature").
 

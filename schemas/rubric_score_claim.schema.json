@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:rubric-score-claim:0.1",
+  "title": "AEP RubricScore Claim",
+  "description": "v1.0.3.1 A4 backport. RubricScore is a new claim.type value formally added to claims.jsonl row vocab. Every rubric verdict's per-dimension score becomes a structured queryable claim instead of prose narrative. The rubric_definitional_closure_set field is the LOAD-BEARING addition that closes the v1.0.3 VG04 root cause (list-valued recall-field overlap-threshold ambiguity). Composes_with: doctrine/02-truth-tags.html, doctrine/41-hash-chained-receipt-ledger.html, doctrine/69-verification-law-and-operator-spec-sovereignty.html sec69.5 operator-verbatim-sacred, AEP_v1_0_3_SPEC.md sec3 RegexicalCue, rater_quorum_attestation.schema.json.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "rubric_id",
+    "dimension_id",
+    "dimension_label",
+    "score",
+    "score_scale",
+    "bound_to_artifact_sha256",
+    "rater_principal_id"
+  ],
+  "properties": {
+    "type": {
+      "const": "RubricScore",
+      "description": "Discriminator. Always 'RubricScore'. Adds 'RubricScore' to the v0.5+ claim.type vocab."
+    },
+    "schema_version": {
+      "const": "aep-rubric-score-0.1",
+      "description": "Schema version pin."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^rubricscore:[a-z0-9][a-z0-9._:-]*:v[0-9]+$",
+      "description": "Stable RubricScore id. Recommended pattern: rubricscore:<rubric-slug>:<dimension-slug>:<rater-slug>:v0."
+    },
+    "rubric_id": {
+      "type": "string",
+      "description": "Stable id of the rubric this score applies to (e.g., 'vg04-blind-recall-v1.0.3' or 'vg04-blind-recall-v1.0.3.1')."
+    },
+    "rubric_version": {
+      "type": "string",
+      "description": "Optional version of the rubric. Allows tracking rubric refinement across v1.0.3 -> v1.0.3.1.",
+      "examples": ["1.0.3", "1.0.3.1"]
+    },
+    "dimension_id": {
+      "type": "string",
+      "description": "Stable id of the dimension being scored (e.g., 'failure_prevented_overlap', 'packet_id_drift', 'stop_condition_present', 'fabrication_count', 'overall_rubric_5pt')."
+    },
+    "dimension_label": {
+      "type": "string",
+      "description": "Human-readable label."
+    },
+    "score": {
+      "type": "number",
+      "description": "Numeric score. Range determined by score_scale."
+    },
+    "score_scale": {
+      "type": "string",
+      "enum": ["0_to_5", "0_to_10", "normalized_0_to_1"],
+      "description": "Scale identifier. 0_to_5 default for VG04 rubric (matches operator source.md L274-280)."
+    },
+    "score_label": {
+      "type": "string",
+      "enum": [
+        "EXACT",
+        "GOOD",
+        "HARD_PLUS",
+        "HARD",
+        "FAIL_EASY",
+        "FAIL_MISLEADING",
+        "BLACKOUT"
+      ],
+      "description": "Optional categorical label corresponding to operator source.md L274-280 rubric levels."
+    },
+    "bound_to_artifact_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Anchor: sha256 of the artifact being scored (e.g., recall_payload, packet, attempt). Drift here invalidates the score."
+    },
+    "rater_principal_id": {
+      "type": "string",
+      "description": "Who scored. Must match a raters[].principal_id in the associated RaterQuorumAttestation."
+    },
+    "rater_role": {
+      "type": "string",
+      "enum": [
+        "strategist",
+        "pathfinder",
+        "scout",
+        "forge",
+        "judge",
+        "adversary",
+        "warden",
+        "scribe",
+        "curator",
+        "visual-judge",
+        "diana",
+        "operator",
+        "external_reader"
+      ],
+      "description": "Optional rater role for lens-class queries."
+    },
+    "rationale_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "sha256 of the rationale prose. Allows audit without inlining full text."
+    },
+    "rationale_text": {
+      "type": "string",
+      "maxLength": 8192,
+      "description": "Optional inline rationale. If present and rationale_sha256 also present, validator verifies sha256(rationale_text) == rationale_sha256."
+    },
+    "session_id": {
+      "type": "string",
+      "description": "Session in which this score was emitted. Validates against RaterQuorumAttestation session_id uniqueness."
+    },
+    "time_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "rubric_definitional_closure_set": {
+      "type": "array",
+      "description": "LOAD-BEARING ADDITION: closes the v1.0.3 VG04 rubric-definitional-gap on list-valued recall fields. Every dimension that is scored MUST have a closure entry specifying: (a) how partial-overlap is resolved, (b) the partial-credit formula, (c) the list-overlap threshold (for list-valued dimensions), and (d) the load-bearing-vs-decorative classifier. This is the field that makes the rubric MACHINE-CHECKABLE rather than rater-discretion.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dimension_id", "definitional_resolution"],
+        "properties": {
+          "dimension_id": {
+            "type": "string",
+            "description": "Must match a dimension_id used in a RubricScore claim for this rubric."
+          },
+          "definitional_resolution": {
+            "type": "string",
+            "description": "Plain-English statement of how this dimension is resolved when ambiguous. Example for failure_prevented[]: 'Item is LOAD-BEARING if it names a specific lesson_id or doctrine sec-number; DECORATIVE otherwise. Score gold-overlap on LOAD-BEARING items only.'"
+          },
+          "partial_credit_formula": {
+            "type": "string",
+            "description": "Computable formula expressing partial credit. Example: 'partial_credit = (overlap_count_load_bearing / gold_load_bearing_count) clamped 0-1; final_score = partial_credit * 4.0 + (presence_of_stop_condition * 1.0)'. Validator REPRODUCES this computation if all inputs are present in the bound artifact."
+          },
+          "list_overlap_threshold": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 1.0,
+            "description": "For list-valued dimensions: fraction of gold-list items that must overlap for the field to count as 'present' rather than 'missing'. Default 0.5 (majority overlap) per v1.0.3 judge tiebreaker analysis."
+          },
+          "load_bearing_classifier": {
+            "type": "string",
+            "description": "Decision rule that distinguishes load-bearing from decorative items in a list. Example: 'item is load-bearing if substring contains \"lesson_id\" OR \"sec-\" OR matches /\\bsec\\d+/i; else decorative.'"
+          },
+          "applies_to_scale": {
+            "type": "string",
+            "enum": ["0_to_5", "0_to_10", "normalized_0_to_1"],
+            "description": "Which score_scale this closure entry applies to."
+          },
+          "version": {
+            "type": "string",
+            "description": "Optional version of this closure rule (e.g., '1.0.3.1.a' for the first revision)."
+          }
+        }
+      }
+    },
+    "computed_inputs": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Inputs the partial_credit_formula references, captured for audit reproducibility. Example: {gold_load_bearing_count: 3, overlap_count_load_bearing: 1, presence_of_stop_condition: 1}."
+    },
+    "computed_score_from_formula": {
+      "type": "number",
+      "description": "Score recomputed by validator from partial_credit_formula + computed_inputs. Validator emits RUBRICSCORE_FORMULA_DRIFT warning if |score - computed_score_from_formula| > 0.25."
+    },
+    "rater_quorum_attestation_id": {
+      "type": "string",
+      "pattern": "^rqa:[a-z0-9][a-z0-9._:-]*:v[0-9]+$",
+      "description": "Optional pointer to the RaterQuorumAttestation that this score participates in (forming the multi-rater bundle)."
+    },
+    "composes_with": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}

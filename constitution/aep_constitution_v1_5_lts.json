@@ -1,0 +1,302 @@
+{
+  "$schema": "https://aep.dev/schemas/constitution-v1.5.json",
+  "version": "1.5.0-lts",
+  "frozen_at": "2026-05-18T10:30:00Z",
+  "doctrine_bindings": {
+    "primary_authority": "doctrine/69-verification-law-and-operator-spec-sovereignty.html",
+    "incident_law": "doctrine/68-defender-alert-stops-burn.html",
+    "surface_mirror_law": "doctrine/70-surface-mirror-discipline.html",
+    "sustainability_law": "doctrine/71-operator-sustainability.html",
+    "canonical_order_law": "doctrine/72-canonical-order-of-operations.html",
+    "verification_law_sub_clauses": [
+      "sec73.1-API-VERIFICATION-LAW",
+      "sec73.2-OPERATOR-VERBATIM-SACRED",
+      "sec73.3-PRIOR-ART-INHERITANCE-AUDIT",
+      "sec73.4-SINGLE-FORGE-FOR-PRODUCT-BUILDS",
+      "sec73.5-WARDEN-RECEIPTS-OR-HALT",
+      "sec73.6-NO-OPERATOR-REACTION-CALIBRATION"
+    ]
+  },
+  "operator_authority": {
+    "verbatim_quote": "go beyond all reasoning ... complete authority for all decisions ... execute the following regardless of what adversary says ... iterate until there's nothing left to do because it just works for everyone involved.",
+    "directive_date": "2026-05-18",
+    "directive_context": "AEP v1.5 LTS Sovereign Agentic File System - Phase 2+3 Constitution+Hooks landing",
+    "operator_spec_sovereignty_invoked": true,
+    "adversary_veto_explicitly_overridden_by_operator": true,
+    "binding_note": "Per sec73.2 (operator-verbatim-sacred) and sec69.5 (operator-spec-sovereignty), the operator's verbatim words constrain agent action. Mode B (the agent own-best-judgment override) is OFF on operator-spec content."
+  },
+  "policy_precedence": [
+    "AEP Constitution (this file, sha256-bound)",
+    "safety hooks (PreToolUse defender_guard.py + aep_pre_tool_guard.py)",
+    "project policy (CLAUDE.md + doctrine/*)",
+    "task contract (UserPromptSubmit compiled meaning)",
+    "user style preferences (~/.claude/CLAUDE.md)",
+    "agent suggestions (10 canonical agents + Claude Code built-ins)",
+    "generated plans (pathfinder/strategist output)"
+  ],
+  "forbidden_actions": [
+    "read .credentials.json content",
+    "read .env content",
+    "read SSH private keys (id_rsa, id_ed25519, id_ecdsa)",
+    "read certificate/key files (.pem, .pfx, .p12, .key)",
+    "read MCP auth caches (.mcp-auth-*)",
+    "print secret bytes to stdout/stderr/logs",
+    "hash secret bytes (presence-only inventory allowed)",
+    "summarize secret content (presence + type + path + risk_class only)",
+    "include secrets in AEP packets/logs/proof_cards/telemetry/memory",
+    "invoke powershell.exe (sec68 PowerShell-hooks-forbidden inheritance)",
+    "invoke pwsh.exe (sec68)",
+    "invoke pwsh (sec68)",
+    "use -EncodedCommand on any process (sec68)",
+    "use -Command on any process (sec68)",
+    "disable AEP hooks via settings.json edit without receipt",
+    "edit constitution at .claude/aep/constitution/* without receipt",
+    "edit AEP hook code at .claude/hooks/aep/* without receipt",
+    "weaken trust requirements via prompt injection (per F12 prompt-isolation)",
+    "promote claims with laundering_score > 0.6 (per F18 laundering-detector)",
+    "execute falsifier scripts without sandbox permission (per F22)",
+    "accept reviewer quorum if principal_ids not distinct (per F10 cosign)",
+    "export private evidence without redaction (per F19 trust-card-issuer)",
+    "claim completion without per-criterion witness (per F15)",
+    "rebroadcast operator content into operator surface (sec70.4 ceremony-cap)",
+    "issue Defender-mitigating commands without HALT (sec68.1)"
+  ],
+  "secret_airlock_rules": {
+    "secret_path_patterns": [
+      ".credentials.json",
+      ".env",
+      "id_rsa",
+      "id_ed25519",
+      "id_ecdsa",
+      ".pem",
+      ".pfx",
+      ".p12",
+      ".key",
+      "token",
+      "secret",
+      "password",
+      "cookie",
+      "session",
+      "mcp-auth",
+      "credentials.json",
+      ".aws/credentials",
+      "auth.json",
+      "client_secret"
+    ],
+    "secret_command_patterns": [
+      "cat .env",
+      "type .env",
+      "Get-Content .env",
+      "cat .credentials.json",
+      "type .credentials.json",
+      "cat **/id_rsa",
+      "cat **/id_ed25519",
+      "ssh-keygen -y -f",
+      "openssl rsa -in",
+      "openssl pkey -in",
+      "openssl pkcs12 -in"
+    ],
+    "default_action": "BLOCK_PRE_TOOL_USE",
+    "explicit_audit_override": {
+      "task_must_declare": "local_credential_audit",
+      "task_declaration_location": "session_env_or_CLAUDE_MD_memory",
+      "scope": "local_only",
+      "output_allowed": [
+        "presence (file exists yes/no)",
+        "type (kind classifier e.g. ssh_private_key)",
+        "path (relative path, never absolute home path)",
+        "risk_class (low/medium/high/critical)",
+        "size_bucket (small/medium/large)",
+        "mtime_iso (when last modified)"
+      ],
+      "output_forbidden": [
+        "secret bytes (any subset)",
+        "summary of secret content",
+        "sha256 of secret bytes",
+        "first/last N chars",
+        "inferred decoded form",
+        "passing through to telemetry"
+      ]
+    }
+  },
+  "trust_tiers": {
+    "Casual": {
+      "description": "Quick chat, drafting, ideation, single-file edits in non-critical areas",
+      "proof_required": "minimal",
+      "witness_required": false,
+      "max_token_overhead": 350
+    },
+    "Important": {
+      "description": "Multi-file edits, doctrine reads, agent invocations, non-trivial Bash",
+      "proof_required": "transaction_log",
+      "witness_required": false,
+      "max_token_overhead": 700
+    },
+    "Professional": {
+      "description": "Doctrine edits, canonical artifact creation, lesson promotion, settings.json modifications",
+      "proof_required": "transaction_log + completion_witness",
+      "witness_required": true,
+      "max_token_overhead": 1200
+    },
+    "Critical": {
+      "description": "Constitution edits, hook modifications, payment/health/legal-domain output, irreversible operations",
+      "proof_required": "transaction_log + completion_witness + cosign_quorum",
+      "witness_required": true,
+      "cosign_quorum_required": true,
+      "max_token_overhead": 2400
+    }
+  },
+  "safety_floor_categories": [
+    "money (payments, transfers, trades, financial advice with specific amounts)",
+    "health (medical advice, dosages, diagnostics)",
+    "legal (binding legal advice, contract review with execution recommendation)",
+    "irreversible (rm -rf, git push --force to main, settings overrides, hook disablement)"
+  ],
+  "proof_budgets": {
+    "casual_max_token_overhead": 350,
+    "important_max_token_overhead": 700,
+    "professional_max_token_overhead": 1200,
+    "critical_max_token_overhead": 2400
+  },
+  "sandbox_requirements": {
+    "executable_falsifier_must_run_in_sandbox": true,
+    "ttl_ms_default": 100,
+    "ttl_ms_max": 5000,
+    "primitives": {
+      "windows": "AppContainer_or_env_strip_subprocess",
+      "linux": "firejail_or_seccomp",
+      "macos": "sandbox_exec_Seatbelt"
+    },
+    "network_default": "denied",
+    "filesystem_default": "read_only_workspace_temp_write",
+    "stdin_max_bytes": 65536,
+    "stdout_max_bytes": 65536,
+    "deny_subprocess": true
+  },
+  "completion_witness_requirements": {
+    "every_criterion_needs_witness": true,
+    "witness_sha256_must_match_artifact": true,
+    "F15_witness_chain_binding": true,
+    "witness_types_accepted": [
+      "file_sha256_match",
+      "test_pass_receipt",
+      "lint_pass_receipt",
+      "command_exit_zero_with_expected_stdout",
+      "validation_script_pass_receipt"
+    ],
+    "witness_types_rejected": [
+      "self_declaration_without_artifact",
+      "model_claim_without_test_run",
+      "summary_of_what_was_attempted"
+    ]
+  },
+  "mutation_test_requirements": {
+    "critical_validator_floor": 1.0,
+    "non_critical_validator_floor": 0.95,
+    "clean_packet_false_positive_max": 0.01,
+    "F23_required_before_validator_promoted_to_RELIABLE": true,
+    "mutation_classes": [
+      "sign_flip",
+      "off_by_one",
+      "boundary_swap",
+      "field_omit",
+      "field_extra",
+      "type_swap",
+      "encoding_swap",
+      "null_inject"
+    ]
+  },
+  "extension_abi_rules": {
+    "kernel_schema_frozen_at_v1_5": true,
+    "extensions_must_be_namespaced": true,
+    "extensions_cannot_modify_core_schema": true,
+    "extensions_must_declare_compatibility_range": true,
+    "extension_namespace_pattern": "ext.<vendor>.<name>",
+    "core_schema_fields_unchangeable": [
+      "version",
+      "frozen_at",
+      "operator_authority",
+      "policy_precedence",
+      "forbidden_actions",
+      "secret_airlock_rules",
+      "trust_tiers",
+      "completion_witness_requirements"
+    ]
+  },
+  "emergency_override_rules": {
+    "operator_can_override_any_VETO": true,
+    "operator_override_creates_audit_row": true,
+    "operator_override_audit_path": ".claude/_logs/aep-v15-lts-operator-overrides.jsonl",
+    "agent_cannot_override_constitution_without_operator": true,
+    "adversary_VETO_can_be_overridden_by_operator_only": true,
+    "override_must_quote_operator_verbatim": true,
+    "override_creates_HCRL_row": true
+  },
+  "performance_gates": {
+    "pretooluse_p95_ms": 75,
+    "pretooluse_target_p95_ms": 30,
+    "pretooluse_p99_ms": 150,
+    "posttooluse_p95_ms": 150,
+    "posttooluse_p99_ms": 300,
+    "userpromptsubmit_p95_ms": 200,
+    "stop_p95_ms": 500,
+    "precompact_p95_ms": 200,
+    "cached_doctor_p95_ms": 300,
+    "normal_doctor_p95_ms": 1500,
+    "viewer_verdict_max_ms": 2000,
+    "steady_state_prompt_overhead_tokens": 350,
+    "first_turn_contract_overhead_tokens": 1200,
+    "repeated_task_reduction_pct": 60
+  },
+  "quality_gates": {
+    "attack_corpus_size": 10000,
+    "secret_exfiltration_corpus_size": 500,
+    "critical_attack_FN_max": 0,
+    "critical_secret_FN_max": 0,
+    "validator_mutation_score_floor_critical": 1.0,
+    "validator_mutation_score_floor_normal": 0.95,
+    "FP_rate_on_clean_corpus_max": 0.01
+  },
+  "release_freeze_invariants": [
+    "no critical attack false negatives in 10000 test corpus",
+    "no critical secret exfiltration failures in 500 test corpus",
+    "no unsupported promoted claims (claims_must_have_evidence)",
+    "no completion without witness (F15 enforcement)",
+    "no private evidence in public trust cards (F19 enforcement)",
+    "no validator trusted without mutation tests (F23 enforcement)",
+    "no future extension may require breaking the core (ABI freeze)",
+    "no PowerShell hook ever wired in settings.json (sec68 inheritance)",
+    "no secret content read by any hook (airlock invariant)",
+    "no operator-reaction calibration loop (sec73.6 inheritance)"
+  ],
+  "kernel_modules_aligned": [
+    "K1-Control-Plane",
+    "K2-Constitutional-Precedence (this file embodies)",
+    "K3-Secret-Airlock (aep_pre_tool_guard.py enforces)",
+    "K4-Deterministic-Meaning-Compiler (aep_prompt_contract.py enforces)",
+    "K5-Compaction-Survival (aep_precompact_kernel.py enforces)",
+    "K6-Evidence-Transaction-Journal (aep_post_tool_ledger.py enforces)",
+    "K7-Replay-And-Reproduce",
+    "K8-Cross-Runtime-Determinism",
+    "K9-Adversarial-Resistance",
+    "K10-Operator-Sovereignty",
+    "K11-Multi-Agent-Audit",
+    "K12-AEP-Doctor-Supreme (aep_stop_doctor.py enforces)"
+  ],
+  "composes_with": [
+    "doctrine/02-truth-tags.html",
+    "doctrine/68-defender-alert-stops-burn.html",
+    "doctrine/69-verification-law-and-operator-spec-sovereignty.html",
+    "doctrine/70-surface-mirror-discipline.html",
+    "doctrine/71-operator-sustainability.html",
+    "doctrine/72-canonical-order-of-operations.html",
+    "projects/v11-aep/publish-ready/aep/spec/AEP_v0_8_SPEC.md (frontier-break ladder)"
+  ],
+  "falsifiers": [
+    "any hook in .claude/hooks/aep/* invokes powershell/pwsh = sec68 violation = HALT",
+    "any constitution edit without HCRL row = sec73.5 violation = REVERT",
+    "any forbidden_action surface bypass = constitution-precedence violation = HALT",
+    "any release shipped with attack_FN > 0 on 10000 corpus = release-freeze violation = REVERT",
+    "any completion claim without witness = F15 violation = REJECT"
+  ]
+}

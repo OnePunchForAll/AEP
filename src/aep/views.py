@@ -1,6 +1,6 @@
 """views.py — Apache-2.0 — AEP v0.7-rc1 view derivation engine.
 
-Implements visual-judge review cycle findings: deterministic view projections derived
+Implements visual-judge KR-1 findings: deterministic view projections derived
 from canonical AEP packet data. Three view types ship in v0.7-rc1:
 
   - views/claim-ledger.html — claim/source/span table view
@@ -141,7 +141,7 @@ def derive_integrity_tree_svg(packet_root: Path) -> str:
 
     Three rooted subtrees: state_hash (over data/*), manifest_hash (over aepkg.json
     minus manifest_hash field), assets_merkle_root (over assets/). Visible
-    disjointness proves body/envelope split per §3.2.1.
+    disjointness proves body/envelope split per §V60-2.1.
     """
     manifest = _read_manifest(packet_root)
     integrity = manifest.get("integrity", {}) if isinstance(manifest.get("integrity"), dict) else {}
@@ -185,7 +185,7 @@ def derive_integrity_tree_svg(packet_root: Path) -> str:
                  '.edge{stroke:#888;fill:none;stroke-width:1}'
                  'text{text-anchor:middle}'
                  '</style>\n')
-    parts.append('<text x="450" y="20" font-weight="bold" font-size="14">AEP integrity envelope — §3.2.1 disjoint hash bases</text>\n')
+    parts.append('<text x="450" y="20" font-weight="bold" font-size="14">AEP integrity envelope — §V60-2.1 disjoint hash bases</text>\n')
 
     # Column headers
     parts.append(f'<text x="{col_x[0]}" y="50" font-weight="bold">BODY (data/*)</text>\n')
@@ -245,7 +245,7 @@ def derive_integrity_tree_svg(packet_root: Path) -> str:
 
     # Footer: invariant note
     parts.append('<text x="450" y="495" font-size="11" fill="#555">'
-                 'Invariant §3.2.1: state_hash MUST NOT reference envelope fields (no self-reference circles)'
+                 'Invariant §V60-2.1: state_hash MUST NOT reference envelope fields (no self-reference circles)'
                  '</text>')
     parts.append("</svg>\n")
     return "".join(parts)

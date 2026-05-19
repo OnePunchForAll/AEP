@@ -1,0 +1,190 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:policy-rego:0.1",
+  "title": "AEP v1.2 Policy-as-Code Rego Record",
+  "description": "v1.2 immune-system primitive (operator source.md L21). Some rules should not live in prompts; they should live in executable policy. Operator-named 4 example rules verbatim: 'Do not promote claims with laundering_score > 0.6' / 'do not run executable validation without sandbox permission' / 'do not accept reviewer quorum if principal IDs are not distinct' / 'do not export private evidence without redaction.' Operator L21 cites Open Policy Agent/Rego as 'strong precedent.' Lineage EXTENDS Open Policy Agent + Rego policy language. v1.2 ships one-way export to Rego (full import STAGED v1.3+). Composes_with: v1.1 F14 RaterQuorumAttestation (quorum-distinct-principal rule) + v1.2 F24 (private-export-without-redaction rule) + v1.2 SandboxGate (sandbox-permission rule). A4 + A5 + A6 + A11 adversary closures all mappable to policy rules per HV closure summary.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "policy_name",
+    "policy_kind",
+    "rego_expression",
+    "operator_directive_basis_line_range",
+    "policy_target_field_path",
+    "violation_outcome",
+    "ci_gate_enforcement",
+    "lineage_basis",
+    "policy_authored_at",
+    "policy_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "PolicyRegoRecord",
+      "description": "Discriminator. Always 'PolicyRegoRecord'."
+    },
+    "schema_version": {
+      "const": "aep-policy-rego-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^pol:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "policy_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256
+    },
+    "policy_kind": {
+      "type": "string",
+      "enum": [
+        "promotion_gate",
+        "export_gate",
+        "execution_gate",
+        "quorum_gate",
+        "redaction_gate",
+        "sandbox_gate",
+        "trust_dial_floor_gate",
+        "invariant_gate"
+      ],
+      "description": "Which gate class this policy enforces."
+    },
+    "rego_expression": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["expression", "rego_dialect", "compiled_against_opa_version"],
+      "properties": {
+        "expression": {
+          "type": "string",
+          "minLength": 16,
+          "description": "The Rego policy expression. Examples (operator L21 verbatim): 'deny[reason] { input.claim.laundering_score > 0.6; reason := \"laundering_score above promotion threshold\" }'."
+        },
+        "rego_dialect": {
+          "type": "string",
+          "enum": ["rego_v0", "rego_v1"],
+          "description": "Rego language dialect. v0 (legacy) vs v1 (modern, opa 0.46+)."
+        },
+        "compiled_against_opa_version": {
+          "type": "string",
+          "description": "OPA version this policy was compiled and tested against (e.g., '0.65.0'). Per sec73.1 API-verification-law: cite docs or do not call."
+        }
+      }
+    },
+    "operator_directive_basis_line_range": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["start_line", "end_line", "source_path"],
+      "properties": {
+        "start_line": {"type": "integer", "minimum": 1},
+        "end_line": {"type": "integer", "minimum": 1},
+        "source_path": {
+          "type": "string",
+          "const": "research/sources/operator-2026-05-18-aep-v12-immune-system/assets/source.md"
+        }
+      }
+    },
+    "policy_target_field_path": {
+      "type": "string",
+      "description": "JSON path to the input field this policy evaluates. Example: '$.claim.basis_source_ids' or '$.review.principal_ids'."
+    },
+    "violation_outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "civilian_phrasing"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["REJECT_PROMOTION", "REJECT_EXPORT", "REJECT_EXECUTION", "WARN_WITH_DOWNGRADE", "QUARANTINE"]
+        },
+        "civilian_phrasing": {
+          "type": "string",
+          "description": "Plain-language explanation when policy denies. Banned-term linter applies."
+        }
+      }
+    },
+    "ci_gate_enforcement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["enforced_in_ci", "test_fixture_path"],
+      "properties": {
+        "enforced_in_ci": {
+          "type": "boolean",
+          "description": "Whether the policy fires as a CI gate (true) or advisory-only (false). HV closures HARD-CONSTRAINED policies MUST be true."
+        },
+        "test_fixture_path": {
+          "type": "string",
+          "description": "Path to the CI test fixture that exercises both PASS and FAIL paths."
+        }
+      }
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "F18 lineage. Policy-as-code EXTENDS: Open Policy Agent + Rego policy language + CNCF policy primitives."
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    },
+    "policy_authored_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "policy_signature_ed25519": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "PolicyRegoRecord",
+      "schema_version": "aep-policy-rego-0.1",
+      "id": "pol:laundering-score-promotion-gate",
+      "policy_name": "block_promotion_when_laundering_score_above_threshold",
+      "policy_kind": "promotion_gate",
+      "rego_expression": {
+        "expression": "package aep.v1_2.promotion\n\ndeny[reason] {\n  input.claim.laundering_score > 0.6\n  reason := sprintf(\"claim %v has laundering_score %.2f above 0.6 threshold\", [input.claim.id, input.claim.laundering_score])\n}",
+        "rego_dialect": "rego_v1",
+        "compiled_against_opa_version": "0.65.0"
+      },
+      "operator_directive_basis_line_range": {
+        "start_line": 21,
+        "end_line": 21,
+        "source_path": "research/sources/operator-2026-05-18-aep-v12-immune-system/assets/source.md"
+      },
+      "policy_target_field_path": "$.claim.laundering_score",
+      "violation_outcome": {
+        "status": "REJECT_PROMOTION",
+        "civilian_phrasing": "This claim's source provenance looks suspicious — too many sources trace back to AI-generated content. Promotion blocked until evidence chain is checked."
+      },
+      "ci_gate_enforcement": {
+        "enforced_in_ci": true,
+        "test_fixture_path": "projects/v11-aep/publish-ready/aep/tests/test_policy_blocks_high_laundering.py"
+      },
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "Open Policy Agent",
+          "Rego policy language",
+          "CNCF policy primitives"
+        ],
+        "verifying_grep": "rg 'open policy agent|rego|opa policy' --type md research/sources/",
+        "n_hits": 0
+      },
+      "policy_authored_at": "2026-05-18T08:35:00Z",
+      "policy_signature_ed25519": "ed25519_pending_phase_5_keypair"
+    }
+  ]
+}

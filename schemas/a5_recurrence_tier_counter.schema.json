@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:a5-recurrence-tier-counter:0.1",
+  "title": "AEP v1.1 A5 Recurrence Tier Counter",
+  "description": "v1.1 A5 amendment (STRONGLY PLAUSIBLE × CONTEXT-BOUND PATTERN). Two-agent convergence (curator + adversary implicit). Integer rt_count per claim (1=receipt, 2=memory, 3=rule/hook/test). Operator heuristic: 1st mistake = receipt; 2nd recurrence = memory promotion; 3rd recurrence = rule/hook/test promotion. Composes_with: sec02 truth-tags (recurrence drives promotion tier), v1.0.3 RegexicalCue (cues tally per-lesson recurrences).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_claim_id",
+    "rt_count",
+    "tier_label",
+    "last_observed_at"
+  ],
+  "properties": {
+    "type": {
+      "const": "RecurrenceTierCounter"
+    },
+    "schema_version": {
+      "const": "aep-recurrence-tier-counter-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^rtc:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_claim_id": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "rt_count": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Number of observed recurrences. 1 = receipt-only. 2 = memory-promotion threshold. 3 = rule/hook/test promotion threshold. >3 = doctrine slot candidate."
+    },
+    "tier_label": {
+      "type": "string",
+      "enum": ["receipt", "memory", "rule_hook_test", "doctrine_candidate"],
+      "description": "Tier derived from rt_count via the operator heuristic. receipt = rt_count==1; memory = rt_count==2; rule_hook_test = rt_count==3; doctrine_candidate = rt_count>3."
+    },
+    "last_observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "observation_artifact_ids": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Artifact IDs where the claim was re-observed. Sec73.5 audit-replay anchor."
+    },
+    "promotion_action_triggered_at_rt_count": {
+      "type": ["integer", "null"],
+      "minimum": 1,
+      "description": "rt_count at which a promotion action (hook/rule/test write) was triggered. null if no promotion fired yet."
+    },
+    "promotion_action_id": {
+      "type": ["string", "null"],
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "RecurrenceTierCounter",
+      "schema_version": "aep-recurrence-tier-counter-0.1",
+      "id": "rtc:rubric-definitional-gap",
+      "bound_to_claim_id": "claim:vg04-rubric-definitional-gap",
+      "rt_count": 1,
+      "tier_label": "receipt",
+      "last_observed_at": "2026-05-18T05:30:00Z",
+      "observation_artifact_ids": [".claude/_logs/aep-v103-vg04-judge-tiebreaker.jsonl"],
+      "promotion_action_triggered_at_rt_count": null,
+      "promotion_action_id": null
+    }
+  ]
+}

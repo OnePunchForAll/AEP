@@ -1,0 +1,139 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:f15-completion-attestation:0.1",
+  "title": "AEP v1.1 F15 Completion Attestation Claim",
+  "description": "v1.1 F15 companion to f15_criterion_witness_chain.schema.json. Completion claim type that lists per-criterion witness signatures. Validator REJECTS packet promotion if any BLOCK criterion lacks a passing witness. Three-agent convergence (judge+pathfinder+adversary). Composes_with: F14 RaterQuorumAttestation, F13 ClaimRuntimeFalsifier, sec41 HCRL receipts, sec73.5 warden-receipts-or-halt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "plan_path",
+    "completion_claim_id",
+    "witnesses",
+    "all_block_criteria_witnessed"
+  ],
+  "properties": {
+    "type": {
+      "const": "CompletionAttestation",
+      "description": "Discriminator. Always 'CompletionAttestation'."
+    },
+    "schema_version": {
+      "const": "aep-completion-attestation-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^cmpa:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable CompletionAttestation id. Recommended: cmpa:<plan-slug>:<phase>."
+    },
+    "plan_path": {
+      "type": "string",
+      "description": "Repo-relative path to the PLAN that defined the criteria.",
+      "maxLength": 512
+    },
+    "completion_claim_id": {
+      "type": "string",
+      "description": "Claim ID asserting completion. Audit-target.",
+      "maxLength": 512
+    },
+    "witnesses": {
+      "type": "array",
+      "minItems": 1,
+      "description": "Per-criterion witness signatures.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "criterion_id",
+          "evidence_kind",
+          "evidence_artifact_sha256",
+          "witness_principal_id",
+          "witness_signature_ed25519",
+          "witnessed_at",
+          "verdict"
+        ],
+        "properties": {
+          "criterion_id": {
+            "type": "string",
+            "pattern": "^crit:[a-z0-9][a-z0-9._:-]*$"
+          },
+          "evidence_kind": {
+            "type": "string",
+            "enum": [
+              "file_sha256_match",
+              "test_exit_0",
+              "command_output_match",
+              "claim_promotion_event",
+              "rater_quorum_attestation",
+              "external_signature",
+              "screenshot_pHash",
+              "hcrl_receipt_row",
+              "regex_pattern_match",
+              "structural_assertion"
+            ]
+          },
+          "evidence_artifact_sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "description": "sha256 of the evidence artifact (e.g., test-output log, file content, attestation receipt). Audit-replayable."
+          },
+          "witness_principal_id": {
+            "type": "string",
+            "description": "Principal that emitted the witness (role + did:key or substrate id).",
+            "maxLength": 256
+          },
+          "witness_signature_ed25519": {
+            "type": "string",
+            "description": "Ed25519 signature over (criterion_id || '\\n' || evidence_artifact_sha256 || '\\n' || witness_principal_id). Base64url-encoded.",
+            "maxLength": 256
+          },
+          "witnessed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "verdict": {
+            "type": "string",
+            "enum": ["PASS", "FAIL", "INSUFFICIENT_EVIDENCE", "TIMEOUT"]
+          },
+          "notes": {
+            "type": "string",
+            "maxLength": 1024
+          }
+        }
+      }
+    },
+    "all_block_criteria_witnessed": {
+      "type": "boolean",
+      "description": "Validator-checked. True iff every BLOCK-severity criterion in the criterion_witness_chain has a PASS verdict in witnesses[]."
+    },
+    "missing_criteria": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^crit:[a-z0-9][a-z0-9._:-]*$"},
+      "description": "Criterion IDs from the chain that lack a PASS witness in this attestation. Empty = all witnessed."
+    }
+  },
+  "examples": [
+    {
+      "type": "CompletionAttestation",
+      "schema_version": "aep-completion-attestation-0.1",
+      "id": "cmpa:v1-1-build:p1",
+      "plan_path": "doctrine/_proposals/diana-2026-05-18-v11-legion-convergence-synthesis.md",
+      "completion_claim_id": "c:v1-1-build:done",
+      "witnesses": [
+        {
+          "criterion_id": "crit:v1-1-build:001",
+          "evidence_kind": "test_exit_0",
+          "evidence_artifact_sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "witness_principal_id": "judge:did:key:zexample",
+          "witness_signature_ed25519": "AAA",
+          "witnessed_at": "2026-05-18T11:00:00Z",
+          "verdict": "PASS",
+          "notes": "All 15 schemas parse clean under python -m json.tool."
+        }
+      ],
+      "all_block_criteria_witnessed": true,
+      "missing_criteria": []
+    }
+  ]
+}

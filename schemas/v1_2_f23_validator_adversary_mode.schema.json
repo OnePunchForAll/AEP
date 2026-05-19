@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:f23-validator-adversary-mode:0.1",
+  "title": "AEP v1.2 F23 Validator Adversary Mode Record",
+  "description": "v1.2 immune-system primitive. Every validator must be tested by an adversary that tries to make a bad packet pass (operator source.md L17 + L69 + L180-186). Operator framing: 'If a validator cannot catch deliberate corruption, it does not deserve authority.' Lineage EXTENDS AFL + honggfuzz + Hypothesis mutation testing + property-based testing per operator L17. A4 MEDIUM closure: adversary recursion stops at depth_2; reuses v1.1 F14 RaterQuorumAttestation for dispute resolution; do NOT invent meta-adversary per sec50 EH Law-3. 7-mutation-class enum verbatim from operator L17. Composes_with: v1.1 F13 ClaimRuntimeFalsifier + v1.1 F16 AttackClass registry.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_validator_id",
+    "validator_version",
+    "mutation_class",
+    "mutation_input_sha256",
+    "mutation_description",
+    "validator_outcome_on_mutation",
+    "validator_should_have_caught",
+    "adversary_verdict",
+    "validator_downgrade_recommendation",
+    "depth_2_recursion_stop",
+    "f14_rater_quorum_for_dispute",
+    "anti_tautology_check",
+    "lineage_basis",
+    "executed_at",
+    "execution_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "ValidatorAdversaryModeRecord",
+      "description": "Discriminator. Always 'ValidatorAdversaryModeRecord'."
+    },
+    "schema_version": {
+      "const": "aep-validator-adversary-mode-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^vam:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_validator_id": {
+      "type": "string",
+      "description": "Validator name + version path (e.g., projects/v11-aep/publish-ready/aep/scripts/validate_v11_amendments.py)."
+    },
+    "validator_version": {
+      "type": "string",
+      "description": "Validator semver or commit sha at attack time."
+    },
+    "mutation_class": {
+      "type": "string",
+      "enum": [
+        "hash_flip",
+        "span_removal",
+        "reviewer_id_flip",
+        "dag_parent_corrupt",
+        "score_shift",
+        "fake_instruction_injection",
+        "event_reorder"
+      ],
+      "description": "Operator L17 verbatim 7-mutation-class enum. Schema-additive-only: future mutation classes added via v1.2.1+ amendment."
+    },
+    "mutation_input_sha256": {
+      "type": "string",
+      "pattern": "^[a-f0-9]{64}$",
+      "description": "sha256 of the mutated packet input. Enables re-execution + dispute resolution."
+    },
+    "mutation_description": {
+      "type": "string",
+      "minLength": 16,
+      "description": "Plain-language description of the mutation. Example for hash_flip: 'Flipped one byte in sources[0].sha256 to corrupt the hash; expected validator to detect via re-hash check.'"
+    },
+    "validator_outcome_on_mutation": {
+      "type": "string",
+      "enum": ["caught", "missed", "errored", "timed_out"],
+      "description": "What the validator actually did when run against the mutated packet. caught = correctly rejected; missed = wrongly accepted (sandbox theater); errored = crashed; timed_out = exceeded budget."
+    },
+    "validator_should_have_caught": {
+      "type": "boolean",
+      "description": "Ground truth: did the mutation introduce a defect that should have been caught? True for all 7 mutation classes by construction (each mutation creates a known-bad packet)."
+    },
+    "adversary_verdict": {
+      "type": "string",
+      "enum": ["validator_passes", "validator_fails", "validator_inconclusive"],
+      "description": "Combination of validator_outcome_on_mutation + validator_should_have_caught. validator_passes if outcome=='caught' && should_have_caught=='true'. validator_fails if outcome=='missed' && should_have_caught=='true'. inconclusive on errored/timed_out (requires F14 rater_quorum tiebreaker)."
+    },
+    "validator_downgrade_recommendation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "rationale"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["NO_DOWNGRADE", "DOWNGRADE_TO_EXPERIMENTAL", "DOWNGRADE_TO_DECORATIVE", "RETIRE"]
+        },
+        "rationale": {
+          "type": "string",
+          "description": "If status != NO_DOWNGRADE, plain-language rationale. Plan sec3 (Phase 3 acceptance): at least one real downgrade must be authored — otherwise the layer is decorative per sec56."
+        },
+        "current_truth_tag_before_downgrade": {
+          "type": "string",
+          "enum": ["PROVEN/RELIABLE", "STRONGLY PLAUSIBLE", "EXPERIMENTAL", "SPECULATIVE FRONTIER"]
+        },
+        "recommended_truth_tag_after_downgrade": {
+          "type": "string",
+          "enum": ["STRONGLY PLAUSIBLE", "EXPERIMENTAL", "SPECULATIVE FRONTIER", "IMPOSSIBLE/UNSUPPORTED"]
+        }
+      }
+    },
+    "depth_2_recursion_stop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["depth", "stop_condition_active"],
+      "properties": {
+        "depth": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 2,
+          "description": "A4 MEDIUM closure HARD-CONSTRAINED. Adversary recursion depth. depth=1 = adversary attacks validator. depth=2 = adversary attacks adversary's mutation tooling. depth >=3 REJECTED by validator; use F14 rater_quorum instead."
+        },
+        "stop_condition_active": {
+          "type": "boolean",
+          "description": "True when depth==2 has been reached and further recursion is structurally blocked."
+        }
+      }
+    },
+    "f14_rater_quorum_for_dispute": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required_when_inconclusive", "quorum_records_referenced"],
+      "properties": {
+        "required_when_inconclusive": {
+          "type": "boolean",
+          "description": "A4 closure: when adversary_verdict == validator_inconclusive, F14 quorum becomes load-bearing. >=3 distinct principals attest the mutation actually corrupted the packet."
+        },
+        "quorum_records_referenced": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "F14 RaterQuorumAttestation record ids that ratified the dispute."
+        }
+      }
+    },
+    "anti_tautology_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "method"],
+      "properties": {
+        "status": {"type": "string", "enum": ["PASS", "FAIL", "PENDING"]},
+        "method": {
+          "type": "string",
+          "enum": ["f13_existing_anti_tautology", "input_diversity_check", "mutation_class_coverage_check"]
+        }
+      }
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "F18 lineage. F23 ships EXTENDS: AFL (American Fuzzy Lop), honggfuzz, Hypothesis (Python property-based testing). Operator L17 cite."
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    },
+    "executed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "execution_signature_ed25519": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "ValidatorAdversaryModeRecord",
+      "schema_version": "aep-validator-adversary-mode-0.1",
+      "id": "vam:v11-amendments-hash-flip-test",
+      "bound_to_validator_id": "projects/v11-aep/publish-ready/aep/scripts/validate_v11_amendments.py",
+      "validator_version": "1.1.0-phase-4a",
+      "mutation_class": "hash_flip",
+      "mutation_input_sha256": "0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef",
+      "mutation_description": "Flipped one byte in sources[0].sha256 (first nibble 'a' -> 'b') to corrupt the hash; expected validator to detect via re-hash check.",
+      "validator_outcome_on_mutation": "caught",
+      "validator_should_have_caught": true,
+      "adversary_verdict": "validator_passes",
+      "validator_downgrade_recommendation": {
+        "status": "NO_DOWNGRADE",
+        "rationale": "Validator correctly re-hashed sources[0] against stored sha256 and rejected the mutation.",
+        "current_truth_tag_before_downgrade": "STRONGLY PLAUSIBLE",
+        "recommended_truth_tag_after_downgrade": "STRONGLY PLAUSIBLE"
+      },
+      "depth_2_recursion_stop": {
+        "depth": 1,
+        "stop_condition_active": false
+      },
+      "f14_rater_quorum_for_dispute": {
+        "required_when_inconclusive": false,
+        "quorum_records_referenced": []
+      },
+      "anti_tautology_check": {
+        "status": "PASS",
+        "method": "input_diversity_check"
+      },
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "AFL (American Fuzzy Lop)",
+          "honggfuzz",
+          "Hypothesis (Python property-based testing)"
+        ],
+        "verifying_grep": "rg 'afl|honggfuzz|hypothesis|fuzz' --type md research/sources/",
+        "n_hits": 0
+      },
+      "executed_at": "2026-05-18T08:15:00Z",
+      "execution_signature_ed25519": "ed25519_pending_phase_3_keypair"
+    }
+  ]
+}

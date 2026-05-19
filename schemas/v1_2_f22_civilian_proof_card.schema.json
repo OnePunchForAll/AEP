@@ -1,0 +1,285 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:f22-civilian-proof-card:0.1",
+  "title": "AEP v1.2 F22 Civilian Proof Card Record",
+  "description": "v1.2 immune-system primitive. Compiles technical evidence into plain-language proof cards (operator source.md L23-27 + L60-66 + L168-176). Operator framing: 'C2PA Content Credentials nutrition label for AI work: Proof Nutrition Labels.' Lineage EXTENDS C2PA Content Credentials per operator L27. HV3 closure: disclosed_signals[] MANDATORY surfacing v1.1 F18 laundering_score >=0.6, F15 missing-witness, F16 attack-flag, F19 coverage-gap. Banned-elision linter: if any v1.1 primitive returned non-PASS, the card MUST contain at least one phrase from civilian_warning_phrasebook[]. Composes_with: v1.1 F18 SourceProvenanceGraph + v1.1 F19 CorpusCoverageWitness (the load-bearing inputs).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_packet_id",
+    "what_is_being_claimed",
+    "what_evidence_supports_it",
+    "what_was_tested",
+    "what_is_weak_stale_missing_or_ai_derived",
+    "what_action_the_user_should_take_next",
+    "disclosed_signals",
+    "banned_elision_lint_status",
+    "civilian_vocabulary_lint_status",
+    "trust_dial_level_required",
+    "lineage_basis",
+    "compiled_at",
+    "compile_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "CivilianProofCardRecord",
+      "description": "Discriminator. Always 'CivilianProofCardRecord'."
+    },
+    "schema_version": {
+      "const": "aep-civilian-proof-card-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^cpc:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_packet_id": {
+      "type": "string",
+      "description": "Packet ID this card describes. Must resolve to an aepkg.json id.",
+      "maxLength": 256
+    },
+    "what_is_being_claimed": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "description": "Operator L61 verbatim row 1. Plain-language statement of the packet's load-bearing claim."
+    },
+    "what_evidence_supports_it": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "description": "Operator L62 verbatim row 2. Plain-language summary of source provenance (count + direct vs AI-derived + venue tier). Example: 'This answer used 8 sources. 6 were direct, 2 were AI-derived.' (operator L25)"
+    },
+    "what_was_tested": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "description": "Operator L63 verbatim row 3. Plain-language summary of falsifier execution + mutation suite + coverage witness. Example: '3 claims were tested.' (operator L25)"
+    },
+    "what_is_weak_stale_missing_or_ai_derived": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 1024,
+      "description": "Operator L64 verbatim row 4. Plain-language summary of all weakness signals (F18 laundering >=0.6, F15 missing-witness, F16 attack-flag, F19 coverage-gap, A8 SRS decay). HV3 closure HARD-CONSTRAINED: if any signal is non-OK, this field MUST contain at least one phrase from civilian_warning_phrasebook[]. Adversary A3 closure: 'This may be AI making things up about itself' is the canonical phrasing when F18 laundering_score > 0.6."
+    },
+    "what_action_the_user_should_take_next": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 512,
+      "description": "Operator L65 verbatim row 5. Plain-language next-step recommendation. Civilian vocabulary mandatory."
+    },
+    "disclosed_signals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "f18_laundering_score",
+        "f15_missing_witness_flag",
+        "f16_attack_flag",
+        "f19_coverage_gap_flag",
+        "a8_srs_decay_status",
+        "any_signal_non_ok"
+      ],
+      "properties": {
+        "f18_laundering_score": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["score", "threshold_breached"],
+          "properties": {
+            "score": {
+              "type": "number",
+              "minimum": 0.0,
+              "maximum": 1.0
+            },
+            "threshold_breached": {
+              "type": "boolean",
+              "description": "True if score >= 0.6 per HV3 closure threshold. Triggers mandatory warning in row 4."
+            },
+            "civilian_phrasing": {
+              "type": "string",
+              "description": "Civilian translation. HV3 closure HARD-CONSTRAINED: when threshold_breached==true, MUST contain literal phrase 'This may be AI making things up about itself' OR equivalent from civilian_warning_phrasebook[]."
+            }
+          }
+        },
+        "f15_missing_witness_flag": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["any_criterion_missing_witness", "count"],
+          "properties": {
+            "any_criterion_missing_witness": {"type": "boolean"},
+            "count": {"type": "integer", "minimum": 0},
+            "civilian_phrasing": {"type": "string"}
+          }
+        },
+        "f16_attack_flag": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["any_attack_class_present", "count"],
+          "properties": {
+            "any_attack_class_present": {"type": "boolean"},
+            "count": {"type": "integer", "minimum": 0},
+            "civilian_phrasing": {"type": "string"}
+          }
+        },
+        "f19_coverage_gap_flag": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["any_corpus_gap_detected", "count"],
+          "properties": {
+            "any_corpus_gap_detected": {"type": "boolean"},
+            "count": {"type": "integer", "minimum": 0},
+            "civilian_phrasing": {"type": "string"}
+          }
+        },
+        "a8_srs_decay_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": ["any_claim_decayed", "count"],
+          "properties": {
+            "any_claim_decayed": {"type": "boolean"},
+            "count": {"type": "integer", "minimum": 0},
+            "civilian_phrasing": {"type": "string"}
+          }
+        },
+        "any_signal_non_ok": {
+          "type": "boolean",
+          "description": "Aggregate. True if ANY of the above signals breached threshold. HV3 closure: when true, row 4 MUST contain at least one civilian_warning_phrasebook[] phrase + card visual state MUST be red-border."
+        }
+      }
+    },
+    "banned_elision_lint_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "banned_elisions_detected"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "FAIL"]
+        },
+        "banned_elisions_detected": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "Adversary A12 closure. List of v1.1 signals omitted from card without explicit safe_to_elide reason. Empty array on PASS."
+        },
+        "required_terms_when_warning_present": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Adversary A12 + A3 composed closure. The civilian_warning_phrasebook phrases REQUIRED on this card given the disclosed_signals. If any required term is absent, status = FAIL."
+        }
+      }
+    },
+    "civilian_vocabulary_lint_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "banned_terms_detected", "banned_term_list_version"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "FAIL"]
+        },
+        "banned_terms_detected": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Banned technical terms detected in any of the 5 rows. Banned list per plan sec18 + operator L74-82: quorum attestation / laundering_score / Ed25519 / attestation graph / DAG / sha256 / state_hash. If non-empty, status = FAIL."
+        },
+        "banned_term_list_version": {
+          "type": "string",
+          "description": "Version tag of the banned-term list. Updated when adversary discovers new technical-jargon leak."
+        }
+      }
+    },
+    "trust_dial_level_required": {
+      "type": "string",
+      "enum": ["Casual", "Important", "Professional", "Critical"],
+      "description": "Operator L200-203 verbatim. The minimum Trust Dial level this proof card is valid for. F25 binding: if packet's action_class is in safety_floor_categories, this MUST be Professional or higher (HV6 closure)."
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    },
+    "compiled_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "compile_signature_ed25519": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "CivilianProofCardRecord",
+      "schema_version": "aep-civilian-proof-card-0.1",
+      "id": "cpc:lease-summary-example",
+      "bound_to_packet_id": "aepkg:lease-summary-example",
+      "what_is_being_claimed": "This lease summary accurately reflects the source 12-page lease PDF you uploaded.",
+      "what_evidence_supports_it": "This answer used 1 source (your uploaded lease PDF). The summary was checked against 11 of 12 pages directly; page 9 was not read because it was a duplicate page-break artifact.",
+      "what_was_tested": "5 claims were tested: monthly rent, security deposit, lease term, pet clause, early-termination clause. All 5 matched the PDF.",
+      "what_is_weak_stale_missing_or_ai_derived": "1 claim is weak: 'Maintenance is the landlord's responsibility.' The PDF says this but with a small-print exception we did not extract. This may be AI making things up about itself if you act on the maintenance clause without re-reading page 7.",
+      "what_action_the_user_should_take_next": "Trust the rent, deposit, and termination details. Re-read page 7 yourself before relying on the maintenance claim. Not safe for legal disputes without a lawyer.",
+      "disclosed_signals": {
+        "f18_laundering_score": {
+          "score": 0.4,
+          "threshold_breached": false,
+          "civilian_phrasing": "Source is direct (your uploaded PDF)."
+        },
+        "f15_missing_witness_flag": {
+          "any_criterion_missing_witness": false,
+          "count": 0
+        },
+        "f16_attack_flag": {
+          "any_attack_class_present": false,
+          "count": 0
+        },
+        "f19_coverage_gap_flag": {
+          "any_corpus_gap_detected": true,
+          "count": 1,
+          "civilian_phrasing": "Page 9 of the PDF was not read."
+        },
+        "a8_srs_decay_status": {
+          "any_claim_decayed": false,
+          "count": 0
+        },
+        "any_signal_non_ok": true
+      },
+      "banned_elision_lint_status": {
+        "status": "PASS",
+        "banned_elisions_detected": [],
+        "required_terms_when_warning_present": ["This may be AI making things up about itself"]
+      },
+      "civilian_vocabulary_lint_status": {
+        "status": "PASS",
+        "banned_terms_detected": [],
+        "banned_term_list_version": "v1.2.0"
+      },
+      "trust_dial_level_required": "Important",
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "C2PA Content Credentials (nutrition label framing)"
+        ],
+        "verifying_grep": "rg 'c2pa|content credentials' --type md research/sources/",
+        "n_hits": 0
+      },
+      "compiled_at": "2026-05-18T08:10:00Z",
+      "compile_signature_ed25519": "ed25519_pending_phase_8_keypair"
+    }
+  ]
+}

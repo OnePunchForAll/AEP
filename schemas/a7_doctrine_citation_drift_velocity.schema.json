@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:a7-doctrine-citation-drift-velocity:0.1",
+  "title": "AEP v1.1 A7 Doctrine Citation Drift Velocity",
+  "description": "v1.1 A7 amendment (STRONGLY PLAUSIBLE × CONTEXT-BOUND PATTERN). Two-agent convergence (warden-IDEA-3 + scout context). Was F11b in legion synthesis; split out as independent amendment per HV-6 closure. Counter of amended citations per packet. Surfaces doctrine slots whose cites are stale (frequently amended in citing packets). Composes_with: sec41 HCRL row attribution, sec73.3 prior-art-inheritance-audit, F18 source_provenance_graph.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_doctrine_slot",
+    "amended_citation_count",
+    "measurement_window",
+    "last_amendment_at"
+  ],
+  "properties": {
+    "type": {
+      "const": "DoctrineCitationDriftVelocity"
+    },
+    "schema_version": {
+      "const": "aep-doctrine-citation-drift-velocity-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^dcdv:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_doctrine_slot": {
+      "type": "string",
+      "pattern": "^sec[0-9]+",
+      "description": "Doctrine slot ID this drift-velocity counter tracks (e.g., 'sec73', 'sec41')."
+    },
+    "amended_citation_count": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Number of times this slot's citation appeared in a packet that was later amended."
+    },
+    "measurement_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["window_start", "window_end"],
+      "properties": {
+        "window_start": {"type": "string", "format": "date-time"},
+        "window_end": {"type": "string", "format": "date-time"}
+      }
+    },
+    "last_amendment_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "amendment_event_ids": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^phe:[a-z0-9][a-z0-9._:-]*$"},
+      "description": "F17 PacketHistoryEvent ids of the amendments. Forms the audit trail."
+    },
+    "drift_velocity_per_week": {
+      "type": ["number", "null"],
+      "minimum": 0.0,
+      "description": "Validator-computed: amended_citation_count / weeks_in_window. High = unstable doctrine; surface to curator."
+    },
+    "alert_threshold_per_week": {
+      "type": "number",
+      "minimum": 0.0,
+      "default": 5.0,
+      "description": "If drift_velocity_per_week > threshold, emit AEP11_A7_DOCTRINE_DRIFT_ALERT."
+    }
+  },
+  "examples": [
+    {
+      "type": "DoctrineCitationDriftVelocity",
+      "schema_version": "aep-doctrine-citation-drift-velocity-0.1",
+      "id": "dcdv:sec73-week-2026-05-12-to-2026-05-18",
+      "bound_to_doctrine_slot": "sec73",
+      "amended_citation_count": 2,
+      "measurement_window": {
+        "window_start": "2026-05-12T00:00:00Z",
+        "window_end": "2026-05-18T23:59:59Z"
+      },
+      "last_amendment_at": "2026-05-18T05:30:00Z",
+      "amendment_event_ids": [],
+      "drift_velocity_per_week": 2.0,
+      "alert_threshold_per_week": 5.0
+    }
+  ]
+}

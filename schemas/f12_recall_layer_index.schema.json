@@ -1,0 +1,157 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:f12-recall-layer-index:0.1",
+  "title": "AEP v1.1 F12 Recall Layer Index Entry",
+  "description": "v1.1 F12 frontier-break primitive (EXPERIMENTAL pending redaction-replay legion per HV-1 closure). Single index-entry row inside the DERIVED projection layer at projects/v11-aep/publish-ready/aep/recall/. Six-agent convergence (scout+forge+scribe+judge+visual-judge+curator). Index entry materializes approximate-set-membership over the canonical 7-file corpus; canonical layer remains untouched per §V60-2 Axiom 4 + sec73.4 single-writer. Composes_with: sec02 truth-tags, sec41 HCRL, sec50 Law-3 multi-lens, sec73 ALL 6 SUBLAWS, v0.8 F1-F8, v1.0.3 RegexicalCue.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "index_kind",
+    "indexed_packet_id",
+    "indexed_packet_sha256",
+    "key_grain",
+    "key_value",
+    "rebuild_event_id",
+    "rebuild_timestamp",
+    "contamination_flag"
+  ],
+  "properties": {
+    "type": {
+      "const": "RecallLayerIndexEntry",
+      "description": "Discriminator. Always 'RecallLayerIndexEntry'."
+    },
+    "schema_version": {
+      "const": "aep-recall-layer-index-0.1",
+      "description": "Schema version pin."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^rli:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable RLI id. Recommended: rli:<index-kind>:<key-hash-prefix>."
+    },
+    "index_kind": {
+      "type": "string",
+      "enum": [
+        "agent_touch_bloom",
+        "claim_type_columnar",
+        "source_reverse_citation",
+        "rubric_dimension_histogram",
+        "cross_agent_cite_resolver",
+        "viewport_screenshot_manifest",
+        "teacher_threshold_precomputed",
+        "compute_step_binding"
+      ],
+      "description": "Six-agent variant taxonomy: scout (touch_bloom), forge (compute_step_binding), scribe (cross_agent_cite_resolver), judge (rubric_dimension_histogram), visual-judge (viewport_screenshot_manifest), curator (teacher_threshold_precomputed), claim_type_columnar (default), source_reverse_citation (basis-graph reverse-walk)."
+    },
+    "indexed_packet_id": {
+      "type": "string",
+      "description": "Canonical packet id the entry projects from.",
+      "maxLength": 256
+    },
+    "indexed_packet_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Tree-sha256 of indexed packet at rebuild time. Mismatch at query time = stale index = AEP11_F12_INDEX_STALE."
+    },
+    "key_grain": {
+      "type": "string",
+      "enum": [
+        "packet_id",
+        "claim_id",
+        "source_id",
+        "agent_principal_id",
+        "rubric_dimension_id",
+        "viewport_pHash",
+        "compute_step_id",
+        "vec_id"
+      ],
+      "description": "Natural grain of the index key. claim_type_columnar=claim_id; cross_agent_cite_resolver=vec_id; etc."
+    },
+    "key_value": {
+      "type": "string",
+      "description": "The key value at this grain (e.g., a claim_id, a source_id, a vec_id token).",
+      "maxLength": 512
+    },
+    "value_payload": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Index-kind-specific payload. agent_touch_bloom = {bloom_filter_b64, hash_count, bit_count, expected_fpr}. claim_type_columnar = {column_name, column_value_canonical_json}. cross_agent_cite_resolver = {peer_agent, peer_lamport, peer_short_slug}. rubric_dimension_histogram = {bin_edges[], counts[], total}. viewport_screenshot_manifest = {pHash, dHash, aHash, image_path}. teacher_threshold_precomputed = {threshold_value, evidence_count, last_eval_at}."
+    },
+    "rebuild_event_id": {
+      "type": "string",
+      "description": "Reference into ops/events.jsonl: the append event that triggered this rebuild.",
+      "maxLength": 256
+    },
+    "rebuild_timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC when this entry was emitted."
+    },
+    "contamination_flag": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["redaction_replay_pending", "convergence_source_count", "convergence_lens_set"],
+      "properties": {
+        "redaction_replay_pending": {
+          "type": "boolean",
+          "description": "v1.1 ships F12 with HV-1 contamination-flag PRESERVED. true = redaction-replay legion not yet run; convergence is contamination-flagged; truth-tag remains EXPERIMENTAL."
+        },
+        "convergence_source_count": {
+          "type": "integer",
+          "minimum": 2,
+          "maximum": 10,
+          "description": "Number of independent legion agents that surfaced this index_kind. 6 for the canonical F12 ship."
+        },
+        "convergence_lens_set": {
+          "type": "array",
+          "items": {"type": "string", "enum": ["strategist","pathfinder","scout","forge","judge","adversary","warden","scribe","curator","visual-judge"]},
+          "minItems": 2,
+          "description": "Canonical lens IDs that converged on this index_kind. Used for sec50 Law-3 anti-laundering audit."
+        }
+      },
+      "description": "HV-1 contamination-flag block per legion synthesis sec7. F12 truth-tag remains EXPERIMENTAL until redaction_replay_pending=false."
+    },
+    "fpr_target": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 0.5,
+      "description": "Target false-positive rate for bloom-style indexes. Default 0.01."
+    },
+    "query_latency_target_us": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 1000000,
+      "description": "Target p99 query latency in microseconds. Operator target: <1000us (ms-NS recall). Default 1000."
+    }
+  },
+  "examples": [
+    {
+      "type": "RecallLayerIndexEntry",
+      "schema_version": "aep-recall-layer-index-0.1",
+      "id": "rli:agent_touch_bloom:0xabcdef12",
+      "index_kind": "agent_touch_bloom",
+      "indexed_packet_id": "doctrine/lessons/2026-05-18-aep-v103-regexical-memory-shipped.aepkg",
+      "indexed_packet_sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "key_grain": "agent_principal_id",
+      "key_value": "forge",
+      "value_payload": {
+        "bloom_filter_b64": "AAA=",
+        "hash_count": 4,
+        "bit_count": 1024,
+        "expected_fpr": 0.01
+      },
+      "rebuild_event_id": "ev:rebuild:0001",
+      "rebuild_timestamp": "2026-05-18T10:00:00Z",
+      "contamination_flag": {
+        "redaction_replay_pending": true,
+        "convergence_source_count": 6,
+        "convergence_lens_set": ["scout","forge","scribe","judge","visual-judge","curator"]
+      },
+      "fpr_target": 0.01,
+      "query_latency_target_us": 1000
+    }
+  ]
+}

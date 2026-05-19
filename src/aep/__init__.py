@@ -27,9 +27,13 @@ from __future__ import annotations
 
 __version__ = "0.7.1"
 
-# v0.5 baseline (internal: validate_v0_5 + validate_v0_5_1 implement the
-# core canonical state-hash + manifest-hash + AEP-MERKLE-v1 + AEP-NUMERIC-v1
-# logic; the v0.7.1 validator wraps these).
+# v0.4 baseline (compat mode)
+from aep.validate_v0_4 import (  # noqa: F401
+    validate_packet_v04,
+    Report as ValidationReportV04,
+)
+
+# v0.5 baseline (Round-2 + Round-3 closures)
 from aep.validate_v0_5 import (  # noqa: F401
     validate_v0_5,
 )
@@ -123,24 +127,36 @@ try:
 except ImportError:
     pass
 
-# Top-level public entry point (preferred external import path)
+# Migration tools
+from aep.convert_v0_3_to_v0_5 import migrate_packet as migrate_v0_3_to_v0_5  # noqa: F401
+from aep.convert_v0_5_shallow_to_deep import deep_migrate_packet as deep_migrate_v0_5_shallow_to_v0_5  # noqa: F401
+
+# Bidirectional transition parser (.html / .md ↔ .aepkg/) — optional convenience API.
 try:
-    from aep.validate import (  # noqa: F401
-        validate,
-        VALID_PROFILES,
+    from aep.transition_parser import (  # noqa: F401
+        find_packet_for_source,
+        source_for_packet,
+        read_packet_lossless,
+        reconstruct_html_from_packet,
+        packet_query,
+        corpus_query,
+        build_corpus_index,
+        agent_view,
     )
 except ImportError:
     pass
 
 __all__ = [
     "__version__",
+    "validate_packet_v04",
+    "ValidationReportV04",
     "validate_v0_5",
-    "validate",
-    "VALID_PROFILES",
     "validate_v0_5_1",
     "ValidationConfig",
     "ValidationResult",
     "Finding",
+    "migrate_v0_3_to_v0_5",
+    "deep_migrate_v0_5_shallow_to_v0_5",
     "validate_v0_6",
     "VALID_PROFILES_V0_6",
     "build_index",

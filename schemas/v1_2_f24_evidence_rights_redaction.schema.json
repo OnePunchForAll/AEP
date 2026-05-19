@@ -1,0 +1,180 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:f24-evidence-rights-redaction:0.1",
+  "title": "AEP v1.2 F24 Evidence Rights & Redaction Record",
+  "description": "v1.2 immune-system primitive. Every evidence item gets a visibility class so AEP is safe for normal people, schools, companies, sensitive workflows (operator source.md L29 + L186-192). 7 visibility classes verbatim from L188-190: public / private / local_only / hashed_only / encrypted / ephemeral / forbidden_to_export. Lineage EXTENDS GDPR Article 25 privacy-by-design + capability security + differential privacy fundamentals per operator L33 + plan sec7. HV5 closure: salted_hash REQUIRES per_packet_random_salt:true (NOT corpus-shared); hash_correlation_resistance documented; frequency-analysis attack noted as known limitation; sensitive workflows MUST use encrypted or forbidden_to_export tier. Composes_with: v1.1 F18 SourceProvenanceGraph.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_evidence_id",
+    "evidence_kind",
+    "visibility_class",
+    "hash_correlation_resistance",
+    "export_manifest_disclosure",
+    "redaction_method",
+    "lineage_basis",
+    "classified_at",
+    "classify_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "EvidenceRightsRedactionRecord",
+      "description": "Discriminator. Always 'EvidenceRightsRedactionRecord'."
+    },
+    "schema_version": {
+      "const": "aep-evidence-rights-redaction-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^err:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_evidence_id": {
+      "type": "string",
+      "description": "Evidence row id (source, span, claim, review, etc.) this classification applies to.",
+      "maxLength": 256
+    },
+    "evidence_kind": {
+      "type": "string",
+      "enum": ["source", "span", "claim", "review", "validation", "event", "relation", "ledger_row"],
+      "description": "Which canonical 7-file row class this evidence belongs to."
+    },
+    "visibility_class": {
+      "type": "string",
+      "enum": [
+        "public",
+        "private",
+        "local_only",
+        "hashed_only",
+        "encrypted",
+        "ephemeral",
+        "forbidden_to_export"
+      ],
+      "description": "Operator L188-190 verbatim 7-class enum. HARD-CONSTRAINED per HV5 closure: schema enforces all 7 classes; no string-label override permitted."
+    },
+    "hash_correlation_resistance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["salt_scope", "salt_present", "frequency_analysis_attack_acknowledged"],
+      "properties": {
+        "salt_scope": {
+          "type": "string",
+          "enum": ["per_packet_random_salt", "per_corpus_shared_salt", "no_salt"],
+          "description": "HV5 closure HARD-CONSTRAINED. Adversary A5 attack: corpus-shared salt leaks via frequency analysis on cross-packet hashes. Required value: per_packet_random_salt. per_corpus_shared_salt EXPLICITLY documented as INSUFFICIENT for sensitive workflows. no_salt REJECTED on hashed_only class."
+        },
+        "salt_present": {
+          "type": "boolean",
+          "description": "Whether a salt is actually present in the redacted artifact. If visibility_class == hashed_only && salt_present == false, validator MUST emit AEP12_F24_HASH_UNSALTED warning."
+        },
+        "salt_storage_class": {
+          "type": "string",
+          "enum": ["local_only", "encrypted", "ephemeral", "forbidden_to_export"],
+          "description": "Where the salt itself lives. Salt MUST NOT be public or hashed_only (recursion)."
+        },
+        "frequency_analysis_attack_acknowledged": {
+          "type": "boolean",
+          "description": "HV5 closure: for hashed_only tier, frequency-analysis attack is a known limitation. Schema requires explicit acknowledgement. Sensitive workflows MUST use encrypted or forbidden_to_export instead."
+        },
+        "frequency_analysis_attack_text": {
+          "type": "string",
+          "description": "When acknowledged==true, the exact text disclosed in export manifest. Civilian-readable. Adversary A5 cheapest disconfirmer test fixture path."
+        }
+      }
+    },
+    "export_manifest_disclosure": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["disclosed_in_export", "what_was_removed"],
+      "properties": {
+        "disclosed_in_export": {
+          "type": "boolean",
+          "description": "Operator L29: 'export manifests that clearly say what was removed.' If visibility_class != public, MUST be true."
+        },
+        "what_was_removed": {
+          "type": "string",
+          "description": "Plain-language description of redacted content. Examples: 'private user file paths', 'reviewer identity', 'salted source hashes', 'all encrypted artifact contents'."
+        },
+        "what_was_kept": {
+          "type": "string",
+          "description": "Plain-language description of what survives export. Example: 'claim text, falsifier outcome, count of sources'."
+        }
+      }
+    },
+    "redaction_method": {
+      "type": "string",
+      "enum": [
+        "field_removed",
+        "value_replaced_with_hash",
+        "value_encrypted_aes256",
+        "value_replaced_with_placeholder",
+        "value_dropped_at_export_only",
+        "field_marked_ephemeral_no_export"
+      ],
+      "description": "How the redaction was applied. value_replaced_with_hash MUST use per_packet_random_salt per HV5."
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "F18 lineage. F24 EXTENDS: GDPR Article 25 privacy-by-design + capability security + differential privacy fundamentals."
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    },
+    "classified_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "classify_signature_ed25519": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "EvidenceRightsRedactionRecord",
+      "schema_version": "aep-evidence-rights-redaction-0.1",
+      "id": "err:lease-pdf-private-source",
+      "bound_to_evidence_id": "src:user-uploaded-lease-pdf",
+      "evidence_kind": "source",
+      "visibility_class": "hashed_only",
+      "hash_correlation_resistance": {
+        "salt_scope": "per_packet_random_salt",
+        "salt_present": true,
+        "salt_storage_class": "local_only",
+        "frequency_analysis_attack_acknowledged": true,
+        "frequency_analysis_attack_text": "Cross-packet hash correlation could in theory reveal that the same file was used across packets. Per-packet random salt makes this attack require corpus-wide salt recovery, which is computationally infeasible at the per-packet entropy this schema enforces."
+      },
+      "export_manifest_disclosure": {
+        "disclosed_in_export": true,
+        "what_was_removed": "Your uploaded lease PDF file contents and original file path.",
+        "what_was_kept": "A salted hash that proves the lease summary referred to a real file, without revealing its contents or location."
+      },
+      "redaction_method": "value_replaced_with_hash",
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "GDPR Article 25 privacy-by-design",
+          "Capability security",
+          "Differential privacy fundamentals"
+        ],
+        "verifying_grep": "rg 'gdpr|privacy by design|differential privacy|capability security' --type md research/sources/",
+        "n_hits": 0
+      },
+      "classified_at": "2026-05-18T08:20:00Z",
+      "classify_signature_ed25519": "ed25519_pending_phase_5_keypair"
+    }
+  ]
+}

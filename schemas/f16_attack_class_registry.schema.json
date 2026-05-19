@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:f16-attack-class-registry:0.1",
+  "title": "AEP v1.1 F16 AttackClass Registry Entry",
+  "description": "v1.1 F16 frontier-break primitive (SPECULATIVE FRONTIER). Three-agent convergence (adversary+judge+forge). AttackClass claim type + inverse attack_classes_closed[] on assertions; bidirectional index. Every prior pre-mortem becomes a live attack-detector on every new claim emit. Composes_with: v0.8 F5 self_falsifying, v1.0.3 RegexicalCue (attack-class to cue resolution), sec02 truth-tags, sec50 EH Law-3.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "attack_class_id",
+    "attack_class_name",
+    "attack_signature_regex",
+    "registered_by_principal",
+    "registered_at",
+    "detection_runtime"
+  ],
+  "properties": {
+    "type": {
+      "const": "AttackClass",
+      "description": "Discriminator. Always 'AttackClass'."
+    },
+    "schema_version": {
+      "const": "aep-attack-class-registry-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^atk:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable AttackClass id. Recommended: atk:<short-name>:<vN>."
+    },
+    "attack_class_id": {
+      "type": "string",
+      "description": "Human-readable attack-class identifier. Recommended: ATK-V<spec-version>-<letter><number>. Example: ATK-V80-N1.",
+      "pattern": "^[A-Z][A-Z0-9-]+$",
+      "maxLength": 128
+    },
+    "attack_class_name": {
+      "type": "string",
+      "description": "Short title for the attack class. Recommended: 4-8 words.",
+      "minLength": 3,
+      "maxLength": 256
+    },
+    "attack_signature_regex": {
+      "type": "string",
+      "description": "Portable regex (rxmem-v1 dialect or PCRE-compat) used to detect the attack signature in new claim text or artifact bodies. Validator runs this against claim emit candidates BEFORE truth-tag assignment.",
+      "minLength": 1,
+      "maxLength": 1024
+    },
+    "registered_by_principal": {
+      "type": "string",
+      "description": "Principal that registered this attack class (typically an adversary or judge role).",
+      "maxLength": 256
+    },
+    "registered_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "detection_runtime": {
+      "type": "string",
+      "enum": ["python_re", "rxmem_v1", "grep_pcre", "f9_quorum"],
+      "description": "Runtime used to evaluate attack_signature_regex. f9_quorum = run on N>=2 substrates per v1.0.x F9."
+    },
+    "first_seen_in_claim_id": {
+      "type": ["string", "null"],
+      "description": "Optional. Claim ID where this attack signature was first observed (the canonical premortem instance)."
+    },
+    "closed_by_packets": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Packet IDs that close this attack class (inverse of attack_classes_closed[] on their assertions). Forms the bidirectional index."
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["HIGH-VETO", "MEDIUM", "LOW", "INFO"],
+      "default": "MEDIUM",
+      "description": "Adversary verdict tier per legion v2 conventions. HIGH-VETO is non-rescindable per sec69.4."
+    },
+    "composes_with_doctrine_slots": {
+      "type": "array",
+      "items": {"type": "string", "pattern": "^sec[0-9]+$"},
+      "description": "Doctrine slot IDs this attack class composes with."
+    },
+    "false_positive_rate_observed": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Empirically observed FPR on corpus runs. Default null (unmeasured). Validator emits AEP11_F16_FPR_UNMEASURED warning if null after >=5 corpus runs."
+    },
+    "narrative_description": {
+      "type": "string",
+      "maxLength": 4096,
+      "description": "Human-readable description of the attack class. Cited by validator emit messages."
+    }
+  },
+  "examples": [
+    {
+      "type": "AttackClass",
+      "schema_version": "aep-attack-class-registry-0.1",
+      "id": "atk:api-surface-hallucination:v0_8",
+      "attack_class_id": "ATK-V80-A1",
+      "attack_class_name": "API Surface Hallucination",
+      "attack_signature_regex": "\\bwindow\\.claude\\.(complete|window\\.storage)\\(",
+      "registered_by_principal": "adversary:did:key:zexample",
+      "registered_at": "2026-05-17T00:00:00Z",
+      "detection_runtime": "python_re",
+      "first_seen_in_claim_id": "claim:lodestone-v3:api-call",
+      "closed_by_packets": ["packet:lodestone-v6"],
+      "severity": "HIGH-VETO",
+      "composes_with_doctrine_slots": ["sec69", "sec73"],
+      "false_positive_rate_observed": 0.0,
+      "narrative_description": "Lodestone V3 shipped 658 LOC calling window.claude.complete which does not exist. F16 detects this pattern at claim-emit time."
+    }
+  ]
+}

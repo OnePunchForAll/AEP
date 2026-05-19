@@ -1,0 +1,333 @@
+{
+  "$schema": "https://aep.spec/v0.5/test_vectors.schema.json",
+  "test_vector_format_version": "1.0",
+  "spec_section": "AEP_v0_5_1_SPEC.md §V51-4 (AEP-NUMERIC-v1)",
+  "purpose": "Cross-runtime conformance corpus. Every conforming implementation of aep_numeric_canonicalize(input) MUST produce the expected canonical string (or raise the expected error). Implementations in Python (reference), Node.js, Go, and Rust must agree byte-for-byte. Discrepancies between runtimes constitute a v0.6 spec gap to close.",
+  "license": "Apache-2.0",
+  "categories": [
+    {
+      "category": "zero_normalization",
+      "rationale": "Sign of zero must be normalized away (no -0); decimal point dropped when fractional is zero.",
+      "vectors": [
+        {
+          "id": "TV-N-001",
+          "input_python": "0",
+          "expected": "0",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-002",
+          "input_python": "-0",
+          "expected": "0",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-003",
+          "input_python": "0.0",
+          "expected": "0",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-004",
+          "input_python": "0.00",
+          "expected": "0",
+          "expected_error": null
+        }
+      ]
+    },
+    {
+      "category": "integer_canonical",
+      "rationale": "Integers serialize without decimal point and without leading zeros.",
+      "vectors": [
+        {
+          "id": "TV-N-010",
+          "input_python": "1",
+          "expected": "1",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-011",
+          "input_python": "-1",
+          "expected": "-1",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-012",
+          "input_python": "42",
+          "expected": "42",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-013",
+          "input_python": "-42",
+          "expected": "-42",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-014",
+          "input_python": "100",
+          "expected": "100",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-015",
+          "input_python": "-100",
+          "expected": "-100",
+          "expected_error": null
+        }
+      ]
+    },
+    {
+      "category": "decimal_canonical_no_trailing_zeros",
+      "rationale": "Decimals drop trailing zeros after the decimal point.",
+      "vectors": [
+        {
+          "id": "TV-N-020",
+          "input_python": "0.1",
+          "expected": "0.1",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-021",
+          "input_python": "0.10",
+          "expected": "0.1",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-022",
+          "input_python": "1.5",
+          "expected": "1.5",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-023",
+          "input_python": "1.50",
+          "expected": "1.5",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-024",
+          "input_python": "-0.5",
+          "expected": "-0.5",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-025",
+          "input_python": "3.14159",
+          "expected": "3.14159",
+          "expected_error": null
+        }
+      ]
+    },
+    {
+      "category": "exponent_form",
+      "rationale": "Exponent form used only when |exp| >= 6; lowercase 'e' with explicit sign. Coefficient is in canonical decimal form (no trailing zeros).",
+      "vectors": [
+        {
+          "id": "TV-N-030",
+          "input_python": "100000",
+          "expected": "100000",
+          "expected_error": null,
+          "comment": "5 digits — below exponent threshold"
+        },
+        {
+          "id": "TV-N-031",
+          "input_python": "1000000",
+          "expected": "1e+6",
+          "expected_error": null,
+          "comment": "6 digits — threshold reached"
+        },
+        {
+          "id": "TV-N-032",
+          "input_python": "1500000",
+          "expected": "1.5e+6",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-033",
+          "input_python": "1e10",
+          "expected": "1e+10",
+          "expected_error": null
+        },
+        {
+          "id": "TV-N-034",
+          "input_python": "1.5e+308",
+          "expected": "1.5e+308",
+          "expected_error": null,
+          "comment": "Within range"
+        },
+        {
+          "id": "TV-N-035",
+          "input_python": "0.000001",
+          "expected": "1e-6",
+          "expected_error": null,
+          "comment": "|exp| >= 6 negative"
+        },
+        {
+          "id": "TV-N-036",
+          "input_python": "0.0000015",
+          "expected": "1.5e-6",
+          "expected_error": null
+        }
+      ]
+    },
+    {
+      "category": "range_limits",
+      "rationale": "Values with |v| > 10^308 are rejected as AEP51_NUMERIC_OUT_OF_RANGE. Subnormal positive values (0 < |v| < 10^-308) are also rejected.",
+      "vectors": [
+        {
+          "id": "TV-N-040",
+          "input_python": "1e+1000",
+          "expected": null,
+          "expected_error": "AEP51_NUMERIC_OUT_OF_RANGE"
+        },
+        {
+          "id": "TV-N-041",
+          "input_python": "-1e+1000",
+          "expected": null,
+          "expected_error": "AEP51_NUMERIC_OUT_OF_RANGE"
+        },
+        {
+          "id": "TV-N-042",
+          "input_python": "1e-1000",
+          "expected": null,
+          "expected_error": "AEP51_NUMERIC_OUT_OF_RANGE",
+          "comment": "Subnormal"
+        },
+        {
+          "id": "TV-N-043",
+          "input_python": "1e+309",
+          "expected": null,
+          "expected_error": "AEP51_NUMERIC_OUT_OF_RANGE"
+        },
+        {
+          "id": "TV-N-044",
+          "input_python": "1e+308",
+          "expected": "1e+308",
+          "expected_error": null,
+          "comment": "At range boundary"
+        }
+      ]
+    },
+    {
+      "category": "forbidden_values",
+      "rationale": "NaN, +Inf, -Inf are forbidden (already enforced by strict canonical JSON parser; v0.5.1 reinforces with numeric-specific code).",
+      "vectors": [
+        {
+          "id": "TV-N-050",
+          "input_python": "float('nan')",
+          "expected": null,
+          "expected_error": "AEP51_NUMERIC_FORBIDDEN"
+        },
+        {
+          "id": "TV-N-051",
+          "input_python": "float('inf')",
+          "expected": null,
+          "expected_error": "AEP51_NUMERIC_FORBIDDEN"
+        },
+        {
+          "id": "TV-N-052",
+          "input_python": "float('-inf')",
+          "expected": null,
+          "expected_error": "AEP51_NUMERIC_FORBIDDEN"
+        }
+      ]
+    },
+    {
+      "category": "precision_limits",
+      "rationale": "Inputs with > 17 significant decimal digits trigger AEP51_NUMERIC_PRECISION_LOSS.",
+      "vectors": [
+        {
+          "id": "TV-N-060",
+          "input_python": "1.23456789012345",
+          "expected": "1.23456789012345",
+          "expected_error": null,
+          "comment": "15 sig figs — within limit"
+        },
+        {
+          "id": "TV-N-061",
+          "input_python": "1.2345678901234567",
+          "expected": "1.2345678901234567",
+          "expected_error": null,
+          "comment": "17 sig figs — at boundary"
+        },
+        {
+          "id": "TV-N-062",
+          "input_python": "1.23456789012345678",
+          "expected": null,
+          "expected_error": "AEP51_NUMERIC_PRECISION_LOSS",
+          "comment": "18 sig figs — over"
+        },
+        {
+          "id": "TV-N-063",
+          "input_python": "0.30000000000000004",
+          "expected": "0.30000000000000004",
+          "expected_error": null,
+          "comment": "17 sig figs — Python float repr edge case"
+        }
+      ]
+    },
+    {
+      "category": "noncanonical_input_rejection",
+      "rationale": "Inputs that parse but don't canonicalize to themselves byte-for-byte trigger AEP51_NUMERIC_NONCANONICAL_FORM. Detection requires the implementation to compute aep_numeric_canonicalize(parsed_value) and compare to the stored serialization. Used for hash-stability when the producer's serializer and consumer's canonicalizer agree.",
+      "vectors": [
+        {
+          "id": "TV-N-070",
+          "stored_string": "1.0",
+          "expected_error": "AEP51_NUMERIC_NONCANONICAL_FORM",
+          "comment": "Stored '1.0' canonicalizes to '1' — mismatch"
+        },
+        {
+          "id": "TV-N-071",
+          "stored_string": "+1",
+          "expected_error": "AEP51_NUMERIC_NONCANONICAL_FORM",
+          "comment": "Leading '+' rejected by canonical form"
+        },
+        {
+          "id": "TV-N-072",
+          "stored_string": "01",
+          "expected_error": "AEP51_NUMERIC_NONCANONICAL_FORM",
+          "comment": "Leading zero rejected"
+        },
+        {
+          "id": "TV-N-073",
+          "stored_string": "1.5E10",
+          "expected_error": "AEP51_NUMERIC_NONCANONICAL_FORM",
+          "comment": "Capital 'E' rejected"
+        },
+        {
+          "id": "TV-N-074",
+          "stored_string": "1e10",
+          "expected_error": "AEP51_NUMERIC_NONCANONICAL_FORM",
+          "comment": "Exponent without '+' sign rejected"
+        }
+      ]
+    },
+    {
+      "category": "duplicate_key_rejection_strict_canonical",
+      "rationale": "Inherited from v0.5 §17 strict canonical JSON profile. v0.5.1 §V51-4 reinforces. JSON objects with duplicate keys must be rejected at parse time.",
+      "vectors": [
+        {
+          "id": "TV-N-080",
+          "stored_json": "{\"k\": 1, \"k\": 2}",
+          "expected_error": "AEP5_JSON_INVALID_DUPLICATE_KEY",
+          "comment": "Duplicate key"
+        }
+      ]
+    }
+  ],
+  "implementation_notes": {
+    "python_reference": "src/aep/validate_v0_5_1.py — function aep_numeric_canonicalize (or equivalent helper)",
+    "nodejs_target": "v0.6 work — implementation expected at @aep/validator-js (placeholder)",
+    "go_target": "v0.6 work — implementation expected at github.com/aep-spec/aep-validator-go (placeholder)",
+    "rust_target": "v0.6 work — implementation expected at aep_validator (placeholder, crates.io)"
+  },
+  "conformance_statement": "An implementation claims AEP-NUMERIC-v1 conformance only when it passes 100% of the vectors above and produces the EXACT expected canonical string (or expected_error code) for every input. Discrepancies are v0.6 specification gaps and must be filed as issues against the AEP spec repository.",
+  "open_test_vector_gaps_for_v0_6": [
+    "Cross-runtime hash stability of canonicalize(parsed) for 1e-310 (truly subnormal in IEEE-754 double)",
+    "Behavior on integer overflow at parse time when input is provided as JSON number (vs. string)",
+    "Locale-sensitive parsing (some runtimes may interpret '1,5' as 1.5 in EU locales — must be rejected)",
+    "Behavior on inputs like '1.7976931348623157e+308' (IEEE-754 double max exactly) — round-trip must be byte-identical",
+    "Behavior on Python decimal.Decimal with arbitrary precision exceeding double precision"
+  ]
+}

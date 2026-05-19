@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aepkit.org/aep/schemas/validation.schema.json",
+  "title": "AEP Validation Run",
+  "type": "object",
+  "required": [
+    "id",
+    "type",
+    "validator",
+    "result",
+    "checked_files",
+    "findings",
+    "state_hash",
+    "created_at"
+  ],
+  "additionalProperties": true,
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^validation:"
+    },
+    "type": {
+      "const": "ValidationRun"
+    },
+    "validator": {
+      "type": "string"
+    },
+    "result": {
+      "enum": [
+        "pass",
+        "warn",
+        "fail"
+      ]
+    },
+    "checked_files": {
+      "type": "array"
+    },
+    "findings": {
+      "type": "array"
+    },
+    "state_hash": {
+      "type": "string",
+      "pattern": "^sha256:"
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

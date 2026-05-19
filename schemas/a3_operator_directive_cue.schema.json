@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:a3-operator-directive-cue:0.1",
+  "title": "AEP v1.1 A3 Operator Directive Cue",
+  "description": "v1.1 A3 amendment (STRONGLY PLAUSIBLE × CONTEXT-BOUND PATTERN). Two-agent convergence (visual-judge + strategist). Verbatim operator reactions indexed as RegexicalCues with polarity. Honors sec73.2 operator-verbatim-sacred + sec73.6 NO-OPERATOR-REACTION-CALIBRATION (the cue records the reaction; it does NOT instruct on what to do about it). Composes_with: v1.0.3 RegexicalCue (this is a specialized cue type), sec73.2/.6.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "verbatim_text",
+    "polarity",
+    "captured_at",
+    "session_id",
+    "surface"
+  ],
+  "properties": {
+    "type": {
+      "const": "OperatorDirectiveCue"
+    },
+    "schema_version": {
+      "const": "aep-operator-directive-cue-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^odc:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "verbatim_text": {
+      "type": "string",
+      "description": "Operator's verbatim utterance. sec73.2 binding: NEVER paraphrased.",
+      "minLength": 1,
+      "maxLength": 8192
+    },
+    "polarity": {
+      "type": "string",
+      "enum": [
+        "directive",
+        "praise",
+        "frustration",
+        "correction",
+        "veto",
+        "approval",
+        "question",
+        "neutral_observation"
+      ],
+      "description": "Classified polarity of the reaction. Cue-author tags this at capture time."
+    },
+    "captured_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "session_id": {
+      "type": "string",
+      "maxLength": 256
+    },
+    "surface": {
+      "type": "string",
+      "enum": ["chat", "artifact", "cowork"],
+      "description": "sec70.1 surface where the directive surfaced."
+    },
+    "bound_to_lesson_id": {
+      "type": ["string", "null"],
+      "description": "Optional. Lesson the cue is bound into."
+    },
+    "regexical_cue_id": {
+      "type": ["string", "null"],
+      "pattern": "^rxmem:",
+      "description": "Optional. RegexicalCue id this directive cue resolves through (v1.0.3 cue layer)."
+    },
+    "downstream_actions_triggered": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "action_id": {"type": "string", "maxLength": 256},
+          "actor_role": {"type": "string"},
+          "action_at": {"type": "string", "format": "date-time"}
+        }
+      },
+      "description": "Downstream actions taken in response to this directive. Anti-reaction-laundering (sec73.6): record what was DONE, not what is INFERRED to have been wanted."
+    },
+    "operator_attestation_signature": {
+      "type": ["string", "null"],
+      "description": "Optional Ed25519 signature attesting the verbatim text is exact. Base64url-encoded.",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "OperatorDirectiveCue",
+      "schema_version": "aep-operator-directive-cue-0.1",
+      "id": "odc:v11-stack-implement-2026-05-18",
+      "verbatim_text": "okay great now implement it all, and at the end, measure every possible % or variable that each thing as an aep whole provides the agentic framework if everything is not perfect, then make it perfect for v1.1 do whatever you have to do i honestly don't see how any of you have limits anymore - just figure it out",
+      "polarity": "directive",
+      "captured_at": "2026-05-18T07:30:00Z",
+      "session_id": "v11-stack-implement-2026-05-18",
+      "surface": "chat",
+      "bound_to_lesson_id": null,
+      "regexical_cue_id": null,
+      "downstream_actions_triggered": [
+        {
+          "action_id": "v11-phase-2-forge-spec-plus-15-schemas",
+          "actor_role": "forge",
+          "action_at": "2026-05-18T08:00:00Z"
+        }
+      ],
+      "operator_attestation_signature": null
+    }
+  ]
+}

@@ -1,0 +1,223 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:rater-quorum-attestation:0.1",
+  "title": "AEP Rater Quorum Attestation",
+  "description": "v1.0.3.1 F14 backport. Multi-rater independence proof binding every score-bearing field (e.g., VG04 rubric verdicts). Universalizes the v1.0.3 HV2 closure (warden re-score + judge tiebreaker on cross-reader mean-delta > 0.5) as a schema-enforced invariant. Composes_with: doctrine/02-truth-tags.html, doctrine/41-hash-chained-receipt-ledger.html, doctrine/50-epistemic-hygiene-meta-law.html Law-3 multi-lens, doctrine/69-verification-law-and-operator-spec-sovereignty.html sec69.4 non-rescindable, doctrine/73-external-claude-receipt-laws.html sec73.5 warden-receipts-or-halt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_artifact_sha256",
+    "raters",
+    "agreement_metric",
+    "agreement_score",
+    "independence_threshold",
+    "independence_pass"
+  ],
+  "properties": {
+    "type": {
+      "const": "RaterQuorumAttestation",
+      "description": "Discriminator. Always 'RaterQuorumAttestation'."
+    },
+    "schema_version": {
+      "const": "aep-rater-quorum-attestation-0.1",
+      "description": "Schema version pin."
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^rqa:[a-z0-9][a-z0-9._:-]*:v[0-9]+$",
+      "description": "Stable RQA id. Recommended pattern: rqa:<artifact-slug>:<rubric-slug>:v0."
+    },
+    "bound_to_artifact_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Anchor: the artifact (verdict, claim, packet) this attestation binds. Drift here invalidates the attestation."
+    },
+    "rubric_id": {
+      "type": "string",
+      "description": "Optional id of the rubric the raters applied (e.g., 'vg04-blind-recall-v1.0.3.1'). Used by cross-rater κ computation when multiple rubrics are in play.",
+      "maxLength": 256
+    },
+    "raters": {
+      "type": "array",
+      "minItems": 2,
+      "description": "N>=2 distinct raters. Validator enforces distinct session_ids AND distinct principal_ids to prevent self-attestation.",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "principal_id",
+          "role",
+          "session_id",
+          "time_utc",
+          "score_0_to_5"
+        ],
+        "properties": {
+          "principal_id": {
+            "type": "string",
+            "description": "Unique principal identifier (e.g., 'diana', 'warden', 'judge', 'adversary')."
+          },
+          "role": {
+            "type": "string",
+            "enum": [
+              "strategist",
+              "pathfinder",
+              "scout",
+              "forge",
+              "judge",
+              "adversary",
+              "warden",
+              "scribe",
+              "curator",
+              "visual-judge",
+              "diana",
+              "operator",
+              "external_reader"
+            ],
+            "description": "Canonical role tag. Determines lens-class for multi-lens independence audit per sec50 Law-3."
+          },
+          "session_id": {
+            "type": "string",
+            "description": "Session identifier. MUST be distinct across raters in this attestation (validator enforces)."
+          },
+          "time_utc": {
+            "type": "string",
+            "format": "date-time",
+            "description": "ISO-8601 UTC timestamp when this rater emitted their score."
+          },
+          "score_0_to_5": {
+            "type": "number",
+            "minimum": 0.0,
+            "maximum": 5.0,
+            "description": "Score on 0-5 scale. For other scales (0-10, normalized 0-1), use RubricScore claim and project to 0-5 here."
+          },
+          "score_label": {
+            "type": "string",
+            "enum": [
+              "EXACT",
+              "GOOD",
+              "HARD_PLUS",
+              "HARD",
+              "FAIL_EASY",
+              "FAIL_MISLEADING",
+              "BLACKOUT"
+            ],
+            "description": "Optional rubric label (corresponds to operator source.md L272-280)."
+          },
+          "prior_exposure_hash": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "description": "Hash of (this rater's prior reads on the same artifact) computed from the hook log. Cross-rater hash equality is a smoking gun for anchoring. Validator emits RQA_ANCHORING_RISK when 2 raters share prior_exposure_hash."
+          },
+          "read_path_excludes": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Paths this rater was hook-blocked from reading (anti-collusion guard per doctrine/11-cortex-v-protocol.html sec3). Derived from hook log, NOT agent-supplied. Validator audits parity across raters per sec50 Law-3."
+          },
+          "rationale_sha256": {
+            "type": "string",
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "description": "sha256 of this rater's rationale text. Allows audit without inlining full rationale prose."
+          }
+        }
+      }
+    },
+    "agreement_metric": {
+      "type": "string",
+      "enum": [
+        "cohens_kappa",
+        "krippendorff_alpha",
+        "simple_mean_delta"
+      ],
+      "description": "Which metric was computed. cohens_kappa for N=2 raters with categorical scores; krippendorff_alpha for N>=3 raters or ordinal scores; simple_mean_delta when scores are continuous and N=2-3 (the v1.0.3 default per HV2 closure)."
+    },
+    "agreement_score": {
+      "type": "number",
+      "description": "Computed agreement value. For cohens_kappa and krippendorff_alpha: 0.0 to 1.0 (1.0 = perfect agreement). For simple_mean_delta: absolute mean-delta on the 0-5 scale (0.0 = perfect agreement; lower is better)."
+    },
+    "independence_threshold": {
+      "type": "number",
+      "description": "Threshold that determines independence_pass. Default 0.6 for cohens_kappa/krippendorff_alpha (>= threshold passes); default 0.5 for simple_mean_delta (<= threshold passes per v1.0.3 HV2 binding)."
+    },
+    "independence_pass": {
+      "type": "boolean",
+      "description": "Computed: cohens_kappa/krippendorff_alpha >= threshold OR simple_mean_delta <= threshold. PROMOTION-GATE: validator REJECTS promotion to PROVEN/RELIABLE if independence_pass = false."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "PASS",
+        "HARD_CONDITIONAL",
+        "FAIL",
+        "ABORT"
+      ],
+      "description": "Final verdict combining mean and independence. PASS: mean >= pass_threshold AND independence_pass. HARD_CONDITIONAL: mean < pass_threshold BUT mean > abort_floor (today's v1.0.3 case). FAIL: independence_pass=false even with mean >= threshold. ABORT: mean <= abort_floor regardless of independence."
+    },
+    "pass_threshold": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 5.0,
+      "default": 4.0,
+      "description": "Mean threshold for verdict=PASS. Default 4.0 per VG04 rubric."
+    },
+    "abort_floor": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 5.0,
+      "default": 3.0,
+      "description": "Mean below which verdict=ABORT (scope is not shippable). Default 3.0."
+    },
+    "mean_score": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 5.0,
+      "description": "Computed: arithmetic mean of all raters' score_0_to_5."
+    },
+    "max_pairwise_delta": {
+      "type": "number",
+      "minimum": 0.0,
+      "description": "Computed: max(|score_i - score_j|) over all rater pairs. The HV2 closure threshold (>0.5 fires tiebreaker)."
+    },
+    "disagreement_decomposition": {
+      "type": "array",
+      "description": "Per-dimension breakdown of disagreement for diagnosing rubric-definitional-gaps. Closes the v1.0.3 VG04 root cause (list-valued recall-field threshold ambiguity).",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["dimension_id", "dimension_label", "max_delta"],
+        "properties": {
+          "dimension_id": {
+            "type": "string",
+            "description": "Stable id of the rubric dimension (e.g., 'failure_prevented_overlap', 'packet_id_drift', 'stop_condition_present')."
+          },
+          "dimension_label": {
+            "type": "string",
+            "description": "Human-readable label."
+          },
+          "max_delta": {
+            "type": "number",
+            "minimum": 0.0,
+            "description": "Max pairwise score-delta on this dimension."
+          },
+          "drivers": {
+            "type": "array",
+            "items": {"type": "string"},
+            "description": "Per-rater quoted phrases that drove the divergence. Read by curator when proposing rubric refinements."
+          }
+        }
+      }
+    },
+    "computed_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When this attestation was computed (validator timestamp)."
+    },
+    "composes_with": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Doctrine slots / lessons / prior receipts this attestation composes with."
+    }
+  }
+}

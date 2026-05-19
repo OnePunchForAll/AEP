@@ -1531,7 +1531,7 @@ def check_schema_version(manifest: dict, profile: str, strict: bool) -> List[Fin
 
     exts = _safe_get(manifest, "extensions", [])
     # Backward-compatibility note: v0.3/v0.4 used `extensions` as a flat dict of namespaced
-    # metadata fields (e.g., implementer:original_sha256, implementer:source_lesson). Those are NOT
+    # metadata fields (e.g., aep:original_sha256, aep:source_lesson). Those are NOT
     # "extensions" in the v0.5 sense (= structured extension entries with semantic_stability).
     # Skip semantic_stability enforcement for legacy dict-form extensions.
     if isinstance(exts, dict):

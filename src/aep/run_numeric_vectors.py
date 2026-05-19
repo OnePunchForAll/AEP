@@ -1,7 +1,7 @@
 """run_numeric_vectors — Apache-2.0 — AEP-NUMERIC-v1 conformance runner.
 
 Reads the cross-runtime test vectors JSON corpus (default:
-``test_vectors/numeric/vectors.json``), evaluates every
+``test_vectors/v0_5/A.10-numeric-canonicalization/vectors.json``), evaluates every
 vector against the Python reference implementation of AEP-NUMERIC-v1 (provided
 by ``aep.validate_v0_5_1``), and reports per-vector + summary pass/fail.
 
@@ -268,8 +268,8 @@ def main(argv: Optional[List[str]] = None) -> int:
         "corpus_path",
         nargs="?",
         type=Path,
-        default=Path("test_vectors/numeric/vectors.json"),
-        help="Path to vectors.json (default: test_vectors/numeric/vectors.json)",
+        default=Path("test_vectors/v0_5/A.10-numeric-canonicalization/vectors.json"),
+        help="Path to vectors.json (default: test_vectors/v0_5/A.10-numeric-canonicalization/vectors.json)",
     )
     args = parser.parse_args(argv)
     return run_vectors(args.corpus_path)

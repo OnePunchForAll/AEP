@@ -47,11 +47,11 @@ AEP60_CONTEXT_REMOTE_FETCH_FORBIDDEN = "AEP60_CONTEXT_REMOTE_FETCH_FORBIDDEN"
 AEP60_BAGIT_MANIFEST_DIVERGENCE = "AEP60_BAGIT_MANIFEST_DIVERGENCE"
 AEP60_ROCRATE_ROOT_DIVERGENCE = "AEP60_ROCRATE_ROOT_DIVERGENCE"
 
-# v0.6.0-rc2 additions from review cycle (adversary ATK-1 + ATK-2 closures)
+# v0.6.0-rc2 additions from knowledge-run-1 (adversary ATK-1 + ATK-2 closures)
 AEP60_REVIEWER_COLLAPSE_SAME_SOURCE = "AEP60_REVIEWER_COLLAPSE_SAME_SOURCE"
 AEP60_SOURCE_LOCATION_HASH_SENTINEL = "AEP60_SOURCE_LOCATION_HASH_SENTINEL"
 
-# v0.6.1 additions from review cycle follow-up (adversary ATK-3/4/5 + SP-R8-01 + GATE-J1)
+# v0.6.1 additions from knowledge-run-1 follow-up (adversary ATK-3/4/5 + SP-R8-01 + GATE-J1)
 AEP61_GR_CHAIN_TRANSITIVE_LAUNDERING = "AEP61_GR_CHAIN_TRANSITIVE_LAUNDERING"
 AEP61_SUPERSESSION_SELF_LOOP = "AEP61_SUPERSESSION_SELF_LOOP"
 AEP61_MIGRATION_RECEIPT_DEGENERATE = "AEP61_MIGRATION_RECEIPT_DEGENERATE"
@@ -61,7 +61,7 @@ AEP61_SHARED_SCHEMA_LENS_COLLAPSE = "AEP61_SHARED_SCHEMA_LENS_COLLAPSE"
 AEP61_CONTENT_HASH_MISMATCH = "AEP61_CONTENT_HASH_MISMATCH"
 
 
-# Hex sentinel patterns rejected as location_hash values (per review cycle ATK-2).
+# Hex sentinel patterns rejected as location_hash values (per knowledge-run-1 ATK-2).
 _LOCATION_HASH_SENTINELS = frozenset({
     "0" * 64,
     "f" * 64,
@@ -103,8 +103,8 @@ VALID_PROFILES_V0_6 = {
 AEP70_VIEW_DETERMINISM_MISMATCH = "AEP70_VIEW_DETERMINISM_MISMATCH"
 AEP70_VIEWS_MERKLE_MISMATCH = "AEP70_VIEWS_MERKLE_MISMATCH"
 
-# v0.7.1 critical fixes (triple-check adversary pass — internal lesson):
-# Close the integrity-envelope trust-root gap exposed by adversary review cycle finding #1.
+# v0.7.1 critical fixes (triple-check adversary pass — sibling-67):
+# Close the integrity-envelope trust-root gap exposed by adversary KR-2 finding #1.
 # The v0.5.5 base validator looks for state_hash + manifest_hash at TOP LEVEL but
 # v0.7 packets have them nested under `integrity.*` — so the v0.5 recompute never
 # fires. This left signing as "attest two scalars, not content-bind to packet."
@@ -301,7 +301,7 @@ def _check_reviewer_collapse(packet_root: Path) -> List[Finding]:
     """v0.6.0-rc2 ATK-1 closure — reviewer-collapse via shared same_source_fingerprint.
 
     When a claim's basis[] contains ≥2 entries with same_source_fingerprint set,
-    the entries' fingerprints MUST be distinct. review cycle adversary finding.
+    the entries' fingerprints MUST be distinct. Knowledge-run-1 adversary finding.
     """
     findings: List[Finding] = []
     claims_path = packet_root / "data" / "claims.jsonl"
@@ -355,7 +355,7 @@ def _check_source_location_hash_sentinel(packet_root: Path) -> List[Finding]:
     """v0.6.0-rc2 ATK-2 closure — Source.location_hash sentinel detection.
 
     When a Source record has location.location_hash set, the value MUST NOT be a
-    sentinel (all-zeros / all-Fs / all-ones in the hex portion). review cycle
+    sentinel (all-zeros / all-Fs / all-ones in the hex portion). Knowledge-run-1
     adversary finding; closes accidentally-shipped attack surface in
     atk-context-hijack.aepkg/data/sources.jsonl.
     """
@@ -502,7 +502,7 @@ def _check_supersession_integrity(packet_root: Path, manifest: Dict[str, Any]) -
             )
         )
     # Check deep_migration_receipt fields.
-    receipt = extensions.get("implementer:deep_migration_receipt") or extensions.get("deep_migration_receipt")
+    receipt = extensions.get("aep:deep_migration_receipt") or extensions.get("deep_migration_receipt")
     if isinstance(receipt, dict):
         pre = receipt.get("pre_state_hash")
         post = receipt.get("post_state_hash")
@@ -579,7 +579,7 @@ def _check_body_envelope_split(packet_root: Path, manifest: Dict[str, Any]) -> L
                     _mkfinding(
                         AEP61_BODY_ENVELOPE_LEAK,
                         SEVERITY_ERROR,
-                        f"body file {rel!r} contains envelope.integrity.{key} hex value {hex_value[:16]!r}...; body and envelope hash bases MUST be disjoint (§3.2.1)",
+                        f"body file {rel!r} contains envelope.integrity.{key} hex value {hex_value[:16]!r}...; body and envelope hash bases MUST be disjoint (§V60-2.1)",
                         f"{rel}",
                     )
                 )
@@ -592,7 +592,7 @@ def _check_shared_schema_lens(packet_root: Path) -> List[Finding]:
 
     When a packet declares ≥2 reviews / analyses with identical
     authoring_schema_sha256 but claims convergence_count > 1, REJECT per
-    epistemic-hygiene rule (schema-shared multi-analysis is ONE lens with
+    §50 EH Meta-Law Law 3 (schema-shared multi-analysis is ONE lens with
     internal redundancy, not N independent observers).
     """
     findings: List[Finding] = []
@@ -641,7 +641,7 @@ def _check_shared_schema_lens(packet_root: Path) -> List[Finding]:
 def _check_content_hash_recompute(packet_root: Path, manifest: Dict[str, Any]) -> List[Finding]:
     """v0.6.1 H5 closure — Verifier-Recomputed Content Hash gate.
 
-    Per hash-chained receipt property: every artifact's content_hash MUST be re-verified by
+    Per §41 HCRL property 3: every artifact's content_hash MUST be re-verified by
     re-hashing the artifact at its binding_path. Reject when any declared
     content_hash on Source / EvidenceArtifact records differs from sha256 of
     referenced file in the packet.
@@ -739,7 +739,7 @@ def _check_view_determinism(packet_root: Path) -> List[Finding]:
     If views/ directory exists with derived projections (claim-ledger.html /
     integrity-tree.svg / provenance-graph.mmd), re-derive and compare bytes.
     Any mismatch is REJECTED — derived views must be byte-identical to
-    canonical re-derivation per visual-judge review cycle finding.
+    canonical re-derivation per visual-judge KR-1 finding.
     """
     findings: List[Finding] = []
     views_dir = packet_root / "views"
@@ -841,7 +841,7 @@ def _check_signature_required(packet_root: Path, manifest: Dict[str, Any]) -> Li
 def _check_integrity_state_hash(packet_root: Path, manifest: Dict[str, Any]) -> List[Finding]:
     """v0.7.1 critical fix — recompute integrity.state_hash from raw body bytes.
 
-    Closes adversary review cycle finding #1 (signing-lane cryptographic theater).
+    Closes adversary KR-2 finding #1 (signing-lane cryptographic theater).
     v0.5.5 base validator looks for state_hash at TOP LEVEL of manifest; v0.7
     packets nest it under integrity.* so the base recompute never fires.
     This explicit check recomputes via canonical_state_hash_v0_5 and compares.
@@ -881,7 +881,7 @@ def _check_integrity_state_hash(packet_root: Path, manifest: Dict[str, Any]) -> 
 def _check_integrity_manifest_hash(packet_root: Path, manifest: Dict[str, Any]) -> List[Finding]:
     """v0.7.1 critical fix — recompute integrity.manifest_hash with 3-field exclusion.
 
-    Closes adversary review cycle finding #1. Exclusion set per AEP-v0.7 SIGNED_DIGEST
+    Closes adversary KR-2 finding #1. Exclusion set per AEP-v0.7 SIGNED_DIGEST
     design: {integrity.manifest_hash, integrity.views_merkle_root, signatures}.
     """
     findings: List[Finding] = []
@@ -921,7 +921,7 @@ def _check_integrity_manifest_hash(packet_root: Path, manifest: Dict[str, Any]) 
 def _check_views_merkle_root(packet_root: Path, manifest: Dict[str, Any]) -> List[Finding]:
     """v0.7.1 critical fix — recompute integrity.views_merkle_root.
 
-    Closes adversary review cycle finding #7 (AEP70_VIEWS_MERKLE_MISMATCH declared but
+    Closes adversary KR-2 finding #7 (AEP70_VIEWS_MERKLE_MISMATCH declared but
     never emitted). When integrity.views_merkle_root is declared, recompute via
     views.views_merkle_root() and compare.
     """
@@ -1011,10 +1011,10 @@ def validate_v0_6(packet_root: Path, config: ValidationConfig, allow_remote_cont
     closure_findings.extend(_check_jsonld_context(packet_root, manifest, allow_remote_context))
     closure_findings.extend(_check_bagit_single_authority(packet_root, manifest))
     closure_findings.extend(_check_rocrate_single_authority(packet_root, manifest))
-    # v0.6.0-rc2 — review cycle adversary closures (ATK-1 + ATK-2).
+    # v0.6.0-rc2 — knowledge-run-1 adversary closures (ATK-1 + ATK-2).
     closure_findings.extend(_check_reviewer_collapse(packet_root))
     closure_findings.extend(_check_source_location_hash_sentinel(packet_root))
-    # v0.6.1 — review cycle follow-up closures (ATK-3 + ATK-4 + ATK-5 + SP-R8-01 + GATE-J1 + H5).
+    # v0.6.1 — knowledge-run-1 follow-up closures (ATK-3 + ATK-4 + ATK-5 + SP-R8-01 + GATE-J1 + H5).
     closure_findings.extend(_check_gr_transitive_laundering(packet_root))
     closure_findings.extend(_check_supersession_integrity(packet_root, manifest))
     closure_findings.extend(_check_identity_authenticated(packet_root, manifest))
@@ -1025,7 +1025,7 @@ def validate_v0_6(packet_root: Path, config: ValidationConfig, allow_remote_cont
     closure_findings.extend(_check_view_determinism(packet_root))
     if config.profile in {"aep:0.7/signed"}:
         closure_findings.extend(_check_signature_required(packet_root, manifest))
-    # v0.7.1 CRITICAL FIXES (triple-check adversary pass — internal lesson):
+    # v0.7.1 CRITICAL FIXES (triple-check adversary pass — sibling-67):
     # Recompute integrity.state_hash + manifest_hash + views_merkle_root from
     # raw bytes and reject drift. Closes the trust-root subversion gap where
     # the v0.5.5 base validator failed to fire on nested integrity.* values.

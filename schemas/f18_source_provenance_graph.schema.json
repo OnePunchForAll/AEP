@@ -1,0 +1,132 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:f18-source-provenance-graph:0.1",
+  "title": "AEP v1.1 F18 Source Provenance Graph Row",
+  "description": "v1.1 F18 frontier-break primitive (SPECULATIVE FRONTIER). Three-agent convergence (scout+scout+warden+curator). Every source row carries lineage_depth + venue_tier + peer_review_status + invalidator_checked + adjacency_invalidator_ids[]. Promotion-time freeze-lock via Ed25519. Validator computes laundering-score on read; promotion gates condition on score <= threshold. Composes_with: sec04 security, sec50 EH Law-3 anti-source-laundering, sec73.3 prior-art-inheritance, v0.8 F2 reproducibility_certificate (source_hashes_at_reproduce).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_source_id",
+    "lineage_depth",
+    "venue_tier",
+    "peer_review_status",
+    "invalidator_checked"
+  ],
+  "properties": {
+    "type": {
+      "const": "SourceProvenanceGraphRow",
+      "description": "Discriminator. Always 'SourceProvenanceGraphRow'."
+    },
+    "schema_version": {
+      "const": "aep-source-provenance-graph-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^spg:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_source_id": {
+      "type": "string",
+      "description": "Source ID this row annotates. Must resolve to an entry in data/sources.jsonl.",
+      "maxLength": 256
+    },
+    "lineage_depth": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Distance from operator-verbatim origin. 0 = operator verbatim. 1 = external (e.g., arxiv, OpenAI). 2 = peer-reviewed analysis citing external. 3+ = the agent-synthesis or deeper. Anti-source-laundering audit gates on this."
+    },
+    "venue_tier": {
+      "type": "string",
+      "enum": [
+        "operator_verbatim",
+        "peer_reviewed_journal",
+        "preprint_arxiv",
+        "industry_blog_first_party",
+        "industry_blog_third_party",
+        "social_media",
+        "internal_synthesis",
+        "external_claude_session",
+        "unknown"
+      ],
+      "description": "Source venue category. operator_verbatim is the canonical anchor; unknown emits AEP11_F18_VENUE_UNKNOWN warning."
+    },
+    "peer_review_status": {
+      "type": "string",
+      "enum": ["peer_reviewed", "preprint", "first_party_attestation", "external_validator_signed", "operator_attested", "not_applicable", "unverified"],
+      "description": "Peer-review status. external_validator_signed composes with v0.8 F3 external_validator_signatures[]."
+    },
+    "invalidator_checked": {
+      "type": "boolean",
+      "description": "Whether scout has checked the source against known invalidators (retractions, errata, contradicting peer-reviewed sources)."
+    },
+    "adjacency_invalidator_ids": {
+      "type": "array",
+      "items": {"type": "string"},
+      "description": "Source IDs of adjacent invalidators (retractions, contradicting sources) that scout has checked against."
+    },
+    "citation_count_at_absorption": {
+      "type": ["integer", "null"],
+      "minimum": 0,
+      "description": "External citation count at the time scout absorbed this source. null if not applicable."
+    },
+    "freeze_lock_ed25519_signature": {
+      "type": ["string", "null"],
+      "description": "Ed25519 signature freezing this source's bytes at LANDED time. Base64url-encoded. null until packet promotes to PROVEN/RELIABLE. Composes with v0.8 F3.",
+      "maxLength": 256
+    },
+    "freeze_lock_signer_principal": {
+      "type": ["string", "null"],
+      "maxLength": 256
+    },
+    "freeze_lock_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "laundering_score_computed": {
+      "type": ["number", "null"],
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "description": "Validator-computed laundering score. Graph-walk distance / fan-out / source-self-citation density. Higher = more laundered. Default null = unmeasured."
+    },
+    "laundering_score_threshold": {
+      "type": "number",
+      "minimum": 0.0,
+      "maximum": 1.0,
+      "default": 0.6,
+      "description": "Threshold above which the source is laundering-risky. Default 0.6."
+    },
+    "source_url_at_absorption": {
+      "type": ["string", "null"],
+      "format": "uri",
+      "description": "URL of the source at absorption time. Composes with future Memento-RFC-7089 perma-binding."
+    },
+    "source_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "Source byte sha256 at absorption time. Anchors freeze-lock."
+    }
+  },
+  "examples": [
+    {
+      "type": "SourceProvenanceGraphRow",
+      "schema_version": "aep-source-provenance-graph-0.1",
+      "id": "spg:operator-2026-05-18-regexical-memory:v1",
+      "bound_to_source_id": "src:operator-2026-05-18-regexical-memory",
+      "lineage_depth": 0,
+      "venue_tier": "operator_verbatim",
+      "peer_review_status": "operator_attested",
+      "invalidator_checked": true,
+      "adjacency_invalidator_ids": [],
+      "citation_count_at_absorption": null,
+      "freeze_lock_ed25519_signature": null,
+      "freeze_lock_signer_principal": null,
+      "freeze_lock_at": null,
+      "laundering_score_computed": 0.0,
+      "laundering_score_threshold": 0.6,
+      "source_url_at_absorption": null,
+      "source_sha256": "sha256:1bb674654ff75afc2660ade6f96456bab7ef054a33390ea85a7178bbf0d314bb"
+    }
+  ]
+}

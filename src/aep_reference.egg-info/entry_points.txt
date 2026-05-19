@@ -1,4 +1,0 @@
-[console_scripts]
-aep-sign = aep.signing:_cli_main
-aep-validate = aep.validate_v0_6:main
-aep-views = aep.views:_cli_main

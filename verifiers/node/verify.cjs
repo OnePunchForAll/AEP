@@ -2,7 +2,7 @@
 // Apache-2.0 — AEP v0.7-rc1 minimal Node.js reference verifier.
 // SP-R8-02 cross-language byte-parity proof: this verifier MUST produce
 // byte-identical state_hash + manifest_hash to the Python reference impl
-// at projects/AEP development/publish-ready/aep/src/aep/validate_v0_6.py.
+// at projects/v11-aep/publish-ready/aep/src/aep/validate_v0_6.py.
 //
 // Authored independently of the Python source per Two-Verifier Promotion
 // discipline. The canonicalization rules below are derived from the AEP

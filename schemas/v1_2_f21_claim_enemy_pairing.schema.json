@@ -1,0 +1,183 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:f21-claim-enemy-pairing:0.1",
+  "title": "AEP v1.2 F21 Claim Enemy Pairing Record",
+  "description": "v1.2 immune-system primitive. Every PROVEN/RELIABLE claim ships with its strongest plausible enemy: the condition under which the claim would be false (operator source.md L154-164). Operator's framing: 'most AI systems only optimize for saying true-looking things. AEP should force every claim to carry its own assassin.' Lineage NOVEL: no direct external precedent (closest is Popperian falsificationism + Toulmin argument structure rebuttal field, both philosophical not structural). HV2 closure: enemy_authored_by_principal_id != claim_authored_by_principal_id HARD-CONSTRAINED via schema; enemy_review_required_by_role enum HARD-CONSTRAINED to [judge, adversary]; enemy_basis_source_ids MUST include >=1 source NOT in claim.basis_source_ids[]. Composes_with: v1.1 F13 ClaimRuntimeFalsifier (the enemy IS the falsifier in claim_enemy_pairing form).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_claim_id",
+    "claim_authored_by_principal_id",
+    "claim_truth_tag",
+    "enemy_text",
+    "enemy_authored_by_principal_id",
+    "enemy_authored_by_role",
+    "enemy_review_required_by_role",
+    "enemy_basis_source_ids",
+    "claim_basis_source_ids_at_pairing_time",
+    "required_falsifier",
+    "anti_tautology_check",
+    "pairing_at",
+    "pairing_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "ClaimEnemyPairingRecord",
+      "description": "Discriminator. Always 'ClaimEnemyPairingRecord'."
+    },
+    "schema_version": {
+      "const": "aep-claim-enemy-pairing-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^cep:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_claim_id": {
+      "type": "string",
+      "description": "Claim ID this enemy pairs against. Must resolve to an entry in data/claims.jsonl.",
+      "maxLength": 256
+    },
+    "claim_authored_by_principal_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Principal ID of the claim author. HV2 closure: enemy.authored_by_principal_id MUST differ from this."
+    },
+    "claim_truth_tag": {
+      "type": "string",
+      "enum": ["PROVEN/RELIABLE", "STRONGLY PLAUSIBLE", "EXPERIMENTAL", "SPECULATIVE FRONTIER", "IMPOSSIBLE/UNSUPPORTED", "DANGEROUS/NOT WORTH DOING"],
+      "description": "Enforcement scope (plan sec6 + operator L154 + adversary A2 closure): enemy pairing REQUIRED on PROVEN/RELIABLE claims; advisory on STRONGLY PLAUSIBLE; not required on lower tiers (to prevent enforcement scope creep)."
+    },
+    "enemy_text": {
+      "type": "string",
+      "minLength": 16,
+      "description": "Operator L156 verbatim. The strongest plausible condition under which the claim would be false. Plain language; civilian-readable. Operator L159-162 example: claim='The agent reviewed all expected packets'; enemy='One expected packet was omitted from expected_corpus_scope or touched only by metadata, not content'."
+    },
+    "enemy_authored_by_principal_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "HV2 closure HARD-CONSTRAINED: this MUST differ from claim_authored_by_principal_id. Schema-level enforcement via not-equal assertion in validator (additionalProperties:false plus runtime check). Adversary attack A2 mitigation: enemy text from the same principal is sycophantic-tautology-shaped per Toulmin rebuttal discipline."
+    },
+    "enemy_authored_by_role": {
+      "type": "string",
+      "enum": ["judge", "adversary"],
+      "description": "HV2 closure HARD-CONSTRAINED. Only judge or adversary may author an enemy pairing on a PROVEN/RELIABLE claim. Scribe + curator + forge + pathfinder + strategist + scout + warden + visual-judge are explicitly EXCLUDED from enemy authorship to enforce independence."
+    },
+    "enemy_review_required_by_role": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["judge", "adversary"]
+      },
+      "minItems": 1,
+      "uniqueItems": true,
+      "description": "HV2 closure HARD-CONSTRAINED. The role(s) required to attest the enemy pairing was peer-reviewed. At minimum one of {judge, adversary} must sign the review attestation."
+    },
+    "enemy_basis_source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "description": "Adversary A2 cheapest disconfirmer: enemy MUST cite different evidence than the claim. Validator enforces: at least one source in enemy_basis_source_ids[] is NOT in claim.basis_source_ids[] at pairing time. Hard fail if enemy_basis_source_ids is a subset of claim.basis_source_ids."
+    },
+    "claim_basis_source_ids_at_pairing_time": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Snapshot of claim.basis_source_ids at the time the enemy was paired. Used to compute the source-divergence invariant. If empty, enemy_basis_source_ids must be non-empty and the validator emits AEP12_F21_CLAIM_BASIS_EMPTY warning."
+    },
+    "required_falsifier": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["falsifier_id", "executable_cmd", "expected_exit"],
+      "properties": {
+        "falsifier_id": {
+          "type": "string",
+          "pattern": "^crf:[a-z0-9][a-z0-9._:-]*$",
+          "description": "Bound to v1.1 F13 ClaimRuntimeFalsifier id."
+        },
+        "executable_cmd": {
+          "type": "string",
+          "description": "Operator L163 verbatim example: 'prove packet content access, not just filename touch.' The enemy MUST be testable; the falsifier is the test. F13 anti-tautology reuse per A2 closure (do not invent new layer per sec50 EH Law-3)."
+        },
+        "expected_exit": {
+          "type": "integer",
+          "enum": [0, 1],
+          "description": "0 = enemy disproven (claim survives); 1 = enemy confirmed (claim falsified)."
+        }
+      }
+    },
+    "anti_tautology_check": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "method"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["PASS", "FAIL", "PENDING"]
+        },
+        "method": {
+          "type": "string",
+          "enum": [
+            "f13_existing_anti_tautology",
+            "manual_review_by_judge",
+            "automated_token_overlap_check"
+          ],
+          "description": "Adversary A4 closure: anti-tautology stops at depth 2 — reuse F13 anti-tautology + F14 rater quorum, do NOT invent meta-adversary."
+        },
+        "token_overlap_ratio": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "If method == automated_token_overlap_check, the token overlap between claim_text and enemy_text. Threshold 0.5 = boilerplate; 0.8 = tautology."
+        }
+      }
+    },
+    "pairing_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "pairing_signature_ed25519": {
+      "type": "string",
+      "description": "Ed25519 signature freezing this pairing's bytes at pairing time. Composes with v0.8 F3.",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "ClaimEnemyPairingRecord",
+      "schema_version": "aep-claim-enemy-pairing-0.1",
+      "id": "cep:v12-f26-passport-verified-claim",
+      "bound_to_claim_id": "claim:v12:f26:passport-roundtrips-against-prov",
+      "claim_authored_by_principal_id": "principal:scout:diana-prime",
+      "claim_truth_tag": "PROVEN/RELIABLE",
+      "enemy_text": "The PROV round-trip test fixture imported via the same library that emitted the export; an external W3C PROV validator (rdflib + prov-toolbox) was never invoked. The claim 'AEP packet round-trips against PROV' is true ONLY against the in-repo validator, not the canonical external validator.",
+      "enemy_authored_by_principal_id": "principal:adversary:diana-prime",
+      "enemy_authored_by_role": "adversary",
+      "enemy_review_required_by_role": ["judge"],
+      "enemy_basis_source_ids": [
+        "src:w3c:prov-validator-spec:2013",
+        "src:prov-toolbox:lucmoreau:2020"
+      ],
+      "claim_basis_source_ids_at_pairing_time": [
+        "src:in-repo:aep_to_prov_export_test:test_passport_roundtrip"
+      ],
+      "required_falsifier": {
+        "falsifier_id": "crf:v12-f26-prov-external-validator",
+        "executable_cmd": "python tools/run_external_prov_validator.py --packet $PACKET --validator prov-toolbox && python tools/run_external_prov_validator.py --packet $PACKET --validator rdflib",
+        "expected_exit": 0
+      },
+      "anti_tautology_check": {
+        "status": "PASS",
+        "method": "f13_existing_anti_tautology",
+        "token_overlap_ratio": 0.12
+      },
+      "pairing_at": "2026-05-18T08:05:00Z",
+      "pairing_signature_ed25519": "ed25519_pending_phase_6_keypair"
+    }
+  ]
+}

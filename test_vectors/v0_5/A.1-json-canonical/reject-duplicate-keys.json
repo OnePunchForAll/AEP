@@ -1,0 +1,14 @@
+{
+  "id": "claim:tv-a1-001",
+  "type": "Claim",
+  "reliability": "PROVEN_RELIABLE",
+  "reliability": "ASSUMPTION",
+  "scope": "LOCAL_OBSERVATION",
+  "text": "duplicate-key attack",
+  "basis": [{ "source_id": "src:a" }],
+  "reasoning": "strict canonical profile rejects duplicate keys per Attack 1 mitigation",
+  "owner_agent": "adversary",
+  "review_tier": "R1",
+  "status": "active",
+  "created_at": "2026-05-14T12:00:00Z"
+}

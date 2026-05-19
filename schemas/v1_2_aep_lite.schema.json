@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:aep-lite:0.1",
+  "title": "AEP v1.2 Lite Packet Schema",
+  "description": "v1.2 immune-system primitive (operator source.md L84-93). The brutally simple civilian schema. 4 files verbatim from L88-91: claim.json + sources/ + receipt.json + proof-card.json. Operator framing: 'The general population does not need the full engine. They need the receipt.' Advanced AEP packets compile DOWN to AEP Lite. Lineage NOVEL packaging; EXTENDS PROV simple-graph + C2PA minimal-manifest patterns. Composes_with: v1.2 F22 CivilianProofCard (proof-card.json shape) + v1.1 F18 SourceProvenanceGraph (single-source honest framing).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "packet_layout",
+    "claim_json_required_fields",
+    "sources_dir_required_shape",
+    "receipt_json_required_fields",
+    "proof_card_json_binding",
+    "compile_down_from_pro_allowed",
+    "minimum_file_count",
+    "maximum_file_count",
+    "lineage_basis"
+  ],
+  "properties": {
+    "type": {
+      "const": "AEPLitePacketSchema",
+      "description": "Discriminator. Always 'AEPLitePacketSchema'."
+    },
+    "schema_version": {
+      "const": "aep-lite-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^lite:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "packet_layout": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["claim_json_path", "sources_dir_path", "receipt_json_path", "proof_card_json_path"],
+      "properties": {
+        "claim_json_path": {
+          "type": "string",
+          "const": "claim.json",
+          "description": "Operator L88 verbatim. Single claim.json at packet root."
+        },
+        "sources_dir_path": {
+          "type": "string",
+          "const": "sources/",
+          "description": "Operator L89 verbatim. Sources directory at packet root."
+        },
+        "receipt_json_path": {
+          "type": "string",
+          "const": "receipt.json",
+          "description": "Operator L90 verbatim. Single receipt.json at packet root."
+        },
+        "proof_card_json_path": {
+          "type": "string",
+          "const": "proof-card.json",
+          "description": "Operator L91 verbatim. Single proof-card.json at packet root."
+        }
+      }
+    },
+    "claim_json_required_fields": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["claim_text", "truth_tag", "basis_source_ids", "falsifier_summary", "expires_at"]
+      },
+      "minItems": 5,
+      "uniqueItems": true,
+      "description": "Minimal fields required in claim.json for AEP Lite. Pro-form attestations and quorum records are dropped on compile-down."
+    },
+    "sources_dir_required_shape": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["one_file_per_source", "file_naming_pattern", "minimum_count"],
+      "properties": {
+        "one_file_per_source": {
+          "type": "boolean",
+          "const": true
+        },
+        "file_naming_pattern": {
+          "type": "string",
+          "const": "^src-[a-z0-9-]+\\.(md|html|pdf|txt|json)$",
+          "description": "One file per source. Original source attached directly; no separate metadata JSON."
+        },
+        "minimum_count": {
+          "type": "integer",
+          "minimum": 1
+        }
+      }
+    },
+    "receipt_json_required_fields": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "packet_id",
+          "emitted_at",
+          "emitted_by_agent_or_user",
+          "validator_verdict",
+          "tests_run_count",
+          "tests_passed_count",
+          "tests_failed_count",
+          "any_signal_non_ok",
+          "checked_by_runtimes_count"
+        ]
+      },
+      "minItems": 9,
+      "uniqueItems": true,
+      "description": "Minimal receipt fields. Civilian-readable. 'checked_by_runtimes_count' per operator L75 'Checked by 3 runtimes' civilian vocabulary."
+    },
+    "proof_card_json_binding": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["bound_to_schema_id", "5_rows_required"],
+      "properties": {
+        "bound_to_schema_id": {
+          "type": "string",
+          "const": "aep:v1_2:f22-civilian-proof-card:0.1",
+          "description": "F22 schema is the source of truth for proof-card.json shape."
+        },
+        "5_rows_required": {
+          "type": "boolean",
+          "const": true,
+          "description": "Operator L60-66 verbatim. All 5 rows MUST be present in a Lite packet."
+        }
+      }
+    },
+    "compile_down_from_pro_allowed": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["allowed", "lossless_for_civilian_decision", "what_is_lost"],
+      "properties": {
+        "allowed": {
+          "type": "boolean",
+          "const": true,
+          "description": "Operator L93: 'advanced AEP can compile down to AEP Lite.'"
+        },
+        "lossless_for_civilian_decision": {
+          "type": "boolean",
+          "description": "Plan SC1 + RB-2 acceptance: compile-down must not lose information material to civilian decision. Falsified by Phase 9 stop-condition test."
+        },
+        "what_is_lost": {
+          "type": "array",
+          "items": {"type": "string"},
+          "description": "Honest disclosure per sec73.6. Examples: 'DAG amendment history', 'rater quorum attestations', 'Ed25519 signatures', 'reproducibility certificate'."
+        }
+      }
+    },
+    "minimum_file_count": {
+      "type": "integer",
+      "const": 4,
+      "description": "claim.json + receipt.json + proof-card.json + at least one file in sources/."
+    },
+    "maximum_file_count": {
+      "type": "integer",
+      "minimum": 4,
+      "description": "Operator L86 'brutally simple.' Practical cap to prevent Pro-shape creep."
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "F18 lineage. AEP Lite EXTENDS: PROV simple-graph + C2PA minimal-manifest packaging conventions."
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    }
+  },
+  "examples": [
+    {
+      "type": "AEPLitePacketSchema",
+      "schema_version": "aep-lite-0.1",
+      "id": "lite:lease-summary-example",
+      "packet_layout": {
+        "claim_json_path": "claim.json",
+        "sources_dir_path": "sources/",
+        "receipt_json_path": "receipt.json",
+        "proof_card_json_path": "proof-card.json"
+      },
+      "claim_json_required_fields": ["claim_text", "truth_tag", "basis_source_ids", "falsifier_summary", "expires_at"],
+      "sources_dir_required_shape": {
+        "one_file_per_source": true,
+        "file_naming_pattern": "^src-[a-z0-9-]+\\.(md|html|pdf|txt|json)$",
+        "minimum_count": 1
+      },
+      "receipt_json_required_fields": [
+        "packet_id",
+        "emitted_at",
+        "emitted_by_agent_or_user",
+        "validator_verdict",
+        "tests_run_count",
+        "tests_passed_count",
+        "tests_failed_count",
+        "any_signal_non_ok",
+        "checked_by_runtimes_count"
+      ],
+      "proof_card_json_binding": {
+        "bound_to_schema_id": "aep:v1_2:f22-civilian-proof-card:0.1",
+        "5_rows_required": true
+      },
+      "compile_down_from_pro_allowed": {
+        "allowed": true,
+        "lossless_for_civilian_decision": true,
+        "what_is_lost": [
+          "DAG amendment history",
+          "Ed25519 signatures (replaced with text checkmark)",
+          "Reviewer principal IDs (replaced with role names)",
+          "Mutation suite per-mutation reports (replaced with summary counts)"
+        ]
+      },
+      "minimum_file_count": 4,
+      "maximum_file_count": 50,
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "PROV simple-graph",
+          "C2PA minimal-manifest packaging"
+        ],
+        "verifying_grep": "rg 'prov simple graph|c2pa minimal manifest' --type md research/sources/",
+        "n_hits": 0
+      }
+    }
+  ]
+}

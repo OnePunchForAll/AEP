@@ -1,0 +1,202 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:f25-trust-dial:0.1",
+  "title": "AEP v1.2 F25 Trust Dial Record",
+  "description": "v1.2 immune-system primitive. Users choose required proof level based on risk (operator source.md L196-205). 4 levels verbatim from L200-203: Casual / Important / Professional / Critical. Lineage EXTENDS NIST SP 800-63 assurance levels + NIST AI RMF + ISO 42001 risk tiering per operator L41. HV6 closure: safety_floor_categories HARD-CONSTRAINED enum [money, health, legal, irreversible]; when packet's action_class matches any safety_floor_category, MINIMUM tier = Professional (cannot self-select Casual or Important). Operator L82 verbatim 'Not safe for money, health, legal, or irreversible decisions' triggers the floor. Composes_with: ALL v1.1 primitives (dial level activates appropriate primitive subset).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_packet_id",
+    "user_selected_level",
+    "action_class",
+    "safety_floor_categories",
+    "required_minimum_level",
+    "level_enforcement_status",
+    "primitive_subset_activated",
+    "civilian_banner_text_required",
+    "lineage_basis",
+    "selected_at",
+    "select_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "TrustDialRecord",
+      "description": "Discriminator. Always 'TrustDialRecord'."
+    },
+    "schema_version": {
+      "const": "aep-trust-dial-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^td:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_packet_id": {
+      "type": "string",
+      "description": "Packet ID this trust dial selection applies to.",
+      "maxLength": 256
+    },
+    "user_selected_level": {
+      "type": "string",
+      "enum": ["Casual", "Important", "Professional", "Critical"],
+      "description": "Operator L200-203 verbatim. Casual = basic source and claim check. Important = falsifier + provenance + coverage. Professional = quorum + review + policy gates. Critical = sandbox + mutation + formal invariant + human approval."
+    },
+    "action_class": {
+      "type": "string",
+      "enum": [
+        "money",
+        "health",
+        "legal",
+        "irreversible",
+        "education",
+        "creative",
+        "research",
+        "personal_organization",
+        "casual_chat",
+        "unknown"
+      ],
+      "description": "HV6 closure HARD-CONSTRAINED enum. money + health + legal + irreversible are safety_floor_categories (operator L82 verbatim). Auto-classified by risk_classifier.py (Phase 8 forge) on packet emission. unknown defaults to Professional minimum per fail-safe."
+    },
+    "safety_floor_categories": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": ["money", "health", "legal", "irreversible"]
+      },
+      "uniqueItems": true,
+      "description": "HV6 closure HARD-CONSTRAINED. Operator L82 verbatim categories that trigger the safety floor. Empty array if action_class does not match any safety_floor category."
+    },
+    "required_minimum_level": {
+      "type": "string",
+      "enum": ["Casual", "Important", "Professional", "Critical"],
+      "description": "Computed minimum tier based on action_class. HV6 closure: if safety_floor_categories non-empty, required_minimum_level = Professional. If action_class == 'irreversible', required_minimum_level = Critical."
+    },
+    "level_enforcement_status": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["status", "user_selected_meets_required"],
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["ENFORCED", "WARN_USER_TO_UPGRADE", "BLOCKED_UPGRADE_REQUIRED"]
+        },
+        "user_selected_meets_required": {
+          "type": "boolean",
+          "description": "True if user_selected_level >= required_minimum_level. False triggers BLOCKED_UPGRADE_REQUIRED."
+        },
+        "civilian_banner_when_blocked": {
+          "type": "string",
+          "description": "HV6 closure HARD-CONSTRAINED civilian text. Required when status == BLOCKED_UPGRADE_REQUIRED. Operator L82 verbatim: 'This claim affects [money/health/legal] — Casual mode is not allowed.' OR equivalent from civilian_warning_phrasebook[]."
+        }
+      }
+    },
+    "primitive_subset_activated": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["v1_1_primitives", "v1_2_primitives"],
+      "properties": {
+        "v1_1_primitives": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["F12", "F13", "F14", "F15", "F16", "F17", "F18", "F19", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"]
+          },
+          "uniqueItems": true,
+          "description": "Which v1.1 primitives activate at this trust level. Casual = [F13, F18 minimum]. Important = + [F19, F14]. Professional = + [F15, F16, F17, A1..A8]. Critical = ALL v1.1."
+        },
+        "v1_2_primitives": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": ["F20", "F21", "F22", "F23", "F24", "F25", "F26", "InvariantContract", "BugOntology", "PolicyRego", "AEPLite", "SandboxGate"]
+          },
+          "uniqueItems": true,
+          "description": "Which v1.2 primitives activate. Casual = [F22, AEPLite]. Important = + [F26]. Professional = + [F20, F24, PolicyRego]. Critical = ALL v1.2 + SandboxGate + F23."
+        }
+      }
+    },
+    "civilian_banner_text_required": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["banner_text", "civilian_vocabulary_lint_status"],
+      "properties": {
+        "banner_text": {
+          "type": "string",
+          "minLength": 1,
+          "description": "The civilian banner shown to the user when this trust dial level is active. Casual: 'Safe to rely on for low-risk use.' (operator L81 verbatim) Important: 'Checked carefully but ask before high-stakes decisions.' Professional: 'Reviewed by multiple agents with policy checks.' Critical: 'Highest level: human approval required for irreversible actions.'"
+        },
+        "civilian_vocabulary_lint_status": {
+          "type": "string",
+          "enum": ["PASS", "FAIL"],
+          "description": "Banned-term linter against the public trust vocabulary banned list (plan sec18 + operator L74-82)."
+        }
+      }
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {"type": "string"},
+          "minItems": 1,
+          "description": "F18 lineage. F25 EXTENDS: NIST SP 800-63 assurance levels (4-level analog) + NIST AI RMF + ISO 42001 risk tiering per operator L41."
+        },
+        "verifying_grep": {"type": "string"},
+        "n_hits": {"type": "integer", "minimum": 0}
+      }
+    },
+    "selected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "select_signature_ed25519": {
+      "type": "string",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "TrustDialRecord",
+      "schema_version": "aep-trust-dial-0.1",
+      "id": "td:lease-summary-real-estate-block-casual",
+      "bound_to_packet_id": "aepkg:lease-summary-example",
+      "user_selected_level": "Casual",
+      "action_class": "legal",
+      "safety_floor_categories": ["legal"],
+      "required_minimum_level": "Professional",
+      "level_enforcement_status": {
+        "status": "BLOCKED_UPGRADE_REQUIRED",
+        "user_selected_meets_required": false,
+        "civilian_banner_when_blocked": "This claim affects legal — Casual mode is not allowed."
+      },
+      "primitive_subset_activated": {
+        "v1_1_primitives": ["F13", "F14", "F15", "F16", "F17", "F18", "F19", "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8"],
+        "v1_2_primitives": ["F20", "F22", "F24", "F26", "InvariantContract", "PolicyRego", "AEPLite"]
+      },
+      "civilian_banner_text_required": {
+        "banner_text": "Reviewed by multiple agents with policy checks.",
+        "civilian_vocabulary_lint_status": "PASS"
+      },
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "NIST SP 800-63 assurance levels",
+          "NIST AI Risk Management Framework",
+          "ISO/IEC 42001 AI management system"
+        ],
+        "verifying_grep": "rg 'nist sp 800-63|nist ai rmf|iso 42001' --type md research/sources/",
+        "n_hits": 0
+      },
+      "selected_at": "2026-05-18T08:25:00Z",
+      "select_signature_ed25519": "ed25519_pending_phase_8_keypair"
+    }
+  ]
+}

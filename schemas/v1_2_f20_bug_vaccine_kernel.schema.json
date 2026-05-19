@@ -1,0 +1,309 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_2:f20-bug-vaccine-kernel:0.1",
+  "title": "AEP v1.2 F20 Bug Vaccine Kernel Record",
+  "description": "v1.2 immune-system primitive. Every detected bug emits a small permanent prevention object that immunizes the future corpus (operator source.md L135-150). Honest framing per sec73.6: F20 ships EXTENDS Hypothesis (Python property-based testing) + OSS-Fuzz (mutation fuzzing philosophy) per operator L17 — cite in lineage_basis. HV1 closure: vaccine_rule_budget_per_corpus HARD-CONSTRAINED to max 50; vaccine_calcification_alert FP_rate_threshold HARD-CONSTRAINED to 0.05; rule_retirement_condition MANDATORY. Composes_with: v1.1 F13 ClaimRuntimeFalsifier (vaccines emit new falsifiers) + v1.1 F16 AttackClass registry (vaccines populate the registry).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bug_name",
+    "smallest_reproduction",
+    "exact_cause",
+    "why_existing_gates_missed_it",
+    "new_invariant",
+    "new_mutation_test",
+    "new_validator_rule",
+    "new_user_facing_warning",
+    "affected_packet_versions",
+    "retirement_condition",
+    "vaccine_rule_budget_per_corpus",
+    "vaccine_calcification_alert",
+    "lineage_basis",
+    "emitted_at",
+    "emit_signature_ed25519"
+  ],
+  "properties": {
+    "type": {
+      "const": "BugVaccineKernelRecord",
+      "description": "Discriminator. Always 'BugVaccineKernelRecord'."
+    },
+    "schema_version": {
+      "const": "aep-bug-vaccine-kernel-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^bvk:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable vaccine id. Recommended: bvk:<bug-class>:<short-slug>."
+    },
+    "bug_name": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 256,
+      "description": "Operator L139 verbatim. Plain-language bug name."
+    },
+    "smallest_reproduction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["repro_input", "smallest_failing_example"],
+      "properties": {
+        "repro_input": {
+          "type": "string",
+          "description": "The minimal input that reproduces the bug (operator L141)."
+        },
+        "smallest_failing_example": {
+          "type": "string",
+          "description": "Hand-reduced smallest failing example (operator L141; bug ontology field 8)."
+        },
+        "repro_input_sha256": {
+          "type": "string",
+          "pattern": "^[a-f0-9]{64}$"
+        }
+      }
+    },
+    "exact_cause": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operator L142 verbatim. The root cause in machine-checkable form."
+    },
+    "why_existing_gates_missed_it": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Operator L143 verbatim. Detection gap analysis. Must name the v1.1 primitive(s) that failed to catch this."
+    },
+    "new_invariant": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["invariant_id", "machine_checkable_form"],
+      "properties": {
+        "invariant_id": {
+          "type": "string",
+          "pattern": "^inv:[a-z0-9][a-z0-9._:-]*$"
+        },
+        "machine_checkable_form": {
+          "type": "string",
+          "description": "Operator L144 verbatim. The new invariant expressed as a machine-checkable claim type (bound to v1.2 invariant_contract.schema.json)."
+        }
+      }
+    },
+    "new_mutation_test": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["mutation_class", "test_fixture_path"],
+      "properties": {
+        "mutation_class": {
+          "type": "string",
+          "enum": [
+            "hash_flip",
+            "span_removal",
+            "reviewer_id_flip",
+            "dag_parent_corrupt",
+            "score_shift",
+            "fake_instruction_injection",
+            "event_reorder"
+          ],
+          "description": "Operator L17 verbatim 7-mutation-class enum. F23 inherits this enum."
+        },
+        "test_fixture_path": {
+          "type": "string",
+          "description": "Path to the mutation test fixture (e.g., projects/v11-aep/publish-ready/aep/tests/mutations/atk-<bug-name>.aepkg/)."
+        }
+      }
+    },
+    "new_validator_rule": {
+      "type": "string",
+      "description": "Operator L145 verbatim. The new validator rule expressed in policy-as-code form (bound to v1.2 policy_rego.schema.json)."
+    },
+    "new_user_facing_warning": {
+      "type": "string",
+      "description": "Operator L146 verbatim. The civilian-comprehensible warning that surfaces on next packet matching this bug class."
+    },
+    "affected_packet_versions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "aep:0.8/stable",
+          "aep:1.0/stable",
+          "aep:1.0.3/stable",
+          "aep:1.0.3.1/stable",
+          "aep:1.1/stable",
+          "aep:1.1/recall-enabled",
+          "aep:1.1/falsifier-strict",
+          "aep:1.2/lite",
+          "aep:1.2/pro",
+          "aep:1.2/institutional"
+        ]
+      },
+      "minItems": 1,
+      "description": "Operator L147 verbatim. List of profiles where this bug class can manifest."
+    },
+    "retirement_condition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["kind", "criterion"],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": ["no_match_window", "explicit_supersede", "operator_directive", "fp_rate_exceeded"]
+        },
+        "criterion": {
+          "type": "string",
+          "description": "Operator L148 verbatim. The condition under which this vaccine retires from active enforcement."
+        },
+        "no_match_window_days": {
+          "type": "integer",
+          "minimum": 1,
+          "description": "If kind == no_match_window, retire after this many days without any packet triggering this vaccine. HV1 closure default: 90."
+        }
+      }
+    },
+    "vaccine_rule_budget_per_corpus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["max_active_rules", "current_active_count"],
+      "properties": {
+        "max_active_rules": {
+          "type": "integer",
+          "const": 50,
+          "description": "HV1 closure HARD-CONSTRAINED. Max simultaneously-active vaccine rules per corpus profile. Operator's calcification trap defused by structural cap."
+        },
+        "current_active_count": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 50
+        }
+      }
+    },
+    "vaccine_calcification_alert": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["fp_rate_threshold", "current_fp_rate", "alert_status"],
+      "properties": {
+        "fp_rate_threshold": {
+          "type": "number",
+          "const": 0.05,
+          "description": "HV1 closure HARD-CONSTRAINED. FP rate threshold (5%) above which vaccine kernel is frozen pending operator review."
+        },
+        "current_fp_rate": {
+          "type": "number",
+          "minimum": 0.0,
+          "maximum": 1.0,
+          "description": "Measured FP rate on the validation packet sample. Recomputed on every vaccine emit."
+        },
+        "alert_status": {
+          "type": "string",
+          "enum": ["OK", "WARN", "FREEZE"]
+        }
+      }
+    },
+    "vaccine_blast_radius": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["estimated_proven_packets_wrongly_blocked"],
+      "properties": {
+        "estimated_proven_packets_wrongly_blocked": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Adversary attack A1 cheapest disconfirmer. Backfill against existing corpus measures how many already-PROVEN packets would have been wrongly blocked by this vaccine."
+        },
+        "backfill_corpus_size": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "lineage_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["classification", "external_precedents", "verifying_grep"],
+      "properties": {
+        "classification": {
+          "type": "string",
+          "enum": ["EXTENDS", "NOVEL", "DECLARED_ONLY"]
+        },
+        "external_precedents": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "F18 lineage discipline. F20 ships EXTENDS: Hypothesis (Python property-based testing) + OSS-Fuzz (mutation fuzzing philosophy). Cite verbatim per operator L17."
+        },
+        "verifying_grep": {
+          "type": "string",
+          "description": "v1.1 gate 6.5 inheritance. Grep query that verifies the lineage claim against the source corpus."
+        },
+        "n_hits": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "emitted_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "emit_signature_ed25519": {
+      "type": "string",
+      "description": "Ed25519 signature freezing this vaccine's bytes at emit time. Base64url. Composes with v0.8 F3.",
+      "maxLength": 256
+    }
+  },
+  "examples": [
+    {
+      "type": "BugVaccineKernelRecord",
+      "schema_version": "aep-bug-vaccine-kernel-0.1",
+      "id": "bvk:bc-v103-1:rubric-definitional-gap",
+      "bug_name": "Rubric definitional gap on list-valued recall fields",
+      "smallest_reproduction": {
+        "repro_input": "VG04 blind-recall on adversary AEP using cue 'premortem weakest-assumption' produced the agent mean 4.00 vs warden mean 3.00 (delta 1.00 exceeds 0.5 inter-rater threshold) on the same 3 attempts.",
+        "smallest_failing_example": "failure_prevented[] list with 3 items where 2 are load-bearing and 1 is decorative; readers disagree on scoring the decorative item."
+      },
+      "exact_cause": "Rubric language did not distinguish load-bearing vs decorative list items; readers applied different mental models.",
+      "why_existing_gates_missed_it": "v1.1 F14 RaterQuorumAttestation enforces independence but not rubric-language-completeness; F19 corpus-coverage-witness measures presence not quality.",
+      "new_invariant": {
+        "invariant_id": "inv:rubric-list-valued-fields-must-distinguish-load-bearing",
+        "machine_checkable_form": "every RubricScore record whose evaluated_field is array-typed MUST carry rubric_field_class_per_item[] with values from {load_bearing, decorative, evidence_anchor}"
+      },
+      "new_mutation_test": {
+        "mutation_class": "score_shift",
+        "test_fixture_path": "projects/v11-aep/publish-ready/aep/tests/mutations/atk-rubric-list-valued-gap.aepkg/"
+      },
+      "new_validator_rule": "policy.deny[reason] { input.rubric_score.evaluated_field == 'array'; not input.rubric_score.rubric_field_class_per_item } if rubric_field_class_per_item missing on array-valued evaluated_field",
+      "new_user_facing_warning": "This packet's rubric does not separate critical findings from supporting details — reviewers may score it inconsistently.",
+      "affected_packet_versions": ["aep:1.0.3/stable", "aep:1.0.3.1/stable", "aep:1.1/stable"],
+      "retirement_condition": {
+        "kind": "no_match_window",
+        "criterion": "90 consecutive days without any packet triggering this vaccine",
+        "no_match_window_days": 90
+      },
+      "vaccine_rule_budget_per_corpus": {
+        "max_active_rules": 50,
+        "current_active_count": 1
+      },
+      "vaccine_calcification_alert": {
+        "fp_rate_threshold": 0.05,
+        "current_fp_rate": 0.0,
+        "alert_status": "OK"
+      },
+      "vaccine_blast_radius": {
+        "estimated_proven_packets_wrongly_blocked": 0,
+        "backfill_corpus_size": 1112
+      },
+      "lineage_basis": {
+        "classification": "EXTENDS",
+        "external_precedents": [
+          "Hypothesis (Python property-based testing library)",
+          "OSS-Fuzz (Google mutation testing philosophy)"
+        ],
+        "verifying_grep": "rg 'property-based|hypothesis|oss-fuzz' --type md research/sources/",
+        "n_hits": 0
+      },
+      "emitted_at": "2026-05-18T08:00:00Z",
+      "emit_signature_ed25519": "ed25519_pending_phase_2_keypair"
+    }
+  ]
+}

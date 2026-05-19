@@ -1,0 +1,71 @@
+# Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+*.egg
+MANIFEST
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+*.cover
+.hypothesis/
+
+# Virtual environments
+venv/
+env/
+ENV/
+.venv/
+
+# IDE / editor
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Node.js
+node_modules/
+npm-debug.log
+
+# Rust build artifacts
+verifiers/rust/target/
+
+# Private keys / secrets — NEVER commit
+*.priv
+*.private
+*.pem.priv
+*-priv.pem
+*.key
+*.p12
+*.pfx
+private_keys/
+.private/
+
+# Validation receipts (machine-specific append-only logs)
+*.receipt.jsonl
+receipts/local-*.jsonl

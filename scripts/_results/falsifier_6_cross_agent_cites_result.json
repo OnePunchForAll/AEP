@@ -1,0 +1,16 @@
+{
+  "falsifier": "F6-cross-agent-cites-recall",
+  "finding": "Zero cross-agent citations in vec_id format detected across all 10 canonical agent ledgers. Cross-agent citation discipline has not yet emerged \u2014 agents currently emit cross-agent references as narrative prose, not as canonical or informal vec_id tokens. Per scout op-double-evolution BEIR/TREC caution, the absence of peer-emitted citation tokens means F6 self-emitted gold-truth (recall 0.167) cannot yet be cross-validated against an independent peer-judgment lens. This IS the load-bearing finding.",
+  "ledger_root": ".claude\\agents\\_ledgers",
+  "methodology": "peer-agent-citations-as-gold-truth_break_self_signal_circularity",
+  "n_cross_agent_citations": 0,
+  "pair_counts": {},
+  "remediation": [
+    "Update agent .md prompts to require cross-agent citations in vec_id format when referencing peer ledger rows (currently the 10 agents emit narrative-form mentions only).",
+    "Re-run cross-agent F6 once corpus contains N\u22654 cross-agent canonical citations to compare recall_cross vs recall_self.",
+    "Track cross-agent citation count as a \u00a756 promotion-gate criterion for the \u00a753 Semantic Corpus + LAG pattern."
+  ],
+  "scanned_at_utc_iso": "2026-05-15T21:31:49.060878+00:00",
+  "top_k": 5,
+  "verdict": "INSUFFICIENT-DATA"
+}

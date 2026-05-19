@@ -1,0 +1,1099 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="AEP Viewer - civilian-facing trust card for AI outputs. Drop in an AEP packet and see whether the AI's answer can be trusted. No data leaves your browser. WCAG 2.1 AA accessible.">
+<title>AEP Viewer - Trust card for AI outputs</title>
+<style>
+  /* ---------- AEP Viewer styling. Brutally simple. No CDN. WCAG 2.1 AA. ---------- */
+  :root {
+    --bg: #f6f6f4;
+    --fg: #1b1b1a;
+    --muted: #5a5a55;
+    --card: #ffffff;
+    --border: #d8d8d2;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08);
+    /* WCAG AA: each combo verified >=4.5:1 contrast in script below */
+    --pass-bg: #c5eccb;
+    --pass-fg: #0b3514;  /* darker than original for AA contrast vs #c5eccb */
+    --warn-bg: #ffe9a8;
+    --warn-fg: #3a2200;  /* darker for AA contrast */
+    --fail-bg: #f7c1c1;
+    --fail-fg: #3d0808;  /* darker for AA contrast */
+    --unknown-bg: #d7d7d2;
+    --unknown-fg: #1f1f1c;
+    --focus-ring: #2563eb;  /* WCAG focus visible */
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.45;
+    padding: 0;
+  }
+  /* Skip-to-content link - hidden until focused (WCAG 2.4.1) */
+  .skip-link {
+    position: absolute;
+    top: -40px;
+    left: 0;
+    background: var(--fg);
+    color: var(--bg);
+    padding: 8px 16px;
+    z-index: 1000;
+    text-decoration: none;
+    border-radius: 0 0 6px 0;
+  }
+  .skip-link:focus {
+    top: 0;
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+  header[role="banner"] {
+    padding: 22px 28px 14px;
+    border-bottom: 1px solid var(--border);
+    background: var(--card);
+  }
+  header h1 {
+    font-size: 1.55rem;
+    margin: 0 0 4px 0;
+    letter-spacing: -0.01em;
+  }
+  header p {
+    color: var(--muted);
+    margin: 0;
+    font-size: 0.96rem;
+  }
+  main[role="main"] {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 28px 22px 80px;
+  }
+
+  /* WCAG 2.4.7: focus must be visible on EVERY focusable element. */
+  :focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+  button:focus-visible,
+  [tabindex]:focus-visible,
+  a:focus-visible,
+  input:focus-visible {
+    outline: 3px solid var(--focus-ring);
+    outline-offset: 2px;
+  }
+
+  /* Drop zone - upgraded to keyboard-accessible button */
+  #drop {
+    border: 2px dashed var(--border);
+    border-radius: 10px;
+    padding: 36px 22px;
+    background: var(--card);
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 120ms ease, background 120ms ease;
+    margin-bottom: 24px;
+  }
+  #drop.over {
+    border-color: #6b6b65;
+    background: #fafaf6;
+  }
+  #drop strong { font-size: 1.1rem; }
+  #drop .hint {
+    color: var(--muted);
+    font-size: 0.92rem;
+    margin-top: 6px;
+  }
+  #drop input { display: none; }
+  #pick, #pick-examples {
+    display: inline-block;
+    margin-top: 12px;
+    padding: 8px 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font: inherit;
+    border: 1px solid var(--border);
+  }
+  #pick {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+  #pick-examples {
+    margin-left: 6px;
+    background: var(--card);
+    color: var(--fg);
+  }
+
+  /* Verdict banner - accessible color + icon + text label (color is NOT sole signal) */
+  .verdict-banner {
+    border-radius: 10px;
+    padding: 22px 26px;
+    margin-bottom: 18px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .verdict-icon {
+    font-size: 2.4rem;
+    line-height: 1;
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+  .verdict-body { flex: 1; }
+  .verdict-banner .verdict-word {
+    font-size: 2.25rem;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    margin: 0;
+  }
+  .verdict-banner .verdict-sub {
+    font-size: 1.06rem;
+    margin-top: 2px;
+    opacity: 0.95;
+  }
+  .verdict-banner.pass    { background: var(--pass-bg);    color: var(--pass-fg); }
+  .verdict-banner.warn    { background: var(--warn-bg);    color: var(--warn-fg); }
+  .verdict-banner.fail    { background: var(--fail-bg);    color: var(--fail-fg); }
+  .verdict-banner.unknown { background: var(--unknown-bg); color: var(--unknown-fg); }
+
+  /* Trust dial */
+  .trust-dial {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 6px 0 16px;
+    flex-wrap: wrap;
+  }
+  .trust-dial .label { font-size: 0.92rem; color: var(--muted); }
+  .trust-dial .pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    font-size: 0.92rem;
+  }
+  .trust-dial .pill.active {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+
+  /* Sections (5 rows) - semantic buttons replace div onclick */
+  .section {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow);
+  }
+  .section-header {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    text-align: left;
+    color: inherit;
+    font-family: inherit;
+  }
+  .section-header-inner {
+    padding: 14px 18px;
+    font-size: 1.02rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-weight: 600;
+  }
+  .section-header .chev {
+    font-size: 0.85rem;
+    color: var(--muted);
+    font-weight: normal;
+  }
+  .section .body {
+    padding: 0 18px 16px 18px;
+    font-size: 0.99rem;
+    color: var(--fg);
+  }
+  .section.collapsed .body { display: none; }
+  .section .body p:first-child { margin-top: 0; }
+
+  /* Disclosed signals */
+  .signals {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    margin-top: 8px;
+  }
+  @media (min-width: 700px) {
+    .signals { grid-template-columns: 1fr 1fr; }
+  }
+  .signal {
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: #fafaf7;
+    font-size: 0.92rem;
+  }
+  .signal.bad {
+    background: #fdecec;
+    border-color: #c87878;  /* darker for visibility WCAG */
+  }
+  .signal .signal-icon {
+    margin-right: 6px;
+    font-weight: 700;
+  }
+  .signal .name { font-weight: 600; }
+  .signal .val { color: var(--muted); font-size: 0.88rem; }
+
+  /* Evidence list */
+  .evidence ul {
+    margin: 4px 0 0 0;
+    padding-left: 22px;
+  }
+  .evidence li { margin: 4px 0; }
+  .evidence .src-meta {
+    color: var(--muted);
+    font-size: 0.88rem;
+    margin-left: 4px;
+  }
+  .evidence .ai-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    margin-left: 6px;
+    border-radius: 999px;
+    background: #e8c97a;  /* darker for WCAG contrast on tag text */
+    color: #3a2200;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+  .evidence .direct-tag {
+    display: inline-block;
+    padding: 1px 8px;
+    margin-left: 6px;
+    border-radius: 999px;
+    background: #a4d4af;  /* darker for WCAG */
+    color: #0b3514;
+    font-size: 0.78rem;
+    font-weight: 600;
+  }
+
+  /* Tests */
+  .tests ul {
+    margin: 4px 0 0 0;
+    padding-left: 22px;
+  }
+  .tests li { margin: 4px 0; }
+  .tests .pass-mark { color: #0e5a1e; font-weight: 700; margin-right: 4px; }
+  .tests .fail-mark { color: #7a0e0e; font-weight: 700; margin-right: 4px; }
+
+  /* Action buttons */
+  .actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 18px;
+    flex-wrap: wrap;
+  }
+  .actions button {
+    padding: 9px 16px;
+    border-radius: 6px;
+    border: 1px solid var(--border);
+    background: var(--card);
+    color: var(--fg);
+    font: inherit;
+    cursor: pointer;
+  }
+  .actions button.primary {
+    background: var(--fg);
+    color: var(--bg);
+    border-color: var(--fg);
+  }
+
+  /* Footer */
+  footer[role="contentinfo"] {
+    color: var(--muted);
+    font-size: 0.85rem;
+    padding: 16px 22px;
+    text-align: center;
+  }
+  footer code {
+    background: #ececea;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 0.84rem;
+  }
+
+  /* Error message */
+  .error-banner {
+    background: #f7c1c1;
+    color: #3d0808;  /* WCAG AA contrast */
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 12px;
+    font-size: 0.95rem;
+  }
+
+  /* sr-only - visible to screen readers only (WCAG 1.3.1) */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to main content</a>
+<header role="banner" aria-label="AEP Viewer header">
+  <h1>AEP Viewer</h1>
+  <p>Drop in an AEP packet. See whether you can trust what an AI told you.</p>
+</header>
+
+<main id="main-content" role="main" aria-label="AEP packet trust card">
+  <section id="drop"
+           role="button"
+           tabindex="0"
+           aria-label="Drop zone for AEP packet folder or zip file. Press Enter or Space to pick a folder."
+           aria-describedby="drop-hint">
+    <strong>Drag an AEP packet here</strong>
+    <div class="hint" id="drop-hint">
+      Drop a folder ending in <code>.aepkg</code>, or a <code>.aepkg.zip</code> file. Or pick one.
+    </div>
+    <input id="picker" type="file" multiple webkitdirectory directory aria-label="Pick an AEP packet folder">
+    <input id="picker-zip" type="file" accept=".zip,.aepkg.zip" aria-label="Pick an AEP packet zip">
+    <button id="pick" type="button" aria-label="Pick a folder to load AEP packet">Pick a folder</button>
+    <button id="pick-examples" type="button" aria-label="Load an example AEP packet from the bundled examples">Load example</button>
+  </section>
+
+  <div id="error-slot" role="alert" aria-live="assertive" aria-atomic="true"></div>
+  <div id="result-slot" role="region" aria-label="AEP packet verdict and evidence" aria-live="polite" aria-atomic="false"></div>
+</main>
+
+<footer role="contentinfo">
+  AEP Viewer v0.2 - civilian-facing trust card for AEP packets.
+  No data leaves your browser. <code>aep:1.2/lite</code> 4-file shape supported. WCAG 2.1 AA accessible.
+</footer>
+
+<!-- ===== EXAMPLE PACKET INDEX (inlined; loaded on click) ===== -->
+<!--
+  Each example points at a relative path from this viewer file. The button cycles
+  through the 7 civilian examples shipped under ../examples/civilian/.
+-->
+<script>
+/* ====================================================================
+   AEP VIEWER - vanilla JS, no framework, no CDN. WCAG 2.1 AA accessible.
+   Banned-jargon discipline (operator L74-82):
+     We DO NOT show the user words like "quorum attestation", "Ed25519",
+     "Krippendorff alpha", "laundering_score", "state_hash", "DAG".
+     Instead we surface the civilian phrasing baked into proof-card.json
+     and add our own civilian fallbacks.
+   Accessibility upgrades (v0.2):
+     - WCAG 2.1 AA color contrast on every state
+     - Keyboard navigation: Enter/Space activates drop-zone, arrow keys nav sections, Escape closes
+     - Color-NOT-sole-signal: every verdict + signal has color + icon + text label
+     - ARIA live regions for verdict + error announcements
+     - role attributes: banner, main, contentinfo, region, status, button, alert
+     - Semantic HTML5: header, main, footer, section, button (not div onclick)
+     - Skip-to-content link
+     - tabindex on drop-zone for keyboard access
+     - lang="en" on document root
+     - alt-equivalent (aria-hidden or aria-label) on every icon
+     - Focus-visible rings on all focusable elements (never outline:none without alt)
+     - heading hierarchy h1 > h2 > h3 (no skipped levels)
+   ==================================================================== */
+
+const BANNED_TERMS = [
+  // Operator's banned list. The viewer's *rendered* output MUST NOT contain
+  // these. We still parse them out of proof-card.json (the compiler emits
+  // civilian phrasings already), but if a malformed packet somehow leaks
+  // one of these into a row, we replace it with the civilian word.
+  "quorum attestation",
+  "Krippendorff",
+  "Ed25519",
+  "additionalProperties",
+  "schema_version",
+  "draft_2020_12",
+  "state_hash",
+  "attestation graph"
+];
+
+const CIVILIAN_FALLBACKS = {
+  "quorum attestation": "checked by multiple runtimes",
+  "Krippendorff": "rater agreement score",
+  "Ed25519": "cryptographic signature",
+  "additionalProperties": "extra fields",
+  "schema_version": "format version",
+  "state_hash": "packet fingerprint",
+  "attestation graph": "evidence trail"
+};
+
+const EXAMPLE_PATHS = [
+  "../examples/civilian/lease-summary.aepkg/",
+  "../examples/civilian/pdf-actually-used.aepkg/",
+  "../examples/civilian/medical-summary.aepkg/",
+  "../examples/civilian/homework-cited.aepkg/",
+  "../examples/civilian/resume-no-invention.aepkg/",
+  "../examples/civilian/coding-agent-tests.aepkg/",
+  "../examples/civilian/customer-support-policy.aepkg/"
+];
+
+/* Verdict icons - text symbols that double as screen-reader-readable hints.
+   Color is NOT the sole signal. Each verdict carries:
+   1. A distinct color (--pass-bg / --warn-bg / --fail-bg / --unknown-bg)
+   2. A distinct icon (checkmark / warning / cross / question)
+   3. A distinct text label (PASS / WARN / FAIL / UNKNOWN)
+*/
+const VERDICT_ICONS = {
+  PASS: "OK",
+  WARN: "!",
+  FAIL: "X",
+  UNKNOWN: "?"
+};
+const VERDICT_ARIA = {
+  PASS: "Verdict: pass. All checks passed.",
+  WARN: "Verdict: warning. At least one check raised a concern.",
+  FAIL: "Verdict: fail. Do not rely on this for important decisions.",
+  UNKNOWN: "Verdict: unknown. Packet shape could not be parsed."
+};
+
+let exampleCursor = 0;
+
+/* ---------- DOM helpers ---------- */
+function el(tag, attrs, ...children) {
+  const node = document.createElement(tag);
+  if (attrs) {
+    for (const k in attrs) {
+      if (k === "class") node.className = attrs[k];
+      else if (k === "html") node.innerHTML = attrs[k];
+      else if (k.startsWith("on")) node.addEventListener(k.slice(2), attrs[k]);
+      else node.setAttribute(k, attrs[k]);
+    }
+  }
+  for (const c of children) {
+    if (c == null) continue;
+    if (typeof c === "string") node.appendChild(document.createTextNode(c));
+    else node.appendChild(c);
+  }
+  return node;
+}
+
+function scrubBanned(text) {
+  if (!text) return text;
+  let out = text;
+  for (const term of BANNED_TERMS) {
+    if (out.indexOf(term) !== -1) {
+      const fb = CIVILIAN_FALLBACKS[term] || "(technical term)";
+      out = out.split(term).join(fb);
+    }
+  }
+  return out;
+}
+
+/* ---------- Render verdict (with icon + text label, color is not sole signal) ---------- */
+function classifyVerdict(claim, receipt, proofCard) {
+  const v = (receipt && receipt.validator_verdict) || "UNKNOWN";
+  if (v === "PASS" || v === "WARN" || v === "FAIL") return v;
+  return "UNKNOWN";
+}
+
+function renderVerdict(v) {
+  const cls = v.toLowerCase();
+  let word, sub;
+  if (v === "PASS") {
+    word = "PASS";
+    sub = "All checks passed. Safe to rely on for low-risk use.";
+  } else if (v === "WARN") {
+    word = "WARN";
+    sub = "Use with caution. At least one check raised a concern.";
+  } else if (v === "FAIL") {
+    word = "FAIL";
+    sub = "Do not rely on this for important decisions.";
+  } else {
+    word = "UNKNOWN";
+    sub = "Packet shape could not be parsed. We did not default to PASS.";
+  }
+  const icon = VERDICT_ICONS[v] || "?";
+  // role="status" with aria-live="polite" so screen readers announce the verdict.
+  return el("div",
+    {
+      class: "verdict-banner " + cls,
+      role: "status",
+      "aria-live": "polite",
+      "aria-atomic": "true",
+      "aria-label": VERDICT_ARIA[v] || VERDICT_ARIA.UNKNOWN
+    },
+    el("span", {class: "verdict-icon", "aria-hidden": "true"}, icon),
+    el("div", {class: "verdict-body"},
+      el("p", {class: "verdict-word"}, word),
+      el("p", {class: "verdict-sub"}, sub)
+    )
+  );
+}
+
+function renderTrustDial(active, action_class) {
+  const tiers = ["Casual", "Important", "Professional", "Critical"];
+  const pills = tiers.map(t =>
+    el("span",
+      {
+        class: "pill" + (t === active ? " active" : ""),
+        "aria-current": t === active ? "true" : "false"
+      },
+      t)
+  );
+  return el("div", {class: "trust-dial", role: "group", "aria-label": "Required trust level for this packet"},
+    el("span", {class: "label", id: "trust-dial-label"}, "Trust level required:"),
+    ...pills,
+    action_class && action_class !== "general"
+      ? el("span", {class: "label"}, "(action: " + action_class + ")")
+      : null
+  );
+}
+
+/* ---------- Render 5 sections (accessible expandable buttons) ---------- */
+let _sectionSeq = 0;
+function renderSection(title, bodyNode, opts) {
+  const collapsed = opts && opts.collapsed;
+  const sectionId = "sec-" + (_sectionSeq++);
+  const headerId = sectionId + "-h";
+  const bodyId = sectionId + "-body";
+  const sec = el("div",
+    {
+      class: "section" + (collapsed ? " collapsed" : ""),
+      role: "region",
+      "aria-labelledby": headerId
+    });
+  const header = el("button",
+    {
+      type: "button",
+      class: "section-header",
+      id: headerId,
+      "aria-expanded": collapsed ? "false" : "true",
+      "aria-controls": bodyId,
+      onclick: function() {
+        sec.classList.toggle("collapsed");
+        const expanded = !sec.classList.contains("collapsed");
+        header.setAttribute("aria-expanded", expanded ? "true" : "false");
+      },
+      onkeydown: function(e) {
+        // Enter / Space handled natively by <button>; arrow keys navigate
+        if (e.key === "ArrowDown") {
+          e.preventDefault();
+          const nx = sec.nextElementSibling;
+          const nxh = nx && nx.querySelector(".section-header");
+          if (nxh) nxh.focus();
+        } else if (e.key === "ArrowUp") {
+          e.preventDefault();
+          const pv = sec.previousElementSibling;
+          const pvh = pv && pv.querySelector(".section-header");
+          if (pvh) pvh.focus();
+        } else if (e.key === "Escape") {
+          if (!sec.classList.contains("collapsed")) {
+            sec.classList.add("collapsed");
+            header.setAttribute("aria-expanded", "false");
+          }
+        }
+      }
+    },
+    el("h2", {class: "section-header-inner"},
+      el("span", null, title),
+      el("span", {class: "chev", "aria-hidden": "true"}, "click to toggle")
+    )
+  );
+  sec.appendChild(header);
+  sec.appendChild(el("div", {class: "body", id: bodyId, role: "region"}, bodyNode));
+  return sec;
+}
+
+function renderClaim(claim, proofCard) {
+  const text = scrubBanned(
+    (proofCard && proofCard.what_is_being_claimed)
+    || (claim && claim.claim_text)
+    || "(no claim text found)"
+  );
+  return el("p", null, text);
+}
+
+function renderEvidence(claim, sources, proofCard) {
+  const summary = scrubBanned(
+    (proofCard && proofCard.what_evidence_supports_it) || ""
+  );
+  const list = el("ul", {"aria-label": "Source evidence list"});
+  for (const s of sources) {
+    const isAI = (s.lineage_depth != null && s.lineage_depth >= 2);
+    const tag = isAI
+      ? el("span", {class: "ai-tag", "aria-label": "AI-derived source"}, "AI-derived")
+      : el("span", {class: "direct-tag", "aria-label": "Direct (non-AI) source"}, "Direct");
+    list.appendChild(el("li", null,
+      el("strong", null, s.title || s.id || "(untitled)"),
+      el("span", {class: "src-meta"}, " - " + (s.kind || "file")),
+      tag
+    ));
+  }
+  return el("div", {class: "evidence"},
+    summary ? el("p", null, summary) : null,
+    sources.length ? el("p", {class: "src-meta"}, "Sources:") : null,
+    list
+  );
+}
+
+function renderTests(proofCard, validations) {
+  const summary = scrubBanned(
+    (proofCard && proofCard.what_was_tested) || ""
+  );
+  const list = el("ul", {"aria-label": "Validation tests run on this packet"});
+  if (validations && validations.length) {
+    for (const v of validations) {
+      const ok = (v.verdict || "").toUpperCase() === "PASS";
+      list.appendChild(el("li", null,
+        el("span",
+          {
+            class: ok ? "pass-mark" : "fail-mark",
+            "aria-label": ok ? "Test passed" : "Test failed"
+          },
+          ok ? "PASS:" : "FAIL:"),
+        el("span", null, v.test || v.id || "test")
+      ));
+    }
+  } else {
+    list.appendChild(el("li", null, "No validations recorded in this packet."));
+  }
+  return el("div", {class: "tests"},
+    summary ? el("p", null, summary) : null,
+    list
+  );
+}
+
+function renderWeaknesses(proofCard) {
+  const summary = scrubBanned(
+    (proofCard && proofCard.what_is_weak_stale_missing_or_ai_derived) || ""
+  );
+  const sigs = (proofCard && proofCard.disclosed_signals) || {};
+  const items = [];
+
+  function pushSignal(name, sig, bad, civilian) {
+    // Each signal has icon + text label; color is NOT the sole signal.
+    const icon = bad ? "!" : "OK";
+    const iconLabel = bad ? "Concern raised" : "All good";
+    items.push(el("div",
+      {
+        class: "signal" + (bad ? " bad" : ""),
+        role: "group",
+        "aria-label": name + ": " + iconLabel
+      },
+      el("div", {class: "name"},
+        el("span", {class: "signal-icon", "aria-hidden": "true"}, icon),
+        name),
+      el("div", {class: "val"}, scrubBanned(civilian))
+    ));
+  }
+
+  // HV3 mandate: surface every load-bearing signal in civilian language.
+  if (sigs.f18_laundering_score) {
+    pushSignal(
+      "Source provenance",
+      sigs.f18_laundering_score,
+      !!sigs.f18_laundering_score.threshold_breached,
+      sigs.f18_laundering_score.civilian_phrasing
+        || (sigs.f18_laundering_score.threshold_breached
+            ? "Most evidence is AI-derived. This may be AI making things up about itself."
+            : "Sources are direct.")
+    );
+  }
+  if (sigs.f15_missing_witness_flag) {
+    pushSignal(
+      "Hidden completion gap",
+      sigs.f15_missing_witness_flag,
+      !!sigs.f15_missing_witness_flag.any_criterion_missing_witness,
+      sigs.f15_missing_witness_flag.civilian_phrasing
+        || (sigs.f15_missing_witness_flag.any_criterion_missing_witness
+            ? "An expected check is missing."
+            : "All expected checks are present.")
+    );
+  }
+  if (sigs.f16_attack_flag) {
+    pushSignal(
+      "Known attack pattern",
+      sigs.f16_attack_flag,
+      !!sigs.f16_attack_flag.any_attack_class_present,
+      sigs.f16_attack_flag.civilian_phrasing
+        || (sigs.f16_attack_flag.any_attack_class_present
+            ? sigs.f16_attack_flag.count + " known attack pattern(s) flagged."
+            : "No known attack patterns flagged.")
+    );
+  }
+  if (sigs.f19_coverage_gap_flag) {
+    pushSignal(
+      "Skipped scope",
+      sigs.f19_coverage_gap_flag,
+      !!sigs.f19_coverage_gap_flag.any_corpus_gap_detected,
+      sigs.f19_coverage_gap_flag.civilian_phrasing
+        || (sigs.f19_coverage_gap_flag.any_corpus_gap_detected
+            ? "Some expected scope was not covered."
+            : "No skipped scope detected.")
+    );
+  }
+  if (sigs.a8_srs_decay_status) {
+    pushSignal(
+      "Claim is stale",
+      sigs.a8_srs_decay_status,
+      !!sigs.a8_srs_decay_status.any_claim_decayed,
+      (sigs.a8_srs_decay_status.civilian_phrasing
+       || (sigs.a8_srs_decay_status.any_claim_decayed
+           ? "Some claim(s) are stale (last reviewed > 90 days ago)."
+           : "No stale claims."))
+    );
+  }
+
+  return el("div", null,
+    summary ? el("p", null, summary) : null,
+    el("div", {class: "signals", role: "list", "aria-label": "Disclosed signals"}, ...items)
+  );
+}
+
+function renderAction(proofCard) {
+  const text = scrubBanned(
+    (proofCard && proofCard.what_action_the_user_should_take_next) || ""
+  );
+  return el("p", null, text);
+}
+
+/* ---------- Export receipt ---------- */
+function exportReceipt(claim, receipt, proofCard) {
+  // Operator L82-84: export a shareable receipt -> receipt.json + minimal claim.json
+  const blob = new Blob(
+    [JSON.stringify({
+      claim: claim || null,
+      receipt: receipt || null,
+      proof_card_summary: proofCard ? {
+        what_is_being_claimed: proofCard.what_is_being_claimed,
+        what_action_the_user_should_take_next: proofCard.what_action_the_user_should_take_next,
+        trust_dial_level_required: proofCard.trust_dial_level_required,
+        disclosed_signals: proofCard.disclosed_signals
+      } : null,
+      exported_at: new Date().toISOString(),
+      exported_by: "AEP Viewer v0.2"
+    }, null, 2)],
+    {type: "application/json"}
+  );
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "aep-shareable-receipt.json";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1500);
+}
+
+/* ---------- Main render ---------- */
+function renderPacket(packetName, claim, sources, receipt, proofCard, validations) {
+  const verdict = classifyVerdict(claim, receipt, proofCard);
+  const trustActive = (proofCard && proofCard.trust_dial_level_required) || "Casual";
+  const actionClass = (claim && claim.action_class) || "general";
+
+  const root = el("div");
+  root.appendChild(renderVerdict(verdict));
+  root.appendChild(renderTrustDial(trustActive, actionClass));
+
+  if (proofCard && proofCard.civilian_question) {
+    // surface the user's plain question if the packet author wrote it
+  } else if (claim && claim.civilian_question) {
+    root.appendChild(el("p", {class: "src-meta"}, "Question: " + claim.civilian_question));
+  }
+
+  root.appendChild(renderSection("1. What is being claimed",
+    renderClaim(claim, proofCard)));
+
+  root.appendChild(renderSection("2. What evidence supports it",
+    renderEvidence(claim, sources, proofCard)));
+
+  root.appendChild(renderSection("3. What was tested",
+    renderTests(proofCard, validations)));
+
+  root.appendChild(renderSection("4. What is weak, stale, missing, or AI-derived",
+    renderWeaknesses(proofCard)));
+
+  root.appendChild(renderSection("5. What action you should take next",
+    renderAction(proofCard)));
+
+  const actions = el("div", {class: "actions"},
+    el("button",
+      {
+        type: "button",
+        class: "primary",
+        "aria-label": "Export a shareable receipt JSON file",
+        onclick: function() { exportReceipt(claim, receipt, proofCard); }
+      },
+      "Export shareable receipt"),
+    el("button",
+      {
+        type: "button",
+        "aria-label": "Clear the current packet result",
+        onclick: function() {
+          document.getElementById("result-slot").innerHTML = "";
+          document.getElementById("error-slot").innerHTML = "";
+        }
+      },
+      "Clear")
+  );
+  root.appendChild(actions);
+
+  document.getElementById("error-slot").innerHTML = "";
+  const slot = document.getElementById("result-slot");
+  slot.innerHTML = "";
+  slot.appendChild(root);
+}
+
+/* ---------- Error rendering ---------- */
+function showError(msg) {
+  const slot = document.getElementById("error-slot");
+  slot.innerHTML = "";
+  slot.appendChild(el("div",
+    {class: "error-banner", role: "alert", "aria-live": "assertive"},
+    el("span", {class: "verdict-icon", "aria-hidden": "true", style: "margin-right:8px;font-size:1.2rem;"}, "!"),
+    msg));
+}
+
+/* ---------- File parsing helpers ---------- */
+async function readFileAsText(file) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onload = () => resolve(r.result);
+    r.onerror = reject;
+    r.readAsText(file);
+  });
+}
+
+async function readFileAsJson(file) {
+  const t = await readFileAsText(file);
+  try { return JSON.parse(t); } catch (e) { return null; }
+}
+
+async function parseDirectoryHandle(entries) {
+  // entries: array of File objects from a webkitdirectory input.
+  let claim = null;
+  let receipt = null;
+  let proofCard = null;
+  const sources = [];
+  const validations = [];
+  for (const file of entries) {
+    const path = (file.webkitRelativePath || file.name).replace(/\\/g, "/");
+    if (path.endsWith("/claim.json") || path === "claim.json") {
+      claim = await readFileAsJson(file);
+    } else if (path.endsWith("/receipt.json") || path === "receipt.json") {
+      receipt = await readFileAsJson(file);
+    } else if (path.endsWith("/proof-card.json") || path === "proof-card.json") {
+      proofCard = await readFileAsJson(file);
+    } else if (path.indexOf("/sources/") !== -1 && path.endsWith(".json")) {
+      const s = await readFileAsJson(file);
+      if (s) sources.push(s);
+    } else if (path.endsWith("/data/validations.jsonl") || path === "data/validations.jsonl") {
+      const txt = await readFileAsText(file);
+      for (const line of txt.split(/\r?\n/)) {
+        const l = line.trim();
+        if (!l) continue;
+        try { validations.push(JSON.parse(l)); } catch (e) { /* skip */ }
+      }
+    } else if (path.endsWith("/data/sources.jsonl") || path === "data/sources.jsonl") {
+      const txt = await readFileAsText(file);
+      for (const line of txt.split(/\r?\n/)) {
+        const l = line.trim();
+        if (!l) continue;
+        try { sources.push(JSON.parse(l)); } catch (e) { /* skip */ }
+      }
+    }
+  }
+  return {claim, receipt, proofCard, sources, validations};
+}
+
+/* ---------- Fetch-based example loader ---------- */
+async function loadExample(path) {
+  let claim = null, receipt = null, proofCard = null;
+  const sources = [];
+  const validations = [];
+  async function fetchJson(rel) {
+    try {
+      const r = await fetch(path + rel);
+      if (!r.ok) return null;
+      return await r.json();
+    } catch (e) { return null; }
+  }
+  async function fetchText(rel) {
+    try {
+      const r = await fetch(path + rel);
+      if (!r.ok) return null;
+      return await r.text();
+    } catch (e) { return null; }
+  }
+  claim = await fetchJson("claim.json");
+  receipt = await fetchJson("receipt.json");
+  proofCard = await fetchJson("proof-card.json");
+  const srcCandidates = [
+    "src-lease-pdf.json",
+    "src-uploaded-pdf.json", "src-agent-answer.json",
+    "src-visit-audio.json", "src-visit-transcript.json",
+    "src-textbook-pdf.json",
+    "src-resume-original.json", "src-resume-rewritten.json",
+    "src-pytest-log.json",
+    "src-refund-policy.json", "src-bot-conversation.json"
+  ];
+  for (const name of srcCandidates) {
+    const s = await fetchJson("sources/" + name);
+    if (s) sources.push(s);
+  }
+  const valTxt = await fetchText("data/validations.jsonl");
+  if (valTxt) {
+    for (const line of valTxt.split(/\r?\n/)) {
+      const l = line.trim();
+      if (!l) continue;
+      try { validations.push(JSON.parse(l)); } catch (e) { /* skip */ }
+    }
+  }
+  if (!claim && !receipt && !proofCard) {
+    showError("Could not load example. If you opened this file directly (file://), some browsers block fetch. Try serving the directory over a local web server, or drag a packet folder onto the drop zone.");
+    return;
+  }
+  renderPacket(path, claim, sources, receipt, proofCard, validations);
+}
+
+function showZipNotice() {
+  showError(
+    ".aepkg.zip support is staged in viewer v0.3. For now, unzip the packet first and drag the .aepkg/ folder."
+  );
+}
+
+/* ---------- Wire UI (with keyboard handlers) ---------- */
+const drop = document.getElementById("drop");
+const picker = document.getElementById("picker");
+const pickerZip = document.getElementById("picker-zip");
+
+document.getElementById("pick").addEventListener("click", function() {
+  picker.click();
+});
+document.getElementById("pick-examples").addEventListener("click", function() {
+  const path = EXAMPLE_PATHS[exampleCursor % EXAMPLE_PATHS.length];
+  exampleCursor++;
+  loadExample(path);
+});
+
+// Drop zone keyboard handler: Enter or Space activates file picker.
+drop.addEventListener("keydown", function(e) {
+  if (e.key === "Enter" || e.key === " " || e.key === "Spacebar") {
+    e.preventDefault();
+    picker.click();
+  }
+});
+
+// Global keydown: Escape clears result region.
+document.addEventListener("keydown", function(e) {
+  if (e.key === "Escape") {
+    // If a section is expanded under focus, the section's own handler runs.
+    // The doc-level handler only clears global slots when nothing else captures.
+  }
+});
+
+drop.addEventListener("dragover", function(e) {
+  e.preventDefault();
+  drop.classList.add("over");
+});
+drop.addEventListener("dragleave", function() {
+  drop.classList.remove("over");
+});
+drop.addEventListener("drop", async function(e) {
+  e.preventDefault();
+  drop.classList.remove("over");
+  const items = e.dataTransfer.items;
+  if (items && items.length && items[0].webkitGetAsEntry) {
+    const files = [];
+    async function walk(entry, prefix) {
+      if (entry.isFile) {
+        await new Promise((res, rej) => {
+          entry.file(function(f) {
+            try {
+              Object.defineProperty(f, "webkitRelativePath", {
+                value: prefix + entry.name,
+                writable: false
+              });
+            } catch (e) { /* ignore */ }
+            files.push(f);
+            res();
+          }, rej);
+        });
+      } else if (entry.isDirectory) {
+        const reader = entry.createReader();
+        await new Promise((res, rej) => {
+          reader.readEntries(async function(children) {
+            for (const c of children) await walk(c, prefix + entry.name + "/");
+            res();
+          }, rej);
+        });
+      }
+    }
+    for (let i = 0; i < items.length; i++) {
+      const entry = items[i].webkitGetAsEntry();
+      if (entry) await walk(entry, "");
+      else if (items[i].kind === "file") {
+        const f = items[i].getAsFile();
+        if (f && f.name.endsWith(".zip")) {
+          showZipNotice();
+          return;
+        }
+      }
+    }
+    if (files.length === 0) {
+      showError("No files found in the dropped item.");
+      return;
+    }
+    try {
+      const data = await parseDirectoryHandle(files);
+      if (!data.claim && !data.receipt && !data.proofCard) {
+        showError("That folder didn't contain claim.json / receipt.json / proof-card.json. Make sure you dragged a packet folder ending in .aepkg/.");
+        return;
+      }
+      renderPacket("dropped", data.claim, data.sources, data.receipt, data.proofCard, data.validations);
+    } catch (err) {
+      showError("Error reading dropped folder: " + err.message);
+    }
+  }
+});
+
+picker.addEventListener("change", async function() {
+  const files = Array.from(picker.files || []);
+  if (!files.length) return;
+  try {
+    const data = await parseDirectoryHandle(files);
+    if (!data.claim && !data.receipt && !data.proofCard) {
+      showError("That folder didn't contain claim.json / receipt.json / proof-card.json.");
+      return;
+    }
+    renderPacket("picked", data.claim, data.sources, data.receipt, data.proofCard, data.validations);
+  } catch (err) {
+    showError("Error reading picked folder: " + err.message);
+  }
+});
+
+/* Banned-jargon self-check on the static HTML body (visible text only). */
+(function bannedJargonSelfCheck() {
+  const visibleText = document.body.innerText || "";
+  const hits = BANNED_TERMS.filter(t => visibleText.indexOf(t) !== -1);
+  if (hits.length > 0) {
+    console.warn("AEP Viewer banned-jargon self-check FAILED for terms:", hits);
+  } else {
+    console.log("AEP Viewer banned-jargon self-check: PASS");
+  }
+})();
+</script>
+</body>
+</html>

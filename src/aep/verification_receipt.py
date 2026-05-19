@@ -1,9 +1,9 @@
 """verification_receipt.py — Apache-2.0 — AEP v0.6.1 verification_receipt_v1.
 
-Implements SP-R8-03 (verification receipt schema) from review cycle.
+Implements SP-R8-03 (verification receipt schema) from knowledge-run-1.
 
 Every call to validate_v0_6 can optionally emit a structured receipt to an
-append-only JSONL log per hash-chained receipt property discipline. Receipts are:
+append-only JSONL log per §41 HCRL discipline. Receipts are:
 
   - append-only (no row mutation)
   - hash-chained (prev_receipt_hash links each receipt to the prior one)

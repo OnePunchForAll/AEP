@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:a2-lesson-kernel:0.1",
+  "title": "AEP v1.1 A2 Lesson Kernel",
+  "description": "v1.1 A2 amendment (STRONGLY PLAUSIBLE × CONTEXT-BOUND PATTERN). Two-agent convergence (scribe + strategist). <=200-token irreducible nucleus that survives context compaction. The kernel is the operator-readable answer to 'if you could only carry one sentence forward, what would it be?'. Composes_with: sec02 truth-tags (kernel inherits parent lesson's tag), v1.0.3 RegexicalCue (kernels MAY be cue-anchored).",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_lesson_id",
+    "kernel_text",
+    "kernel_token_count",
+    "kernel_sha256",
+    "owner_role"
+  ],
+  "properties": {
+    "type": {
+      "const": "LessonKernel"
+    },
+    "schema_version": {
+      "const": "aep-lesson-kernel-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^lk:[a-z0-9][a-z0-9._:-]*$",
+      "description": "Stable kernel id. Recommended: lk:sibling-<N>."
+    },
+    "bound_to_lesson_id": {
+      "type": "string",
+      "description": "Lesson identifier the kernel summarizes (e.g., 'sibling-132').",
+      "maxLength": 256
+    },
+    "kernel_text": {
+      "type": "string",
+      "description": "The kernel itself. MUST be <=200 tokens (validator approximates via 4-char/token heuristic; canonical token counter is operator-config-bound).",
+      "minLength": 10,
+      "maxLength": 1600
+    },
+    "kernel_token_count": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 200,
+      "description": "Token count under the canonical tokenizer. Validator EMITS AEP11_A2_KERNEL_TOO_LARGE if >200."
+    },
+    "kernel_sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "sha256 over UTF-8 bytes of kernel_text. Used for compaction-survival audit."
+    },
+    "owner_role": {
+      "type": "string",
+      "enum": [
+        "strategist","pathfinder","scout","forge","judge","adversary","warden","scribe","curator","visual-judge","diana"
+      ]
+    },
+    "compaction_survival_test_at": {
+      "type": ["string", "null"],
+      "format": "date-time",
+      "description": "Last time the kernel was tested under blind-compaction (operator query without parent lesson loaded)."
+    },
+    "compaction_survival_score_0_to_5": {
+      "type": ["number", "null"],
+      "minimum": 0.0,
+      "maximum": 5.0,
+      "description": "Empirical recall score under blind compaction test. Composes with v1.0.3.1 F14 RubricScore."
+    },
+    "anchored_to_regexical_cue_id": {
+      "type": ["string", "null"],
+      "pattern": "^rxmem:",
+      "description": "Optional. RegexicalCue id this kernel anchors to (kernel-as-recall-payload pattern)."
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "examples": [
+    {
+      "type": "LessonKernel",
+      "schema_version": "aep-lesson-kernel-0.1",
+      "id": "lk:sibling-132",
+      "bound_to_lesson_id": "sibling-132",
+      "kernel_text": "v1.0.3 RegexicalCue HARD-CONDITIONAL: 3 raters got 4.00 / 3.00 / 3.33; root cause = rubric definitional gap on list-valued recall; F14 + A4 backport closes mechanically; F12-F18 stack proceeds as v1.1.",
+      "kernel_token_count": 50,
+      "kernel_sha256": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "owner_role": "scribe",
+      "compaction_survival_test_at": null,
+      "compaction_survival_score_0_to_5": null,
+      "anchored_to_regexical_cue_id": null,
+      "created_at": "2026-05-18T06:05:00Z"
+    }
+  ]
+}

@@ -1,0 +1,689 @@
+{
+  "advised_by": "scout.lamport-null-7a3b9c2d (external-prior-art agent-memory-mgmt) + pathfinder.lamport-60 (4-phase ladder) + judge.lamport-210 (master verdict)",
+  "graph_stats": {
+    "avg_out_degree": 0.3691,
+    "density": 0.000484,
+    "n_edges": 282,
+    "n_nodes": 764
+  },
+  "hits": {
+    "formula": "authority(p)=sum hub(q in BL); hub(p)=sum auth(q in OL); L2-norm",
+    "iterations": 22,
+    "top_authorities": [
+      {
+        "agent": "judge",
+        "authority_score": 0.583236,
+        "invocation": "",
+        "rank": 1,
+        "vec_id": "ledger::judge::lamport-209::anthropic-defeat-judge-100pct-validation-2026-05-15"
+      },
+      {
+        "agent": "forge",
+        "authority_score": 0.498236,
+        "invocation": "",
+        "rank": 2,
+        "vec_id": "ledger::forge::lamport-214::investigation-loop-2-forge-rrf-fusion-build-2026-05-15"
+      },
+      {
+        "agent": "scribe",
+        "authority_score": 0.424581,
+        "invocation": "",
+        "rank": 3,
+        "vec_id": "ledger::scribe::lamport-null-9d3a8b1c4e5f7a2b8c6d0e9f::anthropic-defeat-scribe-sibling-82-2026-05-15"
+      },
+      {
+        "agent": "scout",
+        "authority_score": 0.248215,
+        "invocation": "",
+        "rank": 4,
+        "vec_id": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::external-prior-art-retrieval-architectures-beyond-tfidf-2026-05-15"
+      },
+      {
+        "agent": "adversary",
+        "authority_score": 0.236751,
+        "invocation": "attack tier-2 soft-match precision; 100% recall claim is INFLATED",
+        "rank": 5,
+        "vec_id": "ledger::adversary::lamport-55::anthropic-defeat-adversary-hybrid-tier2-attack-2026-05-15"
+      }
+    ],
+    "top_hubs": [
+      {
+        "agent": "pathfinder",
+        "hub_score": 0.453197,
+        "invocation": "author master plan for all metrics (F1/F2/F4/F6/Lane-B/PDF/memory-mgmt) to >=99%",
+        "rank": 1,
+        "vec_id": "ledger::pathfinder::lamport-61::mega-wave-pathfinder-100-pct-across-the-board-2026-05-15"
+      },
+      {
+        "agent": "scout",
+        "hub_score": 0.4308,
+        "invocation": "external prior-art: agent memory management (11 precedents 3 domains; capability",
+        "rank": 2,
+        "vec_id": "ledger::scout::lamport-null-7a3b9c2d4e8f1a6b5c0d9e8f7a6b5c4d::mega-wave-scout-memory-mgmt-prior-art-2026-05-15"
+      },
+      {
+        "agent": "forge",
+        "hub_score": 0.353619,
+        "invocation": "F6 SELF canonical-resolve + Tier-0 additive lift to falsifier_6_citation_based.p",
+        "rank": 3,
+        "vec_id": "ledger::forge::lamport-216::mega-wave-forge-f6-self-canonical-resolve-2026-05-15"
+      },
+      {
+        "agent": "forge",
+        "hub_score": 0.311498,
+        "invocation": "",
+        "rank": 4,
+        "vec_id": "ledger::forge::lamport-215::mega-wave-forge-memory-mgmt-proof-2026-05-15"
+      },
+      {
+        "agent": "adversary",
+        "hub_score": 0.268561,
+        "invocation": "consolidated pre-mortem loops 2/3/4 + impossible axis; 12 attacks total (4+3+3+2",
+        "rank": 5,
+        "vec_id": "ledger::adversary::lamport-56::loops-2-3-4-adversary-premortem-each-loop-2026-05-15"
+      }
+    ]
+  },
+  "ledger_root": ".claude\\agents\\_ledgers",
+  "loop": "loop-4-pagerank-citegraph-features",
+  "pagerank": {
+    "damping": 0.85,
+    "formula": "PR=(1-d)/N + d*sum(PR(q)/L(q)) + d*dangle/N",
+    "iterations": 10,
+    "l1_residual_final": 7.351627632960853e-07,
+    "top_k": [
+      {
+        "agent": "forge",
+        "invocation": "",
+        "pagerank": 0.00507058,
+        "rank": 1,
+        "vec_id": "ledger::forge::lamport-214::investigation-loop-2-forge-rrf-fusion-build-2026-05-15"
+      },
+      {
+        "agent": "judge",
+        "invocation": "",
+        "pagerank": 0.00415799,
+        "rank": 2,
+        "vec_id": "ledger::judge::lamport-209::anthropic-defeat-judge-100pct-validation-2026-05-15"
+      },
+      {
+        "agent": "forge",
+        "invocation": "",
+        "pagerank": 0.00389504,
+        "rank": 3,
+        "vec_id": "ledger::forge::lamport-213::investigation-loop-1-forge-contextual-prepend-2026-05-15"
+      },
+      {
+        "agent": "adversary",
+        "invocation": "loop-2 deeper pre-mortem on contextual prepending +10.2pp; 5 NEW attack classes ",
+        "pagerank": 0.00354269,
+        "rank": 4,
+        "vec_id": "ledger::adversary::lamport-54::investigation-loop-2-adversary-contextual-premortem-deeper-2026-05-15"
+      },
+      {
+        "agent": "forge",
+        "invocation": "",
+        "pagerank": 0.00352928,
+        "rank": 5,
+        "vec_id": "ledger::forge::lamport-209::standardize-lamport-null-blake2b-spec-sibling-78"
+      },
+      {
+        "agent": "scout",
+        "invocation": "",
+        "pagerank": 0.00346727,
+        "rank": 6,
+        "vec_id": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::final-round-scout-retrieval-arch-2026-05-15"
+      },
+      {
+        "agent": "scout",
+        "invocation": "",
+        "pagerank": 0.00340959,
+        "rank": 7,
+        "vec_id": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::external-prior-art-retrieval-architectures-beyond-tfidf-2026-05-15"
+      },
+      {
+        "agent": "judge",
+        "invocation": "",
+        "pagerank": 0.00338056,
+        "rank": 8,
+        "vec_id": "ledger::judge::lamport-208::final-round-judge-f6-battery-2026-05-15"
+      },
+      {
+        "agent": "judge",
+        "invocation": "",
+        "pagerank": 0.00326226,
+        "rank": 9,
+        "vec_id": "ledger::judge::lamport-206::f6-post-ac1-ac2-audit"
+      },
+      {
+        "agent": "pathfinder",
+        "invocation": "",
+        "pagerank": 0.00312906,
+        "rank": 10,
+        "vec_id": "ledger::pathfinder::lamport-59::closure-surge-pathfinder-g2-ladder-2026-05-15"
+      }
+    ]
+  },
+  "per_agent_top_k": {
+    "adversary": [
+      {
+        "invocation": "loop-2 deeper pre-mortem on contextual prepending +10.2pp; 5 NEW attack classes ",
+        "pagerank": 0.00354269,
+        "vec_id": "ledger::adversary::lamport-54::investigation-loop-2-adversary-contextual-premortem-deeper-2026-05-15"
+      },
+      {
+        "invocation": "attack tier-2 soft-match precision; 100% recall claim is INFLATED",
+        "pagerank": 0.00292512,
+        "vec_id": "ledger::adversary::lamport-55::anthropic-defeat-adversary-hybrid-tier2-attack-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00281775,
+        "vec_id": "ledger::adversary::lamport-51::validate-cite-against-ledger-premortem"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.0020068,
+        "vec_id": "ledger::adversary::lamport-49::kr-5-lag-premortem-attack-classes"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00193616,
+        "vec_id": "ledger::adversary::lamport-53::investigation-loop-1-adversa"
+      },
+      {
+        "invocation": "MED-tail closure: AC3-AC7 + H3-H5 surgical fixes on F6 validator + lamport_null_",
+        "pagerank": 0.00180493,
+        "vec_id": "ledger::adversary::lamport-52::final-round-adversary-close-med-tail-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00178062,
+        "vec_id": "ledger::adversary::lamport-51::validate-cite-against-ledger-pre-mortem"
+      },
+      {
+        "invocation": "pre-mortem: attack classes 7-12 missing from ledger-augmented-generation proposa",
+        "pagerank": 0.00177008,
+        "vec_id": "ledger::adversary::lamport-49::KR-5-LAG-premortem"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00167061,
+        "vec_id": "ledger::adversary::lamport-tier-2-fp::contextual-fp-probe-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::adversary::lamport-1::pre-mortem-p1-notifications-transactional-spine"
+      }
+    ],
+    "curator": [
+      {
+        "invocation": "tier-promotion verdicts: sibling-77 + section-56 per-gate scoring",
+        "pagerank": 0.0018539,
+        "vec_id": "ledger::curator::lamport-null-c01ab53a5f06::max-power-wave-curator-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00162976,
+        "vec_id": "ledger::curator::lamport-null-final-round-c01ab53a5f06::final-tier-promotion-verdicts"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::curator::lamport-57::cross-agent-citation-test-curator"
+      },
+      {
+        "invocation": "final tier-promotion verdicts: sibling-77 + sibling-78 + section-53 + section-56",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::curator::lamport-null-final-round-c01ab53a5f06::final-round-curator-promotions-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00135098,
+        "vec_id": "ledger::curator::lamport-57::cross-agent-citation-test-curator-promote-section-56"
+      },
+      {
+        "invocation": "tier-promotion: teacher (tier 1) -> tier 2",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::curator::lamport-10::marathon-2026-05-06"
+      },
+      {
+        "invocation": "validate: adversary tier-3 promotion criteria",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::curator::lamport-11::marathon-2026-05-06"
+      },
+      {
+        "invocation": "snapshot: 31 prose citations as cites: structured form",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::curator::lamport-12::marathon-2026-05-06"
+      },
+      {
+        "invocation": "validate: scribe + curator tier-3 promotion criteria",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::curator::lamport-13::marathon-2026-05-06"
+      },
+      {
+        "invocation": "tier-promotion: tier-2 -> tier 3",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::curator::lamport-14::marathon-2026-05-06"
+      }
+    ],
+    "forge": [
+      {
+        "invocation": "",
+        "pagerank": 0.00507058,
+        "vec_id": "ledger::forge::lamport-214::investigation-loop-2-forge-rrf-fusion-build-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00389504,
+        "vec_id": "ledger::forge::lamport-213::investigation-loop-1-forge-contextual-prepend-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00352928,
+        "vec_id": "ledger::forge::lamport-209::standardize-lamport-null-blake2b-spec-sibling-78"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00300665,
+        "vec_id": "ledger::forge::lamport-208::cross-agent-citation-test-forge"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00261472,
+        "vec_id": "ledger::forge::lamport-211::final-round-forge-task-aligned-harness-2026-05-15"
+      },
+      {
+        "invocation": "close adversary H1 race + H2 jsondecode-silent-skip on validate_cite_against_led",
+        "pagerank": 0.00244333,
+        "vec_id": "ledger::forge::lamport-210::closure-surge-forge-close-h1-h2-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00228693,
+        "vec_id": "ledger::forge::lamport-212::investigation-loop-1-forge"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00193772,
+        "vec_id": "ledger::forge::lamport-null::v4-g3-oracle-graph-retriever-phase-0-binary-disconfirmer"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00193616,
+        "vec_id": "ledger::forge::lamport-213::investigation-loop-1-forge-co"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.0019017,
+        "vec_id": "ledger::forge::lamport-210::close-h1-h2-validate-cite-against-ledger"
+      }
+    ],
+    "judge": [
+      {
+        "invocation": "",
+        "pagerank": 0.00415799,
+        "vec_id": "ledger::judge::lamport-209::anthropic-defeat-judge-100pct-validation-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00338056,
+        "vec_id": "ledger::judge::lamport-208::final-round-judge-f6-battery-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00326226,
+        "vec_id": "ledger::judge::lamport-206::f6-post-ac1-ac2-audit"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00301264,
+        "vec_id": "ledger::judge::lamport-203::meta-validate-lag-perfection-claims"
+      },
+      {
+        "invocation": "audit F6-cross-agent stale-baseline; verdict BLOCK on circularity_diagnosis",
+        "pagerank": 0.0028852,
+        "vec_id": "ledger::judge::lamport-205::cross-agent-citation-test-judge-rerun-circularity-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00244841,
+        "vec_id": "ledger::judge::lamport-null-1b919890bc56f546b5ba1779::investigation-loop-2-judge-binomial-ci-n141-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00228693,
+        "vec_id": "ledger::judge::lamport-208::final-round-judge-f6-batte"
+      },
+      {
+        "invocation": "audit lamport_null_fallback.py canonical-spec module (5-test matrix)",
+        "pagerank": 0.00210805,
+        "vec_id": "ledger::judge::lamport-207::closure-surge-judge-task-aligned-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00199639,
+        "vec_id": "ledger::judge::lamport-206::max-power-wave-judge-audit-ac1-ac2-f6-post-closure"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00193616,
+        "vec_id": "ledger::judge::lamport-null-f2679de28a50::investigation-loo"
+      }
+    ],
+    "pathfinder": [
+      {
+        "invocation": "",
+        "pagerank": 0.00312906,
+        "vec_id": "ledger::pathfinder::lamport-59::closure-surge-pathfinder-g2-ladder-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00285974,
+        "vec_id": "ledger::pathfinder::lamport-57::section-56-promotion-ladder"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00271508,
+        "vec_id": "ledger::pathfinder::lamport-60::investigation-loop-1-pathfinder-4-phase-retrieval-arch-ladder-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00266111,
+        "vec_id": "ledger::pathfinder::lamport-45::v7-mega-html-plan-decomposed-15-tasks"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00230733,
+        "vec_id": "ledger::pathfinder::lamport-60::investigation-loop-1-pathfinder-4-phase"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00200229,
+        "vec_id": "ledger::pathfinder::lamport-59::g2-detailed-5-step-ladder"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00200081,
+        "vec_id": "ledger::pathfinder::lamport-57::section-56-promotion-ladder-cross-agent"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.0018539,
+        "vec_id": "ledger::pathfinder::lamport-57::cross-agent-citation-test-pathfinder-2026-05-15-section-56-ladder"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.0018539,
+        "vec_id": "ledger::pathfinder::lamport-57::section-56-promotion-ladder-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00182875,
+        "vec_id": "ledger::pathfinder::lamport-59::closure-surge-pathfinder-g2-detailed-ladder"
+      }
+    ],
+    "scout": [
+      {
+        "invocation": "",
+        "pagerank": 0.00346727,
+        "vec_id": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::final-round-scout-retrieval-arch-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00340959,
+        "vec_id": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::external-prior-art-retrieval-architectures-beyond-tfidf-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00265933,
+        "vec_id": "ledger::scout::lamport-null-9ef4b6577f6b::external-prior-art-content-addressable-row-identity"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00228693,
+        "vec_id": "ledger::scout::lamport-null-0f4c5c5e1c30::final-round-scout-retrie"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00218918,
+        "vec_id": "ledger::scout::lamport-null-1cbdbd36acd7::external-prior-art-validation-citation-gold-truth"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00178062,
+        "vec_id": "ledger::scout::lamport-null-content-addressable::external-prior-art-content-addressable-row-identity"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00177277,
+        "vec_id": "ledger::scout::lamport-48::external-prior-art-slug-agnostic-match-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00174849,
+        "vec_id": "ledger::scout::lamport-null-0f4c5c5e1c30::external-prior-art-retrieval-architectures-beyond-tfidf"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00158567,
+        "vec_id": "ledger::scout::lamport-null-0f4c5c5e1c305d1a9943d19c::external-prior-art-retrieval-architectures-14-precedents"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00132703,
+        "vec_id": "ledger::scout::lamport-48::external-prior-art-slug-agnostic-match-bm25-short-doc-precedents"
+      }
+    ],
+    "scribe": [
+      {
+        "invocation": "",
+        "pagerank": 0.00286744,
+        "vec_id": "ledger::scribe::lamport-null-9d3a8b1c4e5f7a2b8c6d0e9f::anthropic-defeat-scribe-sibling-82-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.0026129,
+        "vec_id": "ledger::scribe::lamport-null-8e2f4b3c9a1d5e6f7a8b9c0d::investigation-loop-2-scribe-sibling-81-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00252608,
+        "vec_id": "ledger::scribe::lamport-null-7a8bd00b95a9::sibling-77-composes-with-audit"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00218918,
+        "vec_id": "ledger::scribe::lamport-null-e4f1296ca6e1::sibling-76-candidate-evaluation"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00210089,
+        "vec_id": "ledger::scribe::lamport-null-sibling-83::operator-mega-wave-all-metrics-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00193616,
+        "vec_id": "ledger::scribe::lamport-null-7d9e3f2a1c8b4e5f6a7b8c9d::investigation-loo"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00187705,
+        "vec_id": "ledger::scribe::lamport-null-7d9e3f2a1c8b4e5f6a7b8c9d::investigation-loop-1-scribe-sibling-80"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00163597,
+        "vec_id": "ledger::scribe::lamport-null-a4b7c2d5e8f1a3b6c9d2e5f8::mega-wave-scribe-sibling-83-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00162976,
+        "vec_id": "ledger::scribe::lamport-null-e649044c625b493d334d761c::sibling-79-recall-deferred-variables"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.0015987,
+        "vec_id": "ledger::scribe::lamport-null-7cdc54680ff7::sibling-78-authoring"
+      }
+    ],
+    "strategist": [
+      {
+        "invocation": "",
+        "pagerank": 0.00158987,
+        "vec_id": "ledger::strategist::lamport-1::operator-double-evolution-continue-pivot-canonize"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::strategist::lamport-1::continue-pivot-canonize-evidence-model"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::strategist::lamport-null-2c44915a89bd::investigation-loops-2-3-4-disconfirmer-first-sequence-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.0014348,
+        "vec_id": "ledger::strategist::lamport-null-2c44915a89bd::investigation-loop-1-strategist-sequence-2026-05-15"
+      },
+      {
+        "invocation": "reframe: tier-2 path for remaining scope-lock SPEC test cases",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::strategist::lamport-10::marathon-2026-05-06"
+      },
+      {
+        "invocation": "reframe: tier-2-to-10 marathon strategy continuation",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::strategist::lamport-11::marathon-2026-05-06"
+      },
+      {
+        "invocation": "reframe: ledger amnesty register strategy revisit",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::strategist::lamport-12::marathon-2026-05-06"
+      },
+      {
+        "invocation": "reframe: research artifact YAML frontmatter standardization",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::strategist::lamport-13::marathon-2026-05-06"
+      },
+      {
+        "invocation": "reframe: PROMOTION-LOG vs ledger outcome semantics drift",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::strategist::lamport-14::marathon-2026-05-06"
+      },
+      {
+        "invocation": "tier-promotion: teacher (tier 1) -> tier 2",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::strategist::lamport-15::marathon-2026-05-06"
+      }
+    ],
+    "visual-judge": [
+      {
+        "invocation": "visual-judge: lodestone/2026-05-09-r7-mega-rcdata-class-fix-confirmation",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-10::AEP-V3-COMPLETE-CONVERSION-wave-12"
+      },
+      {
+        "invocation": "visual-judge: lodestone/2026-05-09-r8-empty-state-prelude",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-11::AEP-V4-LODESTONE-DREAM-FORGE-phase-4"
+      },
+      {
+        "invocation": "visual-judge: lodestone/2026-05-09-r9-soul-string-labels-baseline",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-12::AEP-V6-HOLOGRAPHIC-CRUCIBLE-p1-t1"
+      },
+      {
+        "invocation": "visual-judge: lodestone/2026-05-11-f-cloud-dome-1",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-13::AEP-V7-CODEX-BURN-ENFORCEMENT-VISUAL-PERFECTION-2026-05-11"
+      },
+      {
+        "invocation": "visual-judge: lodestone/2026-05-11-f-planet-detail-3",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-14::AEP-V7-CODEX-BURN-ENFORCEMENT-VISUAL-PERFECTION-2026-05-11"
+      },
+      {
+        "invocation": "visual-judge: section-56 promotion ladder visual score APPROVE 8.4/10",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-15::cross-agent-citation-test-visual-judge-2026-05-15"
+      },
+      {
+        "invocation": "visual-judge: lodestone/2026-05-07-r1",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-1::AEP-V0-REALITY-ALIGNMENT-T1-4"
+      },
+      {
+        "invocation": "visual-judge: lodestone/2026-05-07-r2",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-2::AEP-V0-LODESTONE-AMPLIFIED-L7"
+      },
+      {
+        "invocation": "absorb dreamer snapshot-hash reproducibility",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-3::V1-APEX-passive-consolidation"
+      },
+      {
+        "invocation": "visual-judge: lodestone/2026-05-09-r1-active-wake-card-html",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::visual-judge::lamport-4::AEP-V2-HTML-NATIVE-V2A"
+      }
+    ],
+    "warden": [
+      {
+        "invocation": "",
+        "pagerank": 0.00157562,
+        "vec_id": "ledger::warden::lamport-null-4f44b42badb2e897a16c5a60::final-round-warden-full-session-audit-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::warden::lamport-72::f6-cross-agent-integrity-audit-2026-05-15"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::warden::lamport-null-1548b4c1a22c::audit-doctrine-slots-52-53-54-55"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::warden::lamport-null-9b7897f3485e::operator-double-3-warden-doctrine-validation"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00151862,
+        "vec_id": "ledger::warden::lamport-null-ee23bc29c65d::audit-doctrine-slots-52-55-enforceability"
+      },
+      {
+        "invocation": "",
+        "pagerank": 0.00135098,
+        "vec_id": "ledger::warden::lamport-null-e692539f939b::sibling-78-amendment-chain-end-to-end-audit"
+      },
+      {
+        "invocation": "audit: tests/scope-lock structure post-promotion",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::warden::lamport-10::marathon-2026-05-06"
+      },
+      {
+        "invocation": "audit: research artifacts post-marathon (7 files)",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::warden::lamport-11::marathon-2026-05-06"
+      },
+      {
+        "invocation": "audit: 9 agent files consistency post resolution-v1",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::warden::lamport-12::marathon-2026-05-06"
+      },
+      {
+        "invocation": "audit: PROMOTION-LOG (8 entries) sanity",
+        "pagerank": 0.00118334,
+        "vec_id": "ledger::warden::lamport-13::marathon-2026-05-06"
+      }
+    ]
+  }
+}

@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "aep:v1_1:a6-pilot-observation-ttl:0.1",
+  "title": "AEP v1.1 A6 Pilot Observation TTL",
+  "description": "v1.1 A6 amendment (STRONGLY PLAUSIBLE × CONTEXT-BOUND PATTERN). Two-agent convergence (curator-IDEA-5 + adversary-IDEA-6). Was F11a in legion synthesis; split out as independent amendment per HV-6 closure. TTL + auto-action_on_expire on pilot-promoted claims. Forces pilot-to-LANDED re-audit gate. M1 closure: revalidation_evidence_artifact_sha256 MUST be unique per revalidation (anti-ritual-revalidation Goodhart). Composes_with: sec02 truth-tags (PILOT tier semantics), sec73.5 warden-receipts-or-halt.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "type",
+    "schema_version",
+    "id",
+    "bound_to_claim_id",
+    "ttl_ms",
+    "expires_at",
+    "action_on_expire",
+    "decay_function"
+  ],
+  "properties": {
+    "type": {
+      "const": "PilotObservationTTL"
+    },
+    "schema_version": {
+      "const": "aep-pilot-observation-ttl-0.1"
+    },
+    "id": {
+      "type": "string",
+      "pattern": "^pott:[a-z0-9][a-z0-9._:-]*$"
+    },
+    "bound_to_claim_id": {
+      "type": "string",
+      "maxLength": 512
+    },
+    "ttl_ms": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "TTL in milliseconds. Claim-class default per SPEC (NOT author-discretion) per F11 risk mitigation."
+    },
+    "expires_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO-8601 UTC expiration timestamp. Validator-computed from emit_time + ttl_ms."
+    },
+    "action_on_expire": {
+      "type": "string",
+      "enum": ["WARN", "DOWNGRADE", "QUARANTINE", "FALSIFY"],
+      "description": "Action when TTL expires without revalidation. WARN = log only. DOWNGRADE = truth-tag downgraded one tier. QUARANTINE = claim isolated. FALSIFY = treated as falsified."
+    },
+    "decay_function": {
+      "type": "string",
+      "enum": ["SM2_LITE", "EXPO", "LINEAR", "STEP"],
+      "description": "Decay function shape. SM2_LITE inherits v1.0.3 RegexicalCue precedent."
+    },
+    "last_revalidation_event_id": {
+      "type": ["string", "null"],
+      "description": "Reference into ops/events.jsonl. null if no revalidation observed.",
+      "maxLength": 256
+    },
+    "revalidation_evidence_artifact_sha256": {
+      "type": ["string", "null"],
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "description": "M1 CLOSURE: sha256 of the evidence artifact that backed the last revalidation. Validator REJECTS revalidation if this matches a PRIOR revalidation's sha256 (anti-ritual-revalidation Goodhart). Each revalidation MUST present new evidence."
+    },
+    "revalidation_history": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["revalidation_at", "evidence_artifact_sha256", "outcome"],
+        "properties": {
+          "revalidation_at": {"type": "string", "format": "date-time"},
+          "evidence_artifact_sha256": {"type": "string", "pattern": "^sha256:[0-9a-f]{64}$"},
+          "outcome": {"type": "string", "enum": ["PASS", "FAIL", "PARTIAL"]},
+          "rater_quorum_id": {"type": ["string", "null"], "pattern": "^rqa:[a-z0-9][a-z0-9._:-]*:v[0-9]+$"}
+        }
+      },
+      "description": "Append-only history of revalidations. Each entry's evidence_artifact_sha256 MUST be unique (M1 closure)."
+    },
+    "auto_expire_action_fired_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    }
+  },
+  "examples": [
+    {
+      "type": "PilotObservationTTL",
+      "schema_version": "aep-pilot-observation-ttl-0.1",
+      "id": "pott:rxmem-cue-001-pilot",
+      "bound_to_claim_id": "rxmem:cue-001",
+      "ttl_ms": 604800000,
+      "expires_at": "2026-05-25T08:00:00Z",
+      "action_on_expire": "DOWNGRADE",
+      "decay_function": "SM2_LITE",
+      "last_revalidation_event_id": null,
+      "revalidation_evidence_artifact_sha256": null,
+      "revalidation_history": [],
+      "auto_expire_action_fired_at": null
+    }
+  ]
+}
